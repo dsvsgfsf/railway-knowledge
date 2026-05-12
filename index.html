@@ -228,27 +228,17 @@ a { color: inherit; text-decoration: none; }
 
 @media (max-width:768px) {
   :root { --sidebar-w:0px; }
-  /* 手机端侧边栏改为滑出式菜单 */
-  #sidebar { 
-    position: fixed; 
-    left: 0; top: var(--header-h); bottom: 0;
-    width: 280px; 
-    z-index: 200; 
+  #sidebar {
+    position: fixed; left: 0; top: var(--header-h); bottom: 0;
+    width: 280px; z-index: 200;
     transform: translateX(-100%);
     transition: transform 0.3s ease;
-    display: block;
+    display: flex;
   }
   #sidebar.open { transform: translateX(0); }
-  #sidebar-overlay {
-    display: block;
-    position: fixed;
-    top: var(--header-h); left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 199;
-  }
-  #sidebar:not(.open) + #sidebar-overlay { display: none; }
-  /* 手机端顶部菜单按钮 */
   #mobile-menu-btn { display: flex !important; }
+  #sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 150; }
+  #sidebar-overlay.show { display: block; }
   #messages { padding:16px; }
   #input-area { padding:12px 16px 16px; }
   #header .header-badges { display:none; }
@@ -324,7 +314,8 @@ a { color: inherit; text-decoration: none; }
     <span class="badge red">在线</span>
   </div>
 </header>
-<div id="sidebar-overlay" onclick="toggleMobileMenu()" style="display:none;"></div>
+
+<div id="sidebar-overlay" onclick="toggleMobileMenu()"></div>
 <div id="layout">
   <aside id="sidebar">
     <div class="sidebar-section">
@@ -364,15 +355,15 @@ a { color: inherit; text-decoration: none; }
       <a class="quick-link" onclick="quickAsk('推荐适合我当前年级和专业方向的课程书籍')"><span class="ql-icon">📚</span>课程书籍推荐</a>
       <a class="quick-link" onclick="quickAsk('请详细介绍全国各铁路局的招聘条件和要求')"><span class="ql-icon">🏢</span>铁路局招聘</a>
       <a class="quick-link" onclick="openBureauOverview()"><span class="ql-icon">🏛️</span>铁路局详情页</a>
-      <a class="quick-link" href="public/hospital-map.html" target="_blank" style="color:#27ae60;"><span class="ql-icon">🏥</span>体检医院地图</a>
-      <a class="quick-link" href="public/realtime-news.html" target="_blank" style="color:#e74c3c;"><span class="ql-icon">📡</span>实时铁路消息</a>
+      <a class="quick-link" href="/public/hospital-map.html" target="_blank" style="color:#27ae60;"><span class="ql-icon">🏥</span>体检医院地图</a>
+      <a class="quick-link" href="/public/realtime-news.html" target="_blank" style="color:#e74c3c;"><span class="ql-icon">📡</span>实时铁路消息</a>
       <a class="quick-link" href="hljtu-bookshelf.html" target="_blank" style="color:#C8A951;text-decoration:none"><span class="ql-icon">📖</span>教材书架</a>
       <a class="quick-link" onclick="openBookshelfModal()"><span class="ql-icon">📚</span>课程教材查询</a>
-      <a class="quick-link" href="public/feedback.html" target="_blank" style="color:#f0a500;"><span class="ql-icon">💬</span>问题反馈</a>
+      <a class="quick-link" href="/public/feedback.html" target="_blank" style="color:#f0a500;"><span class="ql-icon">💬</span>问题反馈</a>
       <a class="quick-link" onclick="quickAsk('查看题库目录')"><span class="ql-icon">📝</span>模拟考试</a>
-      <a class="quick-link" href="public/railway-exam.html" target="_blank" style="color:#9b59b6;"><span class="ql-icon">📋</span>铁路模拟考试</a>
-      <a class="quick-link" href="public/railway-game.html" target="_blank" style="color:#e74c3c;"><span class="ql-icon">🎮</span>司机模拟驾驶</a>
-      <a class="quick-link" href="public/social.html" target="_blank" style="color:#27ae60;"><span class="ql-icon">💬</span>铁路社交平台</a>
+      <a class="quick-link" href="/public/railway-exam.html" target="_blank" style="color:#9b59b6;"><span class="ql-icon">📋</span>铁路模拟考试</a>
+      <a class="quick-link" href="/public/railway-game.html" target="_blank" style="color:#e74c3c;"><span class="ql-icon">🎮</span>司机模拟驾驶</a>
+      <a class="quick-link" href="/public/social.html" target="_blank" style="color:#27ae60;"><span class="ql-icon">💬</span>铁路社交平台</a>
       <a class="quick-link" onclick="quickAsk('铁路实操演示')"><span class="ql-icon">📺</span>实操演示</a>
       <a class="quick-link" onclick="openVideoLearning()" style="color:#C8A951;"><span class="ql-icon">🎬</span>学习视频库</a>
     </div>
@@ -407,7 +398,7 @@ a { color: inherit; text-decoration: none; }
             <span class="wb-tag" style="cursor:pointer" onclick="quickAsk('推荐适合我当前年级和专业方向的课程书籍')">📚 课程书籍推荐</span>
             <span class="wb-tag" style="cursor:pointer" onclick="quickAsk('铁路局招聘信息')">🏢 铁路局招聘</span>
             <span class="wb-tag" style="cursor:pointer" onclick="quickAsk('查看题库目录')">📚 题库目录</span>
-          <span class="wb-tag" style="cursor:pointer;background:linear-gradient(135deg,#9b59b6,#8e44ad);" onclick="window.open('public/railway-exam.html','铁路模拟考试','width=1200,height=800')">📋 铁路模拟考试</span>
+          <span class="wb-tag" style="cursor:pointer;background:linear-gradient(135deg,#9b59b6,#8e44ad);" onclick="window.open('/public/railway-exam.html','铁路模拟考试','width=1200,height=800')">📋 铁路模拟考试</span>
             <span class="wb-tag" style="cursor:pointer" onclick="quickAsk('铁道概论课程大纲')">📋 课程大纲</span>
             <span class="wb-tag" style="cursor:pointer" onclick="quickAsk('高铁运营最高速度')">🚄 高速铁路</span>
             <span class="wb-tag" style="cursor:pointer;background:linear-gradient(135deg,#e74c3c,#c0392b);" onclick="quickAsk('五步闸操作')">🚂 五步闸操作</span>
@@ -423,8 +414,8 @@ a { color: inherit; text-decoration: none; }
       <div class="disclaimer">💡 回答基于 <span>铁路专业知识语料库</span> 检索 + <span>DeepSeek AI 流式生成</span>，边搜索边显示，如有疑问请以官方教材为准</div>
       <div class="cat-tabs" id="cat-tabs" style="display:none">
         <span class="cat-tab" onclick="quickAsk('推荐适合我当前年级和专业方向的课程书籍')">📚 课程推荐</span>
-        <span class="cat-tab" style="background:linear-gradient(135deg,#27ae60,#2ecc71);color:#fff;" onclick="window.open('public/quiz-bank-v2.html','题库选择','width=1200,height=800')">📚 题库练习</span>
-        <span class="cat-tab" style="background:linear-gradient(135deg,#9b59b6,#8e44ad);color:#fff;" onclick="window.open('public/railway-exam.html','铁路模拟考试','width=1200,height=800')">📋 模拟考试</span>
+        <span class="cat-tab" style="background:linear-gradient(135deg,#27ae60,#2ecc71);color:#fff;" onclick="window.open('/public/quiz-bank-v2.html','题库选择','width=1200,height=800')">📚 题库练习</span>
+        <span class="cat-tab" style="background:linear-gradient(135deg,#9b59b6,#8e44ad);color:#fff;" onclick="window.open('/public/railway-exam.html','铁路模拟考试','width=1200,height=800')">📋 模拟考试</span>
         <span class="cat-tab" onclick="quickAsk('铁路局招聘信息')">🏢 铁路局招聘</span>
         <span class="cat-tab" style="background:#e74c3c;color:#fff;" onclick="quickAsk('五步闸操作')">🚂 五步闸</span>
         <span class="cat-tab" style="background:#2ecc71;color:#fff;" onclick="quickAsk('一次乘务作业标准')">🚄 乘务作业</span>
@@ -1198,7 +1189,7 @@ ${s.campuses.map(c=>'📍 '+c).join('<br>')}
     html += `<p style="font-size:13px;color:#666;line-height:1.7;margin-bottom:12px">覆盖全国31个省份，包括各省份标志性三甲医院，点击医院名称可跳转高德地图导航</p>`;
     html += `<p style="font-size:13px;color:#c0392b;font-weight:600">⚠️ 建议到铁路局指定医院或二甲以上公立医院体检</p>`;
     html += `</div>`;
-    html += `<a href="public/hospital-map.html" target="_blank" style="display:inline-block;padding:12px 24px;background:#003087;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px;margin-top:8px">`;
+    html += `<a href="/public/hospital-map.html" target="_blank" style="display:inline-block;padding:12px 24px;background:#003087;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px;margin-top:8px">`;
     html += `🗺️ 打开体检医院地图</a>`;
     html += `<br><br><div style="font-size:12px;color:#666">按铁路局筛选：哈尔滨局/沈阳局/北京局/太原局/呼和浩特局/郑州局/武汉局/西安局/济南局/上海局/南昌局/广铁集团/成都局/兰州局/青藏集团/乌鲁木齐局</div>`;
     return html;
@@ -1776,12 +1767,12 @@ function showBureauList(){
 
 /* ── 打开铁路局详情总览页 ── */
 window.openBureauOverview = function(){
-  window.open('public/bureaus/index.html', '_blank');
+  window.open('/public/bureaus/index.html', '_blank');
 };
 
 /* ── 打开单个铁路局详情页 ── */
 window.openBureauDetail = function(bureauCode){
-  window.open('public/bureaus/bureau.html?code=' + bureauCode, '_blank');
+  window.open('/public/bureaus/bureau.html?code=' + bureauCode, '_blank');
 };
 
 /* ── 铁路局详细招聘信息 ── */
@@ -1936,36 +1927,43 @@ async function callDeepSeekApi(userMsg){
 
 /* ── API Config ── */
 function loadApiConfig(){
-  try {
-    const saved = localStorage.getItem('railway_api_config');
-    if(saved) Object.assign(state.apiConfig, JSON.parse(saved));
-    document.getElementById('cfg-api-key').value = state.apiConfig.key || '';
-    document.getElementById('cfg-api-url').value = state.apiConfig.url || '';
-    document.getElementById('cfg-model').value = state.apiConfig.model || 'deepseek-chat';
-    if(state.apiConfig.key) setApiStatus('ok','已配置');
-  } catch(e){}
+  const saved = localStorage.getItem('railway_api_config');
+  if(saved){
+    try {
+      const cfg = JSON.parse(saved);
+      state.apiConfig = cfg;
+      document.getElementById('cfg-api-key').value = cfg.key || '';
+      document.getElementById('cfg-api-url').value = cfg.url || 'https://api.deepseek.com/v1/chat/completions';
+      document.getElementById('cfg-model').value = cfg.model || 'deepseek-chat';
+      updateApiStatus();
+    } catch(e) {}
+  }
 }
 
 window.saveApiConfig = function(){
-  state.apiConfig.key = document.getElementById('cfg-api-key').value.trim();
-  state.apiConfig.url = document.getElementById('cfg-api-url').value.trim() || 'https://api.deepseek.com/v1/chat/completions';
-  state.apiConfig.model = document.getElementById('cfg-model').value;
-  localStorage.setItem('railway_api_config', JSON.stringify(state.apiConfig));
-  if(state.apiConfig.key){
-    setApiStatus('loading','测试中...');
-    fetch(state.apiConfig.url, {
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+state.apiConfig.key},
-      body: JSON.stringify({model:state.apiConfig.model, messages:[{role:'user',content:'hi'}], max_tokens:5})
-    }).then(r=>{
-      if(r.ok) { setApiStatus('ok','连接成功 ✓'); showToast('API配置保存成功','success'); }
-      else { setApiStatus('err','连接失败'); showToast('API连接失败，请检查Key和URL','error'); }
-    }).catch(()=>{ setApiStatus('err','网络错误'); showToast('网络错误','error'); });
-  } else {
-    setApiStatus('','未配置');
-    showToast('已保存（未填Key，将仅使用语料库）');
-  }
+  const cfg = {
+    key: document.getElementById('cfg-api-key').value.trim(),
+    url: document.getElementById('cfg-api-url').value.trim() || 'https://api.deepseek.com/v1/chat/completions',
+    model: document.getElementById('cfg-model').value
+  };
+  state.apiConfig = cfg;
+  localStorage.setItem('railway_api_config', JSON.stringify(cfg));
+  updateApiStatus();
+  showToast('API配置已保存！', 'success');
 };
+
+function updateApiStatus(){
+  const key = state.apiConfig.key;
+  const dot = document.querySelector('#api-status .dot');
+  const text = document.getElementById('api-status-text');
+  if(key){
+    dot.className = 'dot ok';
+    text.textContent = '已配置 ✓';
+  } else {
+    dot.className = 'dot';
+    text.textContent = '未配置（仅语料库）';
+  }
+}
 
 function setApiStatus(cls, text){
   const dot = document.querySelector('#api-status .dot');

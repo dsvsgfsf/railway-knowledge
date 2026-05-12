@@ -1,0 +1,28 @@
+{
+  "bureaus": [
+    { "code": "shanghai", "name": "上海局", "tier": 1 },
+    { "code": "guangzhou", "name": "广州局", "tier": 1 },
+    { "code": "beijing", "name": "北京局", "tier": 1 },
+    { "code": "taiyuan", "name": "太原局", "tier": 2 },
+    { "code": "wuhan", "name": "武汉局", "tier": 2 },
+    { "code": "shenyang", "name": "沈阳局", "tier": 2 },
+    { "code": "jinan", "name": "济南局", "tier": 2 },
+    { "code": "zhengzhou", "name": "郑州局", "tier": 2 },
+    { "code": "qingzang", "name": "青藏集团", "tier": 2 },
+    { "code": "wulumuqi", "name": "乌鲁木齐局", "tier": 2 },
+    { "code": "hohhot", "name": "呼和浩特局", "tier": 2 },
+    { "code": "chengdu", "name": "成都局", "tier": 3 },
+    { "code": "lanzhou", "name": "兰州局", "tier": 3 },
+    { "code": "xian", "name": "西安局", "tier": 3 },
+    { "code": "nanchang", "name": "南昌局", "tier": 3 },
+    { "code": "kunming", "name": "昆明局", "tier": 3 },
+    { "code": "harbin", "name": "哈尔滨局", "tier": 3 },
+    { "code": "nanning", "name": "南宁局", "tier": 3 }
+  ],
+  "tiers": [
+    { "tier": 1, "label": "第一梯队", "desc": "全国待遇最优", "salary": "8000-20000元/月", "emoji": "🥇" },
+    { "tier": 2, "label": "第二梯队", "desc": "中高待遇", "salary": "4000-15000元/月", "emoji": "🥈" },
+    { "tier": 3, "label": "第三梯队", "desc": "待遇中等偏下", "salary": "4000-12000元/月", "emoji": "🥉" }
+  ],
+  "lastUpdated": "2026-05-07"
+}

@@ -1,0 +1,30 @@
+{
+  "code": "xian",
+  "name": "中国铁路西安局集团有限公司",
+  "shortName": "西安局",
+  "tier": 3,
+  "tierLabel": "第三梯队",
+  "tierDesc": "待遇中等偏下",
+  "headquarters": "陕西省西安市",
+  "coverage": "陕西省全境及甘肃、内蒙古、山西、河南部分",
+  "mileage": "约5000公里",
+  "lines": ["郑西高铁", "西宝高铁", "西成高铁"],
+  "recruitmentScale": "2500-3000人/年",
+  "competitionRatio": "10:1-20:1",
+  "difficulty": 3,
+  "difficultyLabel": "中等级",
+  "educationPreference": "专科及以上",
+  "juniorCollegeRatio": "约60%",
+  "salary": {
+    "undergraduateMonthly": "5000-6500",
+    "highSpeedDriverMonthly": "9000-13000",
+    "annualBonus": "0.8-1.5万元",
+    "features": ["西成高铁穿越秦岭司机薪资高", "西北铁路枢纽地位重要"]
+  },
+  "benefits": ["五险一金", "宿舍", "工作餐"],
+  "features": ["西北铁路枢纽", "西成高铁穿越秦岭，工程难度世界级", "司机薪资较高", "西安/兰州铁路院校是主要生源"],
+  "departments": ["西安站", "西安北站", "宝鸡站", "西安机务段", "西安动车段"],
+  "checkupSpecial": ["辨色力严格", "山区线路信号工需求大"],
+  "contact": "029-8XXXXXXX",
+  "lastUpdated": "2025-06"
+}

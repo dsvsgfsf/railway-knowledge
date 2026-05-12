@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>铁路招聘体检医院地图 — 黑龙江交通职业技术学院</title>
+  <style>
+    :root {
+      --primary: #003087;
+      --primary-light: #1a4b8c;
+      --accent: #c0392b;
+      --gold: #f0a500;
+      --bg: #f0f2f7;
+      --card: #fff;
+      --text: #1a1a2e;
+      --text-sub: #666;
+      --border: #e0e4ec;
+      --shadow: 0 4px 20px rgba(0,48,135,.1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Microsoft YaHei','PingFang SC',sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, #1565c0 100%);
+      color: #fff;
+      padding: 20px 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.2);
+    }
+    .header h1 { font-size: 22px; margin-bottom: 6px; }
+    .header p { font-size: 13px; opacity: .85; }
+    .header .back-link {
+      display: inline-block;
+      margin-bottom: 12px;
+      color: rgba(255,255,255,.8);
+      text-decoration: none;
+      font-size: 13px;
+    }
+    .header .back-link:hover { color: #fff; }
+    
+    /* Main Layout */
+    .main { display: flex; min-height: calc(100vh - 80px); }
+    
+    /* Sidebar */
+    .sidebar {
+      width: 380px;
+      background: var(--card);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      padding: 16px;
+      max-height: calc(100vh - 80px);
+    }
+    .sidebar-section { margin-bottom: 20px; }
+    .sidebar-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    /* Bureau Filter */
+    .bureau-list { display: flex; flex-direction: column; gap: 6px; max-height: 280px; overflow-y: auto; }
+    .bureau-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all .2s;
+    }
+    .bureau-item:hover { background: #f5f7fa; }
+    .bureau-item.active {
+      border-color: var(--primary);
+      background: rgba(0,48,135,.05);
+    }
+    .bureau-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .bureau-name { font-weight: 600; font-size: 14px; }
+    .bureau-count {
+      margin-left: auto;
+      background: var(--primary);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    
+    /* Hospital List */
+    .hospital-list { display: flex; flex-direction: column; gap: 10px; }
+    .hospital-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .hospital-card:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow);
+      transform: translateY(-2px);
+    }
+    .hospital-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+    .hospital-name {
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--primary);
+      flex: 1;
+    }
+    .hospital-level {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .hospital-level.三级甲等 { background: #e74c3c; color: #fff; }
+    .hospital-level.三级乙等 { background: #f39c12; color: #fff; }
+    .hospital-level.二级甲等 { background: #27ae60; color: #fff; }
+    .hospital-address {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+    .hospital-features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .feature-tag {
+      padding: 2px 6px;
+      background: rgba(0,48,135,.08);
+      color: var(--primary);
+      border-radius: 4px;
+      font-size: 10px;
+    }
+    .hospital-phone {
+      font-size: 11px;
+      color: var(--text-sub);
+      margin-top: 6px;
+    }
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 10px;
+      padding: 8px 14px;
+      background: #11b96a;
+      color: #fff;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background .2s;
+      cursor: pointer;
+      border: none;
+      width: 100%;
+      justify-content: center;
+    }
+    .nav-btn:hover { background: #0da058; }
+    
+    /* Map Container */
+    .map-container {
+      flex: 1;
+      position: relative;
+      background: linear-gradient(135deg, #e8ecf4 0%, #dde3ed 100%);
+    }
+    
+    /* Map placeholder with info */
+    .map-placeholder {
+      width: 100%;
+      height: 100%;
+      min-height: calc(100vh - 80px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #e8ecf4 0%, #dde3ed 100%);
+      padding: 40px;
+    }
+    .map-placeholder h2 {
+      font-size: 28px;
+      color: var(--primary);
+      margin-bottom: 16px;
+    }
+    .map-placeholder p {
+      font-size: 14px;
+      color: var(--text-sub);
+      text-align: center;
+      max-width: 500px;
+      line-height: 1.8;
+    }
+    .map-placeholder .nav-icon {
+      font-size: 80px;
+      margin-bottom: 24px;
+    }
+    
+    /* Medical Standard Card */
+    .standard-card {
+      background: linear-gradient(135deg, var(--primary) 0%, #1565c0 100%);
+      color: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .standard-card h3 {
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    .standard-card ul {
+      font-size: 12px;
+      line-height: 1.8;
+      padding-left: 16px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 900px) {
+      .main { flex-direction: column; }
+      .sidebar { width: 100%; max-height: 50vh; }
+      .map-container { min-height: 50vh; }
+    }
+    
+    /* Search */
+    .search-box {
+      position: relative;
+      margin-bottom: 16px;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      outline: none;
+    }
+    .search-box input:focus {
+      border-color: var(--primary);
+    }
+    
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-sub);
+    }
+    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+    
+    /* Stats bar */
+    .stats-bar {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: rgba(0,48,135,.05);
+      border-radius: 8px;
+      margin-bottom: 12px;
+      font-size: 12px;
+    }
+    .stats-item { text-align: center; }
+    .stats-num { font-size: 18px; font-weight: 700; color: var(--primary); }
+    .stats-label { color: var(--text-sub); }
+    
+    /* Navigation overlay */
+    .nav-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .nav-dialog {
+      background: #fff;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 420px;
+      text-align: center;
+    }
+    .nav-dialog h3 {
+      font-size: 20px;
+      color: var(--primary);
+      margin-bottom: 16px;
+    }
+    .nav-dialog p {
+      color: var(--text-sub);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .nav-dialog .hospital-info {
+      background: #f5f7fa;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .nav-dialog .hospital-info strong {
+      color: var(--primary);
+    }
+    .nav-btn-group {
+      display: flex;
+      gap: 12px;
+    }
+    .nav-btn-group a {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .nav-btn-group .amap-btn {
+      background: #11b96a;
+      color: #fff;
+    }
+    .nav-btn-group .browser-btn {
+      background: var(--primary);
+      color: #fff;
+    }
+    .close-btn {
+      display: block;
+      margin-top: 16px;
+      color: var(--text-sub);
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .close-btn:hover { color: var(--primary); }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <a href="../index.html" class="back-link">← 返回主系统</a>
+  <h1>🏥 铁路招聘体检医院地图</h1>
+  <p>查看各省份标志性二甲以上医院，点击导航到高德地图</p>
+</div>
+
+<div class="main">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <!-- 体检标准 -->
+    <div class="sidebar-section">
+      <div class="standard-card">
+        <h3>📋 铁路招聘体检通用标准</h3>
+        <ul>
+          <li>身高：男性≥168cm，女性≥158cm</li>
+          <li>视力：矫正≥5.0，无色盲色弱</li>
+          <li>血压：90-140/60-90mmHg</li>
+          <li>BMI：18.5-28</li>
+          <li>听力：各频率≤25dB</li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- 统计 -->
+    <div class="sidebar-section">
+      <div class="stats-bar">
+        <div class="stats-item">
+          <div class="stats-num" id="totalProvinces">0</div>
+          <div class="stats-label">省份</div>
+        </div>
+        <div class="stats-item">
+          <div class="stats-num" id="totalHospitals">0</div>
+          <div class="stats-label">医院</div>
+        </div>
+        <div class="stats-item">
+          <div class="stats-num" id="totalBureaus">0</div>
+          <div class="stats-label">铁路局</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 搜索 -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">🔍 搜索医院</div>
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="输入医院名称、省份或地址...">
+      </div>
+    </div>
+    
+    <!-- 铁路局筛选 -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">🚂 按铁路局筛选</div>
+      <div class="bureau-list" id="bureauList"></div>
+    </div>
+    
+    <!-- 医院列表 -->
+    <div class="sidebar-section" style="flex:1; overflow-y: auto;">
+      <div class="sidebar-title">🏥 推荐医院 (<span id="hospitalCount">0</span>家)</div>
+      <div class="hospital-list" id="hospitalList"></div>
+    </div>
+  </div>
+  
+  <!-- Map placeholder -->
+  <div class="map-container">
+    <div class="map-placeholder" id="mapPlaceholder">
+      <div class="nav-icon">🗺️</div>
+      <h2>铁路招聘体检医院分布图</h2>
+      <p>点击左侧列表中的医院名称或"导航"按钮<br>即可跳转至高德地图进行导航</p>
+      <p style="margin-top:12px;color:var(--accent);font-weight:600">
+        ⚠️ 建议到铁路局指定医院或二甲以上公立医院体检
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- 导航对话框 -->
+<div class="nav-overlay" id="navOverlay" style="display:none">
+  <div class="nav-dialog">
+    <h3>🧭 导航到医院</h3>
+    <div class="hospital-info" id="navHospitalInfo">
+      <strong id="navHospitalName"></strong><br>
+      <span id="navHospitalAddress"></span>
+    </div>
+    <p>请选择导航方式：</p>
+    <div class="nav-btn-group">
+      <a id="amapNavBtn" class="amap-btn" href="#" target="_blank">
+        📱 高德地图App
+      </a>
+      <a id="browserNavBtn" class="browser-btn" href="#" target="_blank">
+        🌐 网页版地图
+      </a>
+    </div>
+    <span class="close-btn" onclick="closeNavDialog()">取消</span>
+  </div>
+</div>
+
+<script src="hospital-data.js"></script>
+<script>
+(function(){
+  'use strict';
+  
+  // 铁路局配置
+  const ALL_BUREAUS = [
+    { name: '全部铁路局', color: '#003087', code: 'all' },
+    { name: '上海局', color: '#c0392b', code: '上海局' },
+    { name: '北京局', color: '#e74c3c', code: '北京局' },
+    { name: '广铁集团', color: '#2980b9', code: '广铁集团' },
+    { name: '成都局', color: '#e74c3c', code: '成都局' },
+    { name: '武汉局', color: '#e67e22', code: '武汉局' },
+    { name: '郑州局', color: '#f39c12', code: '郑州局' },
+    { name: '沈阳局', color: '#3498db', code: '沈阳局' },
+    { name: '哈尔滨局', color: '#2980b9', code: '哈尔滨局' },
+    { name: '济南局', color: '#27ae60', code: '济南局' },
+    { name: '太原局', color: '#9b59b6', code: '太原局' },
+    { name: '西安局', color: '#d35400', code: '西安局' },
+    { name: '南昌局', color: '#16a085', code: '南昌局' },
+    { name: '兰州局', color: '#c0392b', code: '兰州局' },
+    { name: '青藏集团', color: '#16a085', code: '青藏集团' },
+    { name: '乌鲁木齐局', color: '#8e44ad', code: '乌鲁木齐局' },
+    { name: '呼和浩特局', color: '#8e44ad', code: '呼和浩特局' }
+  ];
+  
+  let currentBureau = 'all';
+  let currentSearch = '';
+  let allHospitals = [];
+  
+  // 初始化
+  function init() {
+    // 等待DOM加载完成
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', onReady);
+    } else {
+      onReady();
+    }
+  }
+  
+  function onReady() {
+    loadHospitalData();
+    renderBureauList();
+    updateStats();
+    
+    // 绑定搜索事件
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', debounce(filterHospitals, 300));
+    
+    filterHospitals();
+  }
+  
+  // 防抖函数
+  function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+  }
+  
+  // 更新统计数据
+  function updateStats() {
+    const provinces = Object.keys(window.HOSPITAL_DATA.provinces);
+    const bureaus = new Set();
+    
+    allHospitals.forEach(h => bureaus.add(h.railwayBureau));
+    
+    document.getElementById('totalProvinces').textContent = provinces.length;
+    document.getElementById('totalHospitals').textContent = allHospitals.length;
+    document.getElementById('totalBureaus').textContent = bureaus.size;
+  }
+  
+  // 加载医院数据
+  function loadHospitalData() {
+    if (!window.HOSPITAL_DATA) {
+      console.error('Hospital data not loaded!');
+      return;
+    }
+    
+    allHospitals = [];
+    const provinces = window.HOSPITAL_DATA.provinces;
+    
+    for (const [provinceName, data] of Object.entries(provinces)) {
+      for (const hospital of data.hospitals) {
+        allHospitals.push({
+          ...hospital,
+          province: provinceName,
+          railwayBureau: data.railwayBureau
+        });
+      }
+    }
+  }
+  
+  // 渲染铁路局列表
+  function renderBureauList() {
+    const container = document.getElementById('bureauList');
+    let html = '';
+    
+    ALL_BUREAUS.forEach(bureau => {
+      const count = bureau.code === 'all' 
+        ? allHospitals.length 
+        : allHospitals.filter(h => h.railwayBureau === bureau.code).length;
+      
+      const isActive = currentBureau === bureau.code;
+      
+      html += `
+        <div class="bureau-item ${isActive ? 'active' : ''}" 
+             onclick="selectBureau('${bureau.code}')">
+          <div class="bureau-dot" style="background:${bureau.color}"></div>
+          <div class="bureau-name">${bureau.name}</div>
+          <span class="bureau-count">${count}</span>
+        </div>
+      `;
+    });
+    
+    container.innerHTML = html;
+  }
+  
+  // 选择铁路局
+  window.selectBureau = function(code) {
+    currentBureau = code;
+    renderBureauList();
+    filterHospitals();
+  };
+  
+  // 筛选医院
+  function filterHospitals() {
+    currentSearch = document.getElementById('searchInput').value.trim();
+    
+    let filtered = allHospitals;
+    
+    // 按铁路局筛选
+    if (currentBureau !== 'all') {
+      filtered = filtered.filter(h => h.railwayBureau === currentBureau);
+    }
+    
+    // 按搜索词筛选
+    if (currentSearch) {
+      const search = currentSearch.toLowerCase();
+      filtered = filtered.filter(h => 
+        h.name.toLowerCase().includes(search) ||
+        h.province.toLowerCase().includes(search) ||
+        h.address.toLowerCase().includes(search)
+      );
+    }
+    
+    renderHospitalList(filtered);
+  }
+  
+  // 渲染医院列表
+  function renderHospitalList(hospitals) {
+    const container = document.getElementById('hospitalList');
+    const countEl = document.getElementById('hospitalCount');
+    countEl.textContent = hospitals.length;
+    
+    if (hospitals.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="icon">🔍</div>
+          <p>未找到符合条件的医院</p>
+          <p style="font-size:12px;margin-top:8px">试试其他搜索词或筛选条件</p>
+        </div>
+      `;
+      return;
+    }
+    
+    let html = '';
+    hospitals.forEach((hospital, index) => {
+      const bureauInfo = window.HOSPITAL_DATA.bureauRequirements[hospital.railwayBureau];
+      const bureauColor = bureauInfo ? bureauInfo.color : '#666';
+      
+      html += `
+        <div class="hospital-card">
+          <div class="hospital-header">
+            <div class="hospital-name">${hospital.name}</div>
+            <span class="hospital-level ${hospital.level}">${hospital.level}</span>
+          </div>
+          <div class="hospital-address">📍 ${hospital.address}</div>
+          <div style="font-size:11px;color:${bureauColor};margin-bottom:4px">
+            🚂 ${hospital.railwayBureau} | 📌 ${hospital.province}
+          </div>
+          ${hospital.features && hospital.features.length > 0 ? `
+            <div class="hospital-features">
+              ${hospital.features.slice(0, 3).map(f => `<span class="feature-tag">${f}</span>`).join('')}
+            </div>
+          ` : ''}
+          ${hospital.phone ? `<div class="hospital-phone">📞 ${hospital.phone}</div>` : ''}
+          <button class="nav-btn" onclick="navigateToHospital(${index}, ${hospital.lng}, ${hospital.lat}, '${encodeURIComponent(hospital.name)}', '${encodeURIComponent(hospital.address)}')">
+            🧭 导航到高德地图
+          </button>
+        </div>
+      `;
+    });
+    
+    container.innerHTML = html;
+  }
+  
+  // 导航到医院
+  window.navigateToHospital = function(index, lng, lat, name, address) {
+    name = decodeURIComponent(name);
+    address = decodeURIComponent(address);
+    
+    // 显示导航对话框
+    const overlay = document.getElementById('navOverlay');
+    const nameEl = document.getElementById('navHospitalName');
+    const addrEl = document.getElementById('navHospitalAddress');
+    
+    nameEl.textContent = name;
+    addrEl.textContent = address;
+    
+    // 高德地图App链接 (URI协议)
+    const amapUrl = `https://uri.amap.com/navigation?to=${lng},${lat},${encodeURIComponent(name)}&mode=car&callnative=1`;
+    document.getElementById('amapNavBtn').href = amapUrl;
+    
+    // 高德地图网页版链接
+    const browserUrl = `https://ditu.amap.com/search?query=${encodeURIComponent(name)}&city=${encodeURIComponent(address.substring(0, 2))}&lnglat=${lng},${lat}`;
+    document.getElementById('browserNavBtn').href = browserUrl;
+    
+    overlay.style.display = 'flex';
+  };
+  
+  // 关闭导航对话框
+  window.closeNavDialog = function() {
+    document.getElementById('navOverlay').style.display = 'none';
+  };
+  
+  // 点击遮罩层关闭
+  document.getElementById('navOverlay').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeNavDialog();
+    }
+  });
+  
+  // 初始化
+  init();
+})();
+</script>
+
+</body>
+</html>

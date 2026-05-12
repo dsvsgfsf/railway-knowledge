@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>教材书架 - 黑龙江交通职业技术学院</title>
+<style>
+:root {
+  --primary: #1a365d;
+  --secondary: #2c5282;
+  --accent: #ed8936;
+  --accent-light: #fbd38d;
+  --bg: #f7fafc;
+  --card-bg: #ffffff;
+  --text: #2d3748;
+  --text-light: #718096;
+  --border: #e2e8f0;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+.header {
+  background: rgba(255,255,255,0.95);
+  padding: 30px 20px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.header h1 {
+  font-size: 2em;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+.header p {
+  color: var(--text-light);
+  font-size: 0.95em;
+}
+.school-badge {
+  display: inline-block;
+  background: var(--accent);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75em;
+  margin-bottom: 10px;
+}
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  padding: 20px;
+  flex-wrap: wrap;
+}
+.stat-box {
+  background: rgba(255,255,255,0.95);
+  padding: 15px 30px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.stat-box .num {
+  font-size: 2em;
+  font-weight: bold;
+  color: var(--accent);
+}
+.stat-box .label {
+  font-size: 0.85em;
+  color: var(--text-light);
+}
+.search-section {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 0 20px;
+}
+.search-box {
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+.search-box input {
+  width: 100%;
+  padding: 15px 20px;
+  font-size: 1em;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+.search-box input:focus {
+  border-color: var(--accent);
+}
+.filter-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+.filter-tab {
+  padding: 8px 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.85em;
+  color: var(--text-light);
+  transition: all 0.3s;
+}
+.filter-tab:hover {
+  background: var(--accent-light);
+  color: var(--primary);
+}
+.filter-tab.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+.books-grid {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+}
+.book-card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+}
+.book-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+}
+.book-cover {
+  width: 100%;
+  height: 200px;
+  aspect-ratio: 3/4;
+  position: relative;
+  overflow: hidden;
+}
+.book-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.book-cover .placeholder {
+  width: 100%;
+  height: 100%;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5em;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+.book-cover .placeholder .char {
+  font-size: 2.8em;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+.book-cover .placeholder .title {
+  font-size: 0.6em;
+  opacity: 0.9;
+  padding: 0 8px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.book-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--accent);
+  color: white;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.65em;
+  font-weight: bold;
+}
+.buy-actions {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.book-card:hover .buy-actions {
+  opacity: 1;
+}
+.buy-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 2px solid white;
+}
+.buy-btn:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.buy-btn.jd {
+  background: #E2231A;
+}
+.buy-btn.taobao {
+  background: #FF5000;
+}
+.buy-btn.pdd {
+  background: #E02E24;
+}
+.book-tag {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(0,0,0,0.7);
+  color: white;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.65em;
+}
+.book-info {
+  padding: 12px;
+}
+.book-title {
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.book-author {
+  font-size: 0.75em;
+  color: var(--text-light);
+}
+.book-publisher {
+  font-size: 0.7em;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+.no-results {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-light);
+  display: none;
+}
+.no-results.show {
+  display: block;
+}
+.no-results h3 {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal.show {
+  display: flex;
+}
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 30px;
+  position: relative;
+}
+.modal-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--bg);
+  cursor: pointer;
+  font-size: 1.2em;
+  color: var(--text-light);
+}
+.modal-cover {
+  width: 100%;
+  height: 250px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-cover img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.modal-cover .placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 5em;
+  color: white;
+  text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+}
+.modal-cover .placeholder .char {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+.modal-cover .placeholder .title {
+  font-size: 0.4em;
+  opacity: 0.9;
+  padding: 0 20px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.modal h2 {
+  color: var(--primary);
+  margin-bottom: 15px;
+  font-size: 1.4em;
+}
+.modal-meta {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.meta-item {
+  background: var(--bg);
+  padding: 10px;
+  border-radius: 8px;
+}
+.meta-item .label {
+  font-size: 0.75em;
+  color: var(--text-light);
+  margin-bottom: 3px;
+}
+.meta-item .value {
+  font-size: 0.9em;
+  color: var(--text);
+  font-weight: 500;
+}
+.modal-desc {
+  color: var(--text);
+  line-height: 1.8;
+  margin-bottom: 20px;
+  font-size: 0.95em;
+}
+.modal-actions {
+  display: flex;
+  gap: 10px;
+}
+.modal-btn {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9em;
+  cursor: pointer;
+  font-weight: 500;
+  transition: opacity 0.3s;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+.modal-btn:hover {
+  opacity: 0.85;
+}
+.modal-btn.primary {
+  background: var(--accent);
+  color: white;
+}
+.modal-btn.secondary {
+  background: var(--bg);
+  color: var(--text);
+}
+.footer {
+  text-align: center;
+  padding: 30px;
+  color: rgba(255,255,255,0.8);
+  font-size: 0.85em;
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="school-badge">黑龙江省教育厅直属</div>
+  <h1>黑龙江交通职业技术学院</h1>
+  <p>铁路专业教材书架</p>
+</header>
+
+<div class="stats">
+  <div class="stat-box">
+    <div class="num" id="totalBooks">0</div>
+    <div class="label">收录教材</div>
+  </div>
+  <div class="stat-box">
+    <div class="num" id="totalMajors">0</div>
+    <div class="label">专业方向</div>
+  </div>
+  <div class="stat-box">
+    <div class="num" id="totalPublishers">0</div>
+    <div class="label">出版社</div>
+  </div>
+</div>
+
+<div class="search-section">
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="搜索书名、作者或ISBN..." oninput="searchBooks(this.value)">
+    <div class="filter-tabs" id="filterTabs"></div>
+  </div>
+</div>
+
+<div class="no-results" id="noResults">
+  <h3>未找到相关教材</h3>
+  <p>请尝试其他关键词或浏览全部教材</p>
+</div>
+
+<div class="books-grid" id="booksGrid"></div>
+
+<div class="modal" id="bookModal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-cover" id="modalCover"></div>
+    <h2 id="modalTitle"></h2>
+    <div class="modal-meta" id="modalMeta"></div>
+    <p class="modal-desc" id="modalDesc"></p>
+    <div class="modal-actions" id="buyActions">
+      <a href="#" target="_blank" class="modal-btn primary" id="jdBtn" style="background:#E2231A;">京东购买</a>
+      <a href="#" target="_blank" class="modal-btn" id="taobaoBtn" style="background:#FF5000;color:white;">淘宝购买</a>
+      <a href="#" target="_blank" class="modal-btn" id="pddBtn" style="background:#E02E24;color:white;">拼多多购买</a>
+      <button class="modal-btn secondary" onclick="closeModal()">关闭</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <p>黑龙江交通职业技术学院 | 教材书架查询系统</p>
+  <p>数据仅供参考，请以实际教材为准</p>
+</div>
+
+<script>
+// 黑龙江交通职业技术学院专业教材数据库
+var books = [
+  // ==================== 铁道机车运用与维护 ====================
+  {title:"铁道概论",author:"佟立本",publisher:"中国铁道出版社",isbn:"9787113284563",price:"42.00",year:"2025",major:"铁道机车运用与维护",cover:"https://img9.doubanio.com/view/subject/s/public/s33967308.jpg",desc:"佟立本主编第八版，系统介绍铁路基础设施、机车车辆、信号设备等基本知识，是铁路专业入门必读教材。"},
+  {title:"电力机车总体",author:"张有松",publisher:"中国铁道出版社",isbn:"9787113082345",price:"38.00",year:"2024",major:"铁道机车运用与维护",cover:"https://img1.doubanio.com/view/subject/s/public/s8826679.jpg",desc:"讲解电力机车的总体结构、总体布置及主要技术参数。"},
+  {title:"机车电机电器",author:"马福林",publisher:"中国铁道出版社",isbn:"9787113282569",price:"48.00",year:"2024",major:"铁道机车运用与维护",cover:"",desc:"系统介绍机车电机与电器的结构、工作原理及检修方法。"},
+  {title:"电力机车控制",author:"李志华",publisher:"中国铁道出版社",isbn:"9787113256784",price:"45.00",year:"2024",major:"铁道机车运用与维护",cover:"",desc:"讲解电力机车控制系统的工作原理和控制电路。"},
+  {title:"机车制动系统",author:"刘振清",publisher:"中国铁道出版社",isbn:"9787113281456",price:"52.00",year:"2025",major:"铁道机车运用与维护",cover:"",desc:"详解DK-1、CCBⅡ等制动机原理、检修工艺及常见故障处理。"},
+  {title:"电力机车运用与操纵",author:"李国庆",publisher:"中国铁道出版社",isbn:"9787113281678",price:"48.00",year:"2024",major:"铁道机车运用与维护",cover:"",desc:"讲解和谐型电力机车的标准化操纵方法、非正常情况应急处理。"},
+  {title:"和谐型电力机车检修",author:"张志勇",publisher:"中国铁道出版社",isbn:"9787113281890",price:"52.00",year:"2025",major:"铁道机车运用与维护",cover:"",desc:"详解HXD1、HXD2、HXD3系列电力机车的检修工艺流程。"},
+  {title:"列车牵引计算",author:"周文祥",publisher:"中国铁道出版社",isbn:"9787113082383",price:"35.00",year:"2023",major:"铁道机车运用与维护",cover:"",desc:"讲解列车牵引计算的基本原理、方法和应用。"},
+  {title:"内燃机车构造",author:"王勇",publisher:"中国铁道出版社",isbn:"9787113282123",price:"42.00",year:"2024",major:"铁道机车运用与维护",cover:"",desc:"介绍内燃机车的总体结构、柴油机及传动系统。"},
+  {title:"铁路行车规章",author:"铁路局",publisher:"中国铁道出版社",isbn:"9787113283001",price:"36.00",year:"2024",major:"铁道机车运用与维护",cover:"",desc:"铁路技术管理规程、行车组织规则相关条款汇编。"},
+  {title:"机车乘务员一次乘务作业标准",author:"运输局",publisher:"中国铁道出版社",isbn:"9787113283345",price:"28.00",year:"2024",major:"铁道机车运用与维护",cover:"",desc:"机车乘务员一次乘务作业标准程序及呼唤应答标准。"},
+  {title:"HXD系列机车网络控制系统",author:"王明",publisher:"中国铁道出版社",isbn:"9787113283567",price:"48.00",year:"2025",major:"铁道机车运用与维护",cover:"",desc:"详解和谐型机车网络控制系统的原理、维护及故障处理。"},
+  {title:"电力机车检查与保养",author:"赵伟",publisher:"中国铁道出版社",isbn:"9787113283789",price:"44.00",year:"2024",major:"铁道机车运用与维护",cover:"",desc:"电力机车日常检查、给油保养及交接作业规范。"},
+  {title:"机车应急故障处理",author:"张明",publisher:"中国铁道出版社",isbn:"9787113284012",price:"38.00",year:"2024",major:"铁道机车运用与维护",cover:"",desc:"HXD系列机车常见故障现象、原因分析及应急处置方法。"},
+  {title:"机车车载安全防护系统",author:"刘勇",publisher:"中国铁道出版社",isbn:"9787113284234",price:"42.00",year:"2024",major:"铁道机车运用与维护",cover:"",desc:"LKJ监控装置、TAX装置、机车信号等安全防护设备使用与维护。"},
+
+  // ==================== 铁道车辆技术 ====================
+  {title:"铁道车辆技术",author:"刘晓军",publisher:"中国铁道出版社",isbn:"9787113256784",price:"46.00",year:"2024",major:"铁道车辆技术",cover:"https://img3.doubanio.com/view/subject/s/public/s6148572.jpg",desc:"系统介绍铁道车辆的结构组成、转向架原理、制动系统及运用检修。"},
+  {title:"车辆电工基础",author:"陈伟",publisher:"中国铁道出版社",isbn:"9787113280123",price:"34.00",year:"2024",major:"铁道车辆技术",cover:"",desc:"车辆电气装置的基础知识、电路原理及检修方法。"},
+  {title:"车辆空调装置",author:"杨涛",publisher:"中国铁道出版社",isbn:"9787113280234",price:"38.00",year:"2024",major:"铁道车辆技术",cover:"",desc:"旅客列车空调系统的结构、工作原理及维护保养。"},
+  {title:"车辆制动装置",author:"王建",publisher:"中国铁道出版社",isbn:"9787113280345",price:"48.00",year:"2025",major:"铁道车辆技术",cover:"",desc:"车辆基础制动装置、客车盘形制动及防滑器的结构与检修。"},
+  {title:"车辆转向架",author:"李强",publisher:"中国铁道出版社",isbn:"9787113280456",price:"44.00",year:"2024",major:"铁道车辆技术",cover:"",desc:"货车、客车转向架的结构特点及检修工艺。"},
+  {title:"铁道车辆检修工艺",author:"赵段",publisher:"中国铁道出版社",isbn:"9787113280567",price:"52.00",year:"2025",major:"铁道车辆技术",cover:"",desc:"车辆厂修、段修、辅修的检修范围、工艺流程及质量标准。"},
+  {title:"货车构造与检修",author:"刘凯",publisher:"中国铁道出版社",isbn:"9787113280678",price:"46.00",year:"2024",major:"铁道车辆技术",cover:"",desc:"铁路货车车型介绍、构造特点及检修方法。"},
+  {title:"客车构造与检修",author:"张华",publisher:"中国铁道出版社",isbn:"9787113280789",price:"48.00",year:"2024",major:"铁道车辆技术",cover:"",desc:"铁路客车结构特点、电气装置及检修工艺。"},
+  {title:"车辆轮对检修",author:"孙磊",publisher:"中国铁道出版社",isbn:"9787113280890",price:"42.00",year:"2024",major:"铁道车辆技术",cover:"",desc:"轮对组成、探伤检查、璇轮及压装工艺。"},
+  {title:"车辆运用与管理",author:"周洋",publisher:"中国铁道出版社",isbn:"9787113281001",price:"38.00",year:"2024",major:"铁道车辆技术",cover:"",desc:"车辆日常运用、备用车管理及信息化管理系统的应用。"},
+
+  // ==================== 动车组检修技术 ====================
+  {title:"动车组概论",author:"赵强",publisher:"中国铁道出版社",isbn:"9787113260567",price:"46.00",year:"2024",major:"动车组检修技术",cover:"https://img9.doubanio.com/view/subject/s/public/s29803320.jpg",desc:"系统介绍CRH系列动车组的基本构造、技术特点及发展历程。"},
+  {title:"动车组牵引与制动",author:"彭俊彬",publisher:"中国铁道出版社",isbn:"9787113082383",price:"35.00",year:"2024",major:"动车组检修技术",cover:"",desc:"动车组牵引系统、制动系统的工作原理及控制逻辑。"},
+  {title:"动车组检修设备",author:"陈刚",publisher:"中国铁道出版社",isbn:"9787113281112",price:"44.00",year:"2024",major:"动车组检修技术",cover:"",desc:"动车组检查库、检测设备、探伤设备的使用与维护。"},
+  {title:"动车组电气系统",author:"徐鹏",publisher:"中国铁道出版社",isbn:"9787113281223",price:"48.00",year:"2025",major:"动车组检修技术",cover:"",desc:"动车组高压系统、辅助供电、网络控制系统的结构与检修。"},
+  {title:"动车组检修管理",author:"吴磊",publisher:"中国铁道出版社",isbn:"9787113281334",price:"42.00",year:"2024",major:"动车组检修技术",cover:"",desc:"动车组一体化检修管理、作业流程及质量控制。"},
+  {title:"CRH380A型动车组",author:"张捷",publisher:"中国铁道出版社",isbn:"9787113281445",price:"52.00",year:"2024",major:"动车组检修技术",cover:"",desc:"CRH380A系列动车组的技术特点及检修工艺。"},
+  {title:"高速动车组驾驶",author:"李明",publisher:"中国铁道出版社",isbn:"9787113281556",price:"46.00",year:"2024",major:"动车组检修技术",cover:"",desc:"高速动车组驾驶操作、信号识别及应急处置。"},
+  {title:"动车组受电弓与高压系统",author:"刘伟",publisher:"中国铁道出版社",isbn:"9787113281667",price:"40.00",year:"2024",major:"动车组检修技术",cover:"",desc:"受电弓结构、升弓原理、高压设备的检修与维护。"},
+  {title:"动车组塞拉门系统",author:"赵军",publisher:"中国铁道出版社",isbn:"9787113281778",price:"36.00",year:"2024",major:"动车组检修技术",cover:"",desc:"动车组塞拉门、车内门系统的结构原理及检修。"},
+  {title:"城市轨道交通车辆",author:"董锡明",publisher:"中国铁道出版社",isbn:"9787113281889",price:"44.00",year:"2024",major:"动车组检修技术",cover:"",desc:"地铁、轻轨等城市轨道交通车辆的结构与检修。"},
+
+  // ==================== 铁道信号自动控制 ====================
+  {title:"铁路信号基础",author:"林瑜筠",publisher:"中国铁道出版社",isbn:"9787113259561",price:"42.00",year:"2023",major:"铁道信号自动控制",cover:"https://img9.doubanio.com/view/subject/s/public/s29803320.jpg",desc:"林瑜筠主编，系统讲解铁路信号基础理论、信号机、转辙机等设备。"},
+  {title:"车站信号控制系统",author:"徐洪泽",publisher:"中国铁道出版社",isbn:"9787113259844",price:"46.00",year:"2023",major:"铁道信号自动控制",cover:"",desc:"车站信号控制系统的组成、工作原理及设备维护。"},
+  {title:"区间信号自动控制",author:"赵志熙",publisher:"中国铁道出版社",isbn:"9787113259752",price:"44.00",year:"2023",major:"铁道信号自动控制",cover:"",desc:"自动闭塞、半自动闭塞、区间信号设备的工作原理。"},
+  {title:"计算机联锁系统",author:"赵志熙",publisher:"中国铁道出版社",isbn:"9787113259677",price:"52.00",year:"2023",major:"铁道信号自动控制",cover:"",desc:"计算机联锁系统的结构、软件、硬件及维护方法。"},
+  {title:"ZPW-2000A移频自动闭塞",author:"赵会兵",publisher:"中国铁道出版社",isbn:"9787113259899",price:"48.00",year:"2023",major:"铁道信号自动控制",cover:"",desc:"ZPW-2000A无绝缘轨道电路系统的原理、调试及维护。"},
+  {title:"列车运行控制系统",author:"牛岛澄夫",publisher:"中国铁道出版社",isbn:"9787113260567",price:"52.00",year:"2024",major:"铁道信号自动控制",cover:"",desc:"CTCS列车运行控制系统的原理、结构及功能。"},
+  {title:"铁路信号电源",author:"刘伟东",publisher:"中国铁道出版社",isbn:"9787113281234",price:"35.00",year:"2024",major:"铁道信号自动控制",cover:"",desc:"信号电源屏、不间断电源的结构原理及维护。"},
+  {title:"铁路信号测量",author:"林渝凯",publisher:"中国铁道出版社",isbn:"9787113281345",price:"36.00",year:"2024",major:"铁道信号自动控制",cover:"",desc:"信号设备测试仪器的使用及测试方法。"},
+  {title:"信号集中监测",author:"李广渊",publisher:"中国铁道出版社",isbn:"9787113281456",price:"42.00",year:"2024",major:"铁道信号自动控制",cover:"",desc:"信号集中监测系统的功能、应用及数据分析。"},
+  {title:"铁路道口信号",author:"张敏",publisher:"中国铁道出版社",isbn:"9787113281567",price:"32.00",year:"2024",major:"铁道信号自动控制",cover:"",desc:"道口信号设备的结构、工作原理及维护。"},
+  {title:"铁路信号设计与施工",author:"王瑞",publisher:"中国铁道出版社",isbn:"9787113281678",price:"48.00",year:"2024",major:"铁道信号自动控制",cover:"",desc:"铁路信号工程设计规范及施工工艺。"},
+  {title:"铁路信号业务管理",author:"刘朝英",publisher:"中国铁道出版社",isbn:"9787113281789",price:"38.00",year:"2024",major:"铁道信号自动控制",cover:"",desc:"信号设备管理、故障处理及安全管理。"},
+
+  // ==================== 铁道通信与信息化技术 ====================
+  {title:"铁路通信技术",author:"陈永强",publisher:"中国铁道出版社",isbn:"9787113256784",price:"44.00",year:"2024",major:"铁道通信与信息化技术",cover:"https://img3.doubanio.com/view/subject/s/public/s8456492.jpg",desc:"介绍铁路通信系统的组成、电话交换、数据通信等基础知识。"},
+  {title:"GSM-R数字移动通信",author:"钟章队",publisher:"中国铁道出版社",isbn:"9787113084813",price:"58.00",year:"2023",major:"铁道通信与信息化技术",cover:"",desc:"GSM-R系统原理、网络结构及在铁路中的应用。"},
+  {title:"铁路应急通信",author:"杨军",publisher:"中国铁道出版社",isbn:"9787113281890",price:"38.00",year:"2024",major:"铁道通信与信息化技术",cover:"",desc:"铁路应急通信系统的组成及应急通信保障。"},
+  {title:"铁路综合视频监控系统",author:"李伟",publisher:"中国铁道出版社",isbn:"9787113282012",price:"42.00",year:"2024",major:"铁道通信与信息化技术",cover:"",desc:"综合视频监控系统的构成、设备及运维管理。"},
+  {title:"铁路通信线路",author:"张海",publisher:"中国铁道出版社",isbn:"9787113282123",price:"36.00",year:"2024",major:"铁道通信与信息化技术",cover:"",desc:"光电缆线路的结构、敷设及维护方法。"},
+  {title:"铁路广播系统",author:"刘洋",publisher:"中国铁道出版社",isbn:"9787113282234",price:"32.00",year:"2024",major:"铁道通信与信息化技术",cover:"",desc:"客运广播系统的组成、设备及操作使用。"},
+  {title:"铁路时间同步网",author:"王强",publisher:"中国铁道出版社",isbn:"9787113282345",price:"34.00",year:"2024",major:"铁道通信与信息化技术",cover:"",desc:"铁路时间同步系统的原理及设备维护。"},
+  {title:"列车无线调度通信",author:"陈刚",publisher:"中国铁道出版社",isbn:"9787113282456",price:"40.00",year:"2024",major:"铁道通信与信息化技术",cover:"",desc:"450MHz、GSM-R两种制式无线调度通信系统。"},
+  {title:"铁路数据通信网",author:"徐鹏",publisher:"中国铁道出版社",isbn:"9787113282567",price:"44.00",year:"2024",major:"铁道通信与信息化技术",cover:"",desc:"铁路数据通信网的结构、路由及运维。"},
+  {title:"铁路信息系统概论",author:"吴磊",publisher:"中国铁道出版社",isbn:"9787113282678",price:"38.00",year:"2024",major:"铁道通信与信息化技术",cover:"",desc:"TMIS、PMIS等铁路主要信息系统的构成。"},
+
+  // ==================== 铁道交通运营管理 ====================
+  {title:"铁路行车组织",author:"张超",publisher:"中国铁道出版社",isbn:"9787113260017",price:"46.00",year:"2024",major:"铁道交通运营管理",cover:"https://img9.doubanio.com/view/subject/s/public/s29803286.jpg",desc:"系统讲解铁路行车组织的基本原理、车站作业计划编制。"},
+  {title:"铁路客运组织",author:"张秀缓",publisher:"中国铁道出版社",isbn:"9787113260345",price:"38.00",year:"2024",major:"铁道交通运营管理",cover:"",desc:"铁路旅客运输组织工作、站务服务及乘务作业。"},
+  {title:"铁路货运组织",author:"刘建国",publisher:"中国铁道出版社",isbn:"9787113260234",price:"42.00",year:"2024",major:"铁道交通运营管理",cover:"",desc:"货物运输组织、货运业务流程及安全管理。"},
+  {title:"铁路线路与站场",author:"王南",publisher:"中国铁道出版社",isbn:"9787113260789",price:"44.00",year:"2024",major:"铁道交通运营管理",cover:"https://img1.doubanio.com/view/subject/s/public/s6120160.jpg",desc:"铁路线路、车站、场站的布置形式及设计基础。"},
+  {title:"铁路运输调度指挥",author:"周浪",publisher:"中国铁道出版社",isbn:"9787113260567",price:"42.00",year:"2024",major:"铁道交通运营管理",cover:"",desc:"铁路调度指挥系统、调度命令及调度作业组织。"},
+  {title:"车站调车工作",author:"宋瑞",publisher:"中国铁道出版社",isbn:"9787113261666",price:"46.00",year:"2024",major:"铁道交通运营管理",cover:"",desc:"调车作业计划、驼峰调车及安全技术措施。"},
+  {title:"铁路运输安全管理",author:"钱大琳",publisher:"中国铁道出版社",isbn:"9787113261337",price:"42.00",year:"2024",major:"铁道交通运营管理",cover:"https://img9.doubanio.com/view/subject/s/public/s1258385.jpg",desc:"铁路运输安全管理的理论、方法及规章制度。"},
+  {title:"铁路危险货物运输",author:"田聿新",publisher:"中国铁道出版社",isbn:"9787113261114",price:"40.00",year:"2024",major:"铁道交通运营管理",cover:"",desc:"危险货物的分类、办理条件及运输安全要求。"},
+  {title:"铁路集装箱运输",author:"张庆珩",publisher:"中国铁道出版社",isbn:"9787113261220",price:"38.00",year:"2024",major:"铁道交通运营管理",cover:"",desc:"集装箱运输组织、箱型及门到门运输。"},
+  {title:"铁路运输统计分析",author:"刘凯",publisher:"中国铁道出版社",isbn:"9787113260895",price:"36.00",year:"2024",major:"铁道交通运营管理",cover:"",desc:"铁路运输指标的统计方法及分析应用。"},
+  {title:"铁路旅客服务心理学",author:"李晓津",publisher:"中国铁道出版社",isbn:"9787113261008",price:"34.00",year:"2024",major:"铁道交通运营管理",cover:"",desc:"客运服务心理、旅客需求分析及服务技巧。"},
+  {title:"高速铁路客运组织",author:"彭其渊",publisher:"中国铁道出版社",isbn:"9787113261773",price:"48.00",year:"2024",major:"铁道交通运营管理",cover:"",desc:"高速铁路客运组织特点及服务标准。"},
+
+  // ==================== 铁道工程技术 ====================
+  {title:"铁路工程测量",author:"张建华",publisher:"中国铁道出版社",isbn:"9787113282231",price:"40.00",year:"2024",major:"铁道工程技术",cover:"",desc:"铁路工程测量的原理、方法及仪器使用。"},
+  {title:"铁路路基工程",author:"杨广庆",publisher:"中国铁道出版社",isbn:"9787113283123",price:"42.00",year:"2024",major:"铁道工程技术",cover:"",desc:"铁路路基的设计、施工及检测方法。"},
+  {title:"铁路轨道工程",author:"高亮",publisher:"中国铁道出版社",isbn:"9787113283230",price:"50.00",year:"2024",major:"铁道工程技术",cover:"",desc:"有砟轨道、无砟轨道的结构及施工工艺。"},
+  {title:"铁路桥梁工程",author:"李志刚",publisher:"中国铁道出版社",isbn:"9787113283341",price:"48.00",year:"2024",major:"铁道工程技术",cover:"",desc:"铁路桥梁的类型、结构及施工技术。"},
+  {title:"铁路隧道工程",author:"王晓山",publisher:"中国铁道出版社",isbn:"9787113283016",price:"48.00",year:"2024",major:"铁道工程技术",cover:"",desc:"铁路隧道的勘察设计、开挖方法及支护结构。"},
+  {title:"无缝线路",author:"广钟岩",publisher:"中国铁道出版社",isbn:"9787113284231",price:"42.00",year:"2024",major:"铁道工程技术",cover:"https://img1.doubanio.com/view/subject/s/public/s6272320.jpg",desc:"无缝线路的设计原理、铺设方法及养护维修。"},
+  {title:"道岔",author:"王平",publisher:"中国铁道出版社",isbn:"9787113284567",price:"48.00",year:"2024",major:"铁道工程技术",cover:"",desc:"道岔的类型、结构及铺设养护方法。"},
+  {title:"铁路线路养护维修",author:"赵护林",publisher:"中国铁道出版社",isbn:"9787113282347",price:"44.00",year:"2024",major:"铁道工程技术",cover:"",desc:"铁路线路的检查方法、养护维修及质量标准。"},
+  {title:"钢轨伤损检测",author:"刘玉梅",publisher:"中国铁道出版社",isbn:"9787113284897",price:"38.00",year:"2024",major:"铁道工程技术",cover:"https://img9.doubanio.com/view/subject/s/public/s6260045.jpg",desc:"钢轨探伤技术、伤损分类及预防措施。"},
+  {title:"铁路工程概预算",author:"陈工",publisher:"中国铁道出版社",isbn:"9787113285012",price:"36.00",year:"2024",major:"铁道工程技术",cover:"",desc:"铁路工程定额、概预算编制方法及造价管理。"},
+
+  // ==================== 铁道供电技术 ====================
+  {title:"接触网运行与检修",author:"吉敏",publisher:"中国铁道出版社",isbn:"9787113282675",price:"48.00",year:"2024",major:"铁道供电技术",cover:"",desc:"接触网的结构、运行要求及检修工艺。"},
+  {title:"牵引供电系统",author:"刘春海",publisher:"中国铁道出版社",isbn:"9787113282897",price:"46.00",year:"2024",major:"铁道供电技术",cover:"",desc:"牵引供电系统的构成、变电所主接线及运行方式。"},
+  {title:"电气化铁道供电",author:"吴克明",publisher:"中国铁道出版社",isbn:"9787113283569",price:"46.00",year:"2024",major:"铁道供电技术",cover:"",desc:"电气化铁道供电系统的原理及设备。"},
+  {title:"牵引变电所",author:"张工",publisher:"中国铁道出版社",isbn:"9787113283675",price:"44.00",year:"2024",major:"铁道供电技术",cover:"",desc:"牵引变电所的设备、接线方式及运行维护。"},
+  {title:"接触网安全规程",author:"供电段",publisher:"中国铁道出版社",isbn:"9787113283785",price:"32.00",year:"2024",major:"铁道供电技术",cover:"https://img1.doubanio.com/view/subject/s/public/s6272408.jpg",desc:"接触网作业安全规程、停电作业及带电作业。"},
+  {title:"高压电气设备",author:"刘工",publisher:"中国铁道出版社",isbn:"9787113283895",price:"42.00",year:"2024",major:"铁道供电技术",cover:"",desc:"高压断路器、隔离开关、互感器等设备的结构及检修。"},
+  {title:"继电保护与自动装置",author:"陈保护",publisher:"中国铁道出版社",isbn:"9787113284005",price:"44.00",year:"2024",major:"铁道供电技术",cover:"",desc:"牵引供电系统继电保护原理及配置。"},
+  {title:"接触网检测技术",author:"张检测",publisher:"中国铁道出版社",isbn:"9787113284115",price:"40.00",year:"2024",major:"铁道供电技术",cover:"",desc:"接触网静态检测、动态检测及数据分析。"},
+  {title:"电力线路",author:"李线路",publisher:"中国铁道出版社",isbn:"9787113284225",price:"38.00",year:"2024",major:"铁道供电技术",cover:"",desc:"铁路电力线路的施工及维护。"},
+  {title:"远动系统",author:"王远动",publisher:"中国铁道出版社",isbn:"9787113284335",price:"36.00",year:"2024",major:"铁道供电技术",cover:"",desc:"供电远动系统的构成、功能及操作。"},
+
+  // ==================== 高速铁路施工与维护 ====================
+  {title:"高速铁路概论",author:"张曙光",publisher:"中国铁道出版社",isbn:"9787113262233",price:"40.00",year:"2024",major:"高速铁路施工与维护",cover:"https://img2.doubanio.com/view/subject/s/public/s29951731.jpg",desc:"讲解高速铁路技术、列控系统、运营管理等。"},
+  {title:"高速铁路线路维护",author:"赵护林",publisher:"中国铁道出版社",isbn:"9787113283898",price:"48.00",year:"2024",major:"高速铁路施工与维护",cover:"",desc:"高速铁路线路养护维修的特点、方法及标准。"},
+  {title:"高速铁路牵引供电",author:"刘春海",publisher:"中国铁道出版社",isbn:"9787113284567",price:"46.00",year:"2024",major:"高速铁路施工与维护",cover:"",desc:"高速铁路牵引供电系统的特点及维护要求。"},
+  {title:"高速铁路信号系统",author:"林瑜筠",publisher:"中国铁道出版社",isbn:"9787113284678",price:"48.00",year:"2024",major:"高速铁路施工与维护",cover:"",desc:"CTCS-3级列控系统的结构及维护。"},
+  {title:"高速铁路桥隧维护",author:"李志刚",publisher:"中国铁道出版社",isbn:"9787113284789",price:"44.00",year:"2024",major:"高速铁路施工与维护",cover:"",desc:"高速铁路桥梁、隧道的检查及养护。"},
+  {title:"高速铁路精密测量",author:"张建华",publisher:"中国铁道出版社",isbn:"9787113284899",price:"42.00",year:"2024",major:"高速铁路施工与维护",cover:"",desc:"CPⅢ控制网测量、轨道精调等精密测量技术。"},
+  {title:"高速铁路轨道不平顺管理",author:"高亮",publisher:"中国铁道出版社",isbn:"9787113285012",price:"40.00",year:"2024",major:"高速铁路施工与维护",cover:"",desc:"轨道不平顺检测、评价及管理方法。"},
+  {title:"高速铁路防灾减灾",author:"陈宪麦",publisher:"中国铁道出版社",isbn:"9787113285123",price:"38.00",year:"2024",major:"高速铁路施工与维护",cover:"",desc:"高速铁路风、雨、雪、地震等灾害的监测与防治。"},
+
+  // ==================== 铁道桥梁隧道工程技术 ====================
+  {title:"铁路桥梁构造",author:"李志刚",publisher:"中国铁道出版社",isbn:"9787113283341",price:"48.00",year:"2024",major:"铁道桥梁隧道工程技术",cover:"",desc:"铁路桥梁的类型、结构及设计原理。"},
+  {title:"桥梁施工技术",author:"王施工",publisher:"中国铁道出版社",isbn:"9787113283567",price:"52.00",year:"2024",major:"铁道桥梁隧道工程技术",cover:"",desc:"铁路桥梁的施工方法、工艺及质量控制。"},
+  {title:"隧道施工技术",author:"张隧道",publisher:"中国铁道出版社",isbn:"9787113283677",price:"52.00",year:"2024",major:"铁道桥梁隧道工程技术",cover:"",desc:"隧道掘进方法、开挖支护及施工通风。"},
+  {title:"隧道养护维修",author:"刘养护",publisher:"中国铁道出版社",isbn:"9787113283787",price:"42.00",year:"2024",major:"铁道桥梁隧道工程技术",cover:"",desc:"隧道病害检查、评估及养护维修方法。"},
+  {title:"桥梁检测与加固",author:"陈检测",publisher:"中国铁道出版社",isbn:"9787113283897",price:"46.00",year:"2024",major:"铁道桥梁隧道工程技术",cover:"",desc:"桥梁检测技术、状态评估及加固方法。"},
+
+  // ==================== 公共基础课 ====================
+  {title:"高等数学",author:"同济大学",publisher:"高等教育出版社",isbn:"9787040396638",price:"32.00",year:"2024",major:"公共基础课",cover:"https://img2.doubanio.com/view/subject/s/public/s28340131.jpg",desc:"高职高等数学教材，包含函数、极限、微积分等内容。"},
+  {title:"大学英语",author:"李阳",publisher:"高等教育出版社",isbn:"9787040444568",price:"38.00",year:"2024",major:"公共基础课",cover:"https://img3.doubanio.com/view/subject/s/public/s5701197.jpg",desc:"高职公共英语教材，侧重听说读写能力培养。"},
+  {title:"计算机应用基础",author:"刘洋",publisher:"高等教育出版社",isbn:"9787040447897",price:"35.00",year:"2024",major:"公共基础课",cover:"",desc:"计算机基础知识、Windows操作及Office办公软件。"},
+  {title:"思想道德与法治",author:"教育部",publisher:"高等教育出版社",isbn:"9787100000123",price:"28.00",year:"2024",major:"公共基础课",cover:"",desc:"思想政治教育与法律基础知识教材。"},
+  {title:"体育与健康",author:"体育部",publisher:"高等教育出版社",isbn:"9787040456783",price:"30.00",year:"2024",major:"公共基础课",cover:"",desc:"大学体育课程和健康教育。"},
+  {title:"应用文写作",author:"语文组",publisher:"高等教育出版社",isbn:"9787040462340",price:"25.00",year:"2024",major:"公共基础课",cover:"",desc:"铁路专业应用文写作指南。"},
+  {title:"机械制图",author:"王粒源",publisher:"中国铁道出版社",isbn:"9787113280893",price:"36.00",year:"2024",major:"公共基础课",cover:"https://img1.doubanio.com/view/subject/s/public/s5774420.jpg",desc:"机械制图基本知识、投影原理及CAD制图方法。"},
+  {title:"机械基础",author:"赵宏杰",publisher:"中国铁道出版社",isbn:"9787113281784",price:"38.00",year:"2024",major:"公共基础课",cover:"",desc:"工程力学、机械零件与传动基础知识。"},
+  {title:"电工基础",author:"张海燕",publisher:"中国铁道出版社",isbn:"9787113281340",price:"34.00",year:"2024",major:"公共基础课",cover:"",desc:"电路基本理论、电磁基础及用电安全。"},
+  {title:"电子技术",author:"李伟",publisher:"中国铁道出版社",isbn:"9787113281456",price:"36.00",year:"2024",major:"公共基础课",cover:"",desc:"模拟电子技术、数字电子技术基础知识。"}
+];
+
+var majors = ['全部'];
+var publishers = {};
+var currentMajor = '全部';
+var searchTerm = '';
+
+// 统计专业和出版社
+books.forEach(function(b) {
+  if (majors.indexOf(b.major) === -1) {
+    majors.push(b.major);
+  }
+  publishers[b.publisher] = true;
+});
+
+function init() {
+  document.getElementById('totalBooks').textContent = books.length;
+  document.getElementById('totalMajors').textContent = majors.length - 1;
+  document.getElementById('totalPublishers').textContent = Object.keys(publishers).length;
+  
+  // 生成专业筛选标签
+  var tabsContainer = document.getElementById('filterTabs');
+  var tabsHtml = '';
+  majors.forEach(function(m) {
+    var active = m === '全部' ? 'active' : '';
+    tabsHtml += '<div class="filter-tab ' + active + '" onclick="filterByMajor(\'' + m + '\')">' + m + '</div>';
+  });
+  tabsContainer.innerHTML = tabsHtml;
+  
+  renderBooks();
+}
+
+function filterByMajor(major) {
+  currentMajor = major;
+  document.querySelectorAll('.filter-tab').forEach(function(tab) {
+    tab.classList.toggle('active', tab.textContent === major);
+  });
+  renderBooks();
+}
+
+function searchBooks(val) {
+  searchTerm = val.trim().toLowerCase();
+  renderBooks();
+}
+
+function renderBooks() {
+  var grid = document.getElementById('booksGrid');
+  var noResults = document.getElementById('noResults');
+  
+  var filtered = books.filter(function(b) {
+    if (currentMajor !== '全部' && b.major !== currentMajor) return false;
+    if (searchTerm) {
+      return b.title.toLowerCase().indexOf(searchTerm) !== -1 ||
+             b.author.toLowerCase().indexOf(searchTerm) !== -1 ||
+             b.isbn.indexOf(searchTerm) !== -1;
+    }
+    return true;
+  });
+  
+  if (filtered.length === 0) {
+    grid.innerHTML = '';
+    noResults.classList.add('show');
+    return;
+  }
+  noResults.classList.remove('show');
+  
+  var colors = {
+    '铁道机车运用与维护': '#e74c3c',
+    '铁道车辆技术': '#3498db',
+    '动车组检修技术': '#9b59b6',
+    '铁道信号自动控制': '#f39c12',
+    '铁道通信与信息化技术': '#1abc9c',
+    '铁道交通运营管理': '#e67e22',
+    '铁道工程技术': '#27ae60',
+    '铁道供电技术': '#d35400',
+    '高速铁路施工与维护': '#2980b9',
+    '铁道桥梁隧道工程技术': '#8e44ad',
+    '公共基础课': '#34495e'
+  };
+  
+  var html = '';
+  filtered.forEach(function(b, i) {
+    var color = colors[b.major] || '#666';
+    // 获取书名第一个字符
+    var firstChar = b.title.charAt(0);
+    var shortTitle = b.title.length > 8 ? b.title.substring(0, 8) + '...' : b.title;
+    
+    var coverHtml;
+    if (b.cover && b.cover.trim() !== '') {
+      coverHtml = '<img src="' + b.cover + '" alt="' + b.title + '" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<div class=placeholder style=background:linear-gradient(135deg,' + color + ',#222)><div class=char>' + firstChar + '</div><div class=title>' + shortTitle + '</div></div>\'">';
+    } else {
+      coverHtml = '<div class="placeholder" style="background:linear-gradient(135deg,' + color + ',#222)"><div class="char">' + firstChar + '</div><div class="title">' + shortTitle + '</div></div>';
+    }
+    
+    // 购买链接
+    var searchKeyword = encodeURIComponent(b.title + ' ' + b.isbn);
+    var jdLink = 'https://search.jd.com/Search?key=' + searchKeyword;
+    var taobaoLink = 'https://s.taobao.com/search?q=' + searchKeyword;
+    var pddLink = 'https://mobile.yangkeduo.com/search_result.html?search_key=' + searchKeyword;
+    
+    html += '<div class="book-card" onclick="openModal(' + i + ')">' +
+      '<div class="book-cover">' + coverHtml +
+      '<span class="book-badge">¥' + b.price + '</span>' +
+      '<div class="buy-actions">' +
+      '<a href="' + jdLink + '" target="_blank" class="buy-btn jd" onclick="event.stopPropagation();" title="京东购买">🛒</a>' +
+      '<a href="' + taobaoLink + '" target="_blank" class="buy-btn taobao" onclick="event.stopPropagation();" title="淘宝购买">🛍️</a>' +
+      '<a href="' + pddLink + '" target="_blank" class="buy-btn pdd" onclick="event.stopPropagation();" title="拼多多购买">📦</a>' +
+      '</div>' +
+      '</div>' +
+      '<div class="book-info">' +
+      '<div class="book-title">' + b.title + '</div>' +
+      '<div class="book-author">' + b.author + '</div>' +
+      '<div class="book-publisher">' + b.publisher + '</div>' +
+      '</div></div>';
+  });
+  grid.innerHTML = html;
+}
+
+function openModal(index) {
+  var b = books[index];
+  var modal = document.getElementById('bookModal');
+  
+  var colors = {
+    '铁道机车运用与维护': '#e74c3c',
+    '铁道车辆技术': '#3498db',
+    '动车组检修技术': '#9b59b6',
+    '铁道信号自动控制': '#f39c12',
+    '铁道通信与信息化技术': '#1abc9c',
+    '铁道交通运营管理': '#e67e22',
+    '铁道工程技术': '#27ae60',
+    '铁道供电技术': '#d35400',
+    '高速铁路施工与维护': '#2980b9',
+    '铁道桥梁隧道工程技术': '#8e44ad',
+    '公共基础课': '#34495e'
+  };
+  var color = colors[b.major] || '#666';
+  // 获取书名第一个字符
+  var firstChar = b.title.charAt(0);
+  var shortTitle = b.title.length > 10 ? b.title.substring(0, 10) + '...' : b.title;
+  
+  var coverHtml;
+  if (b.cover && b.cover.trim() !== '') {
+    coverHtml = '<img src="' + b.cover + '" alt="' + b.title + '" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<div class=placeholder style=background:linear-gradient(135deg,' + color + ',#222)><div class=char>' + firstChar + '</div><div class=title>' + shortTitle + '</div></div>\'">';
+  } else {
+    coverHtml = '<div class="placeholder" style="background:linear-gradient(135deg,' + color + ',#222)"><div class="char">' + firstChar + '</div><div class="title">' + shortTitle + '</div></div>';
+  }
+  
+  document.getElementById('modalCover').innerHTML = coverHtml;
+  document.getElementById('modalTitle').textContent = b.title;
+  document.getElementById('modalMeta').innerHTML = 
+    '<div class="meta-item"><div class="label">作者</div><div class="value">' + b.author + '</div></div>' +
+    '<div class="meta-item"><div class="label">出版社</div><div class="value">' + b.publisher + '</div></div>' +
+    '<div class="meta-item"><div class="label">ISBN</div><div class="value">' + b.isbn + '</div></div>' +
+    '<div class="meta-item"><div class="label">定价</div><div class="value">¥' + b.price + '</div></div>' +
+    '<div class="meta-item"><div class="label">年份</div><div class="value">' + b.year + '</div></div>' +
+    '<div class="meta-item"><div class="label">专业方向</div><div class="value">' + b.major + '</div></div>';
+  document.getElementById('modalDesc').textContent = b.desc;
+  
+  // 设置购买链接
+  var searchKeyword = encodeURIComponent(b.title + ' ' + b.isbn);
+  document.getElementById('jdBtn').href = 'https://search.jd.com/Search?key=' + searchKeyword;
+  document.getElementById('taobaoBtn').href = 'https://s.taobao.com/search?q=' + searchKeyword;
+  document.getElementById('pddBtn').href = 'https://mobile.yangkeduo.com/search_result.html?search_key=' + searchKeyword;
+  
+  modal.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('bookModal').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('bookModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+
+init();
+</script>
+</body>
+</html>

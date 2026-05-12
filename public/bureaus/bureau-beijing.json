@@ -1,0 +1,30 @@
+{
+  "code": "beijing",
+  "name": "中国铁路北京局集团有限公司",
+  "shortName": "北京局",
+  "tier": 1,
+  "tierLabel": "第一梯队",
+  "tierDesc": "全国待遇最优",
+  "headquarters": "北京市",
+  "coverage": "北京、天津、河北（一市两省）",
+  "mileage": "约1.2万公里",
+  "lines": ["京沪高铁", "京广高铁", "京哈高铁", "京张高铁"],
+  "recruitmentScale": "3000-4000人/年",
+  "competitionRatio": "30:1-50:1",
+  "difficulty": 4,
+  "difficultyLabel": "困难级",
+  "educationPreference": "本科及以上",
+  "juniorCollegeRatio": "约55%",
+  "salary": {
+    "undergraduateMonthly": "7000-10000",
+    "highSpeedDriverMonthly": "12000-18000",
+    "annualBonus": "2-4万元",
+    "features": ["首都优势", "福利完善"]
+  },
+  "benefits": ["六险二金", "首都户籍加分项", "宿舍", "工作餐", "节日福利"],
+  "features": ["首都光环，吸引力大", "首都户籍考生有加分", "非本地生源竞争更激烈"],
+  "departments": ["北京站", "北京西站", "天津站", "石家庄站", "北京机务段", "北京动车段"],
+  "checkupSpecial": ["高铁司机血压要求≤130/85mmHg", "肝功能ALT/AST<40U/L"],
+  "contact": "010-518X XXXX",
+  "lastUpdated": "2025-06"
+}

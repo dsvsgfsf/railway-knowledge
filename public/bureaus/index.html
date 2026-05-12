@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>铁路局总览 - 铁路知识智能查询系统</title>
+<style>
+:root {
+  --primary: #003087;
+  --primary-light: #1a4b8c;
+  --primary-dark: #001e5a;
+  --accent: #c0392b;
+  --accent-light: #e74c3c;
+  --gold: #f0a500;
+  --bg-page: #f0f2f7;
+  --bg-card: #ffffff;
+  --text-main: #1a1a2e;
+  --text-sub: #555;
+  --text-light: #888;
+  --border: #dde3f0;
+  --shadow: 0 4px 20px rgba(0,48,135,.12);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; font-family: 'Microsoft YaHei','PingFang SC',Arial,sans-serif; background: var(--bg-page); color: var(--text-main); }
+a { color: inherit; text-decoration: none; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #edf0f7; }
+::-webkit-scrollbar-thumb { background: #b0bbd8; border-radius: 6px; }
+
+/* Header */
+#header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 68px;
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, var(--primary-light) 100%);
+  display: flex; align-items: center; padding: 0 24px;
+  box-shadow: 0 2px 12px rgba(0,30,90,.4);
+}
+#header .back-btn {
+  display: flex; align-items: center; gap: 8px;
+  color: rgba(255,255,255,.85); font-size: 14px; font-weight: 500;
+  padding: 8px 16px; border-radius: 8px; background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.2); cursor: pointer;
+  transition: all .2s; margin-right: 20px;
+}
+#header .back-btn:hover { background: rgba(255,255,255,.2); }
+#header .logo-area { display: flex; align-items: center; gap: 14px; flex: 1; }
+#header .logo-icon { width: 46px; height: 46px; background: rgba(255,255,255,.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+#header .logo-text h1 { font-size: 18px; font-weight: 700; color: #fff; letter-spacing: .5px; }
+#header .logo-text p { font-size: 11px; color: rgba(255,255,255,.65); margin-top: 2px; }
+
+/* Main */
+#main { max-width: 1200px; margin: 0 auto; padding: 88px 24px 48px; }
+
+/* Hero */
+.hero-section {
+  background: linear-gradient(135deg, var(--primary) 0%, #1565c0 100%);
+  border-radius: var(--radius); padding: 40px; color: #fff; margin-bottom: 32px;
+  position: relative; overflow: hidden;
+}
+.hero-section::before {
+  content: '🚂'; position: absolute; right: 40px; top: 50%; transform: translateY(-50%);
+  font-size: 120px; opacity: .1;
+}
+.hero-section h1 { font-size: 32px; font-weight: 800; margin-bottom: 12px; }
+.hero-section p { font-size: 16px; opacity: .9; max-width: 600px; line-height: 1.7; }
+.hero-stats { display: flex; gap: 32px; margin-top: 24px; }
+.hero-stat { text-align: center; }
+.hero-stat .num { font-size: 28px; font-weight: 800; }
+.hero-stat .label { font-size: 13px; opacity: .8; }
+
+/* Tier Section */
+.tier-section { margin-bottom: 40px; }
+.tier-header {
+  display: flex; align-items: center; gap: 16px; margin-bottom: 20px;
+}
+.tier-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 20px; border-radius: 24px; font-size: 16px; font-weight: 700;
+  color: #fff;
+}
+.tier-1 .tier-badge { background: linear-gradient(135deg, #f0a500, #ff6b6b); }
+.tier-2 .tier-badge { background: linear-gradient(135deg, #0ea5e9, #06b6d4); }
+.tier-3 .tier-badge { background: linear-gradient(135deg, #8b5cf6, #a855f7); }
+.tier-desc { font-size: 14px; color: var(--text-sub); }
+.tier-salary { font-size: 14px; color: var(--text-light); margin-left: auto; }
+
+/* Bureau Grid */
+.bureau-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+.bureau-card {
+  background: var(--bg-card); border-radius: var(--radius); padding: 20px;
+  border: 2px solid var(--border); cursor: pointer; transition: all .2s;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.bureau-card:hover {
+  border-color: var(--primary); box-shadow: var(--shadow); transform: translateY(-2px);
+}
+.bureau-card-header { display: flex; align-items: center; gap: 14px; }
+.bureau-avatar {
+  width: 56px; height: 56px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; flex-shrink: 0;
+}
+.tier-1 .bureau-avatar { background: linear-gradient(135deg, #fff3e0, #ffe0b2); }
+.tier-2 .bureau-avatar { background: linear-gradient(135deg, #e3f2fd, #bbdefb); }
+.tier-3 .bureau-avatar { background: linear-gradient(135deg, #f3e5f5, #e1bee7); }
+
+.bureau-card-info { flex: 1; }
+.bureau-card-name { font-size: 16px; font-weight: 700; color: var(--primary); }
+.bureau-card-location { font-size: 12px; color: var(--text-sub); margin-top: 4px; }
+
+.difficulty-badge {
+  font-size: 12px; padding: 2px 8px; border-radius: 10px; font-weight: 600;
+  background: rgba(192,57,43,.1); color: var(--accent);
+}
+.difficulty-badge.easy { background: rgba(34,197,94,.1); color: #22c55e; }
+.difficulty-badge.medium { background: rgba(234,179,8,.1); color: #ca8a04; }
+.difficulty-badge.hard { background: rgba(192,57,43,.1); color: var(--accent); }
+
+.bureau-card-stats { display: flex; gap: 16px; padding-top: 12px; border-top: 1px solid var(--border); }
+.stat-item { text-align: center; flex: 1; }
+.stat-item .value { font-size: 16px; font-weight: 700; color: var(--primary); }
+.stat-item .label { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+
+.bureau-card-footer { display: flex; justify-content: space-between; align-items: center; }
+.salary-preview { font-size: 14px; font-weight: 600; color: var(--primary); }
+.view-detail { font-size: 13px; color: var(--text-light); display: flex; align-items: center; gap: 4px; }
+.bureau-card:hover .view-detail { color: var(--primary); }
+
+/* Features Tags */
+.bureau-features { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.feature-tag {
+  font-size: 11px; padding: 2px 8px; border-radius: 10px;
+  background: rgba(0,48,135,.06); color: var(--primary);
+  border: 1px solid rgba(0,48,135,.1);
+}
+
+/* Search/Filter */
+.filter-section { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+.filter-tabs { display: flex; gap: 8px; }
+.filter-tab {
+  padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600;
+  border: 2px solid var(--border); background: var(--bg-card); color: var(--text-sub);
+  cursor: pointer; transition: all .2s;
+}
+.filter-tab:hover, .filter-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+/* Footer */
+#footer { text-align: center; padding: 32px 24px; color: var(--text-light); font-size: 12px; }
+
+@media(max-width: 768px) {
+  .bureau-grid { grid-template-columns: 1fr; }
+  .hero-stats { flex-wrap: wrap; gap: 16px; }
+  .filter-section { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+<header id="header">
+  <a href="/index.html" class="back-btn">
+    <span>←</span> 返回系统
+  </a>
+  <div class="logo-area">
+    <div class="logo-icon">🚂</div>
+    <div class="logo-text">
+      <h1>铁路局总览</h1>
+      <p>黑龙江交通职业技术学院 · Railway AI Assistant</p>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <!-- Hero -->
+  <div class="hero-section">
+    <h1>🏛️ 全国18个铁路局详细介绍</h1>
+    <p>点击任意铁路局卡片，查看详细信息，包括薪资待遇、招聘规模、竞争比、体检要求、福利待遇等</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="num">18</div>
+        <div class="label">铁路局</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">3</div>
+        <div class="label">薪资梯队</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">2026</div>
+        <div class="label">最新数据</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">5000+</div>
+        <div class="label">最大年招人</div>
+      </div>
+    </div>
+    <div style="margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap;">
+      <span style="background: rgba(255,255,255,.15); padding: 6px 12px; border-radius: 20px; font-size: 12px;">🥇 第一梯队：上海/广州/北京</span>
+      <span style="background: rgba(255,255,255,.15); padding: 6px 12px; border-radius: 20px; font-size: 12px;">🥈 第二梯队：太原/武汉/沈阳/济南/郑州/青藏/乌鲁木齐/呼和浩特</span>
+      <span style="background: rgba(255,255,255,.15); padding: 6px 12px; border-radius: 20px; font-size: 12px;">🥉 第三梯队：成都/兰州/西安/南昌/昆明/哈尔滨/南宁</span>
+    </div>
+  </div>
+  
+  <!-- Filter -->
+  <div class="filter-section">
+    <div class="filter-tabs" id="filterTabs">
+      <button class="filter-tab active" data-filter="all">全部铁路局</button>
+      <button class="filter-tab" data-filter="1">第一梯队</button>
+      <button class="filter-tab" data-filter="2">第二梯队</button>
+      <button class="filter-tab" data-filter="3">第三梯队</button>
+    </div>
+  </div>
+  
+  <!-- Content -->
+  <div id="bureauContent"></div>
+</main>
+
+<footer id="footer">
+  <p>数据更新时间：2026年5月 | 数据来源：黑龙江交通职业技术学院铁路知识语料库</p>
+  <p><a href="/index.html">返回铁路知识智能查询系统</a></p>
+</footer>
+
+<script>
+// 内嵌所有铁路局数据（无需fetch）
+const BUREAUS_DATA = [
+  {
+    "code": "shanghai",
+    "name": "中国铁路上海局集团有限公司",
+    "shortName": "上海局",
+    "tier": 1,
+    "tierLabel": "第一梯队",
+    "tierDesc": "全国待遇最优",
+    "headquarters": "上海市静安区",
+    "coverage": "上海、江苏、浙江、安徽（一市三省）",
+    "mileage": "约1.3万公里",
+    "lines": ["京沪高铁", "沪宁城际", "沪杭高铁", "沿海铁路", "沪昆高铁"],
+    "annualRevenue": "全国18个铁路局前三",
+    "recruitmentScale": "4000-5000人/年",
+    "competitionRatio": "≥50:1",
+    "difficulty": 5,
+    "difficultyLabel": "地狱级",
+    "educationPreference": "本科及以上",
+    "juniorCollegeRatio": "约60%",
+    "salary": {
+      "undergraduateMonthly": "8000-12000",
+      "highSpeedDriverMonthly": "15000-20000",
+      "annualBonus": "2-5万元",
+      "features": ["全国最高薪资", "年终奖丰厚"]
+    },
+    "benefits": ["六险二金", "工作餐", "免费通勤票", "节日福利", "职工宿舍"],
+    "features": ["学历要求相对较高", "211/985毕业生竞争激烈", "专科生需专业极对口+有实习经历"],
+    "departments": ["上海站", "南京站", "杭州站", "合肥站", "上海机务段", "南京东机辆段", "上海动车段", "上海高铁基础设施段"],
+    "checkupSpecial": ["高铁司机血压要求≤130/85mmHg", "辨色力严格"],
+    "contact": "021-5122XXXX",
+    "lastUpdated": "2025-06"
+  },
+  {
+    "code": "guangzhou",
+    "name": "中国铁路广州局集团有限公司",
+    "shortName": "广州局",
+    "tier": 1,
+    "tierLabel": "第一梯队",
+    "tierDesc": "全国待遇最优",
+    "headquarters": "广东省广州市",
+    "coverage": "广东、湖南、海南三省",
+    "mileage": "约1.1万公里",
+    "lines": ["京广高铁", "广深港高铁", "沪昆高铁", "粤港澳大湾区城际铁路"],
+    "recruitmentScale": "3000-4000人/年",
+    "competitionRatio": "≥50:1",
+    "difficulty": 5,
+    "difficultyLabel": "地狱级",
+    "educationPreference": "本科及以上",
+    "juniorCollegeRatio": "约65%",
+    "salary": {
+      "undergraduateMonthly": "7000-11000",
+      "highSpeedDriverMonthly": "12000-18000",
+      "annualBonus": "2-4万元",
+      "features": ["珠三角经济发达", "高温补贴特色"]
+    },
+    "benefits": ["六险二金", "高温补贴", "工作餐", "宿舍"],
+    "features": ["珠三角经济发达，吸引力极强", "招聘专业广", "机车/车辆/运输类均有机会"],
+    "departments": ["广州站", "长沙站", "广九客运段", "广州机务段", "长沙动车段", "广州车辆段"],
+    "checkupSpecial": ["辨色力非常严格", "夏季高温需心血管稳定"],
+    "contact": "020-1234XXXX",
+    "lastUpdated": "2025-06"
+  },
+  {
+    "code": "beijing",
+    "name": "中国铁路北京局集团有限公司",
+    "shortName": "北京局",
+    "tier": 1,
+    "tierLabel": "第一梯队",
+    "tierDesc": "全国待遇最优",
+    "headquarters": "北京市",
+    "coverage": "北京、天津、河北（一市两省）",
+    "mileage": "约1.2万公里",
+    "lines": ["京沪高铁", "京广高铁", "京哈高铁", "京张高铁"],
+    "recruitmentScale": "3000-4000人/年",
+    "competitionRatio": "30:1-50:1",
+    "difficulty": 4,
+    "difficultyLabel": "困难级",
+    "educationPreference": "本科及以上",
+    "juniorCollegeRatio": "约55%",
+    "salary": {
+      "undergraduateMonthly": "7000-10000",
+      "highSpeedDriverMonthly": "12000-18000",
+      "annualBonus": "2-4万元",
+      "features": ["首都优势", "福利完善"]
+    },
+    "benefits": ["六险二金", "首都户籍加分项", "宿舍", "工作餐", "节日福利"],
+    "features": ["首都光环，吸引力大", "首都户籍考生有加分", "非本地生源竞争更激烈"],
+    "departments": ["北京站", "北京西站", "天津站", "石家庄站", "北京机务段", "北京动车段"],
+    "checkupSpecial": ["高铁司机血压要求≤130/85mmHg", "肝功能ALT/AST<40U/L"],
+    "contact": "010-518X XXXX",
+    "lastUpdated": "2025-06"
+  },
+  {
+    "code": "taiyuan",
+    "name": "中国铁路太原局集团有限公司",
+    "shortName": "太原局",
+    "tier": 2,
+    "tierLabel": "第二梯队",
+    "tierDesc": "中高待遇",
+    "headquarters": "山西省太原市",
+    "coverage": "山西省全境及陕西、内蒙古部分",
+    "mileage": "约5500公里",
+    "lines": ["大秦铁路（世界最繁忙重载铁路）", "石太线", "同蒲线"],
+    "recruitmentScale": "约2000人/年",
+    "competitionRatio": "20:1-50:1",
+    "difficulty": 4,
+    "difficultyLabel": "困难级",
+    "educationPreference": "专科及以上",
+    "juniorCollegeRatio": "约70%",
+    "salary": {
+      "undergraduateMonthly": "6500-8000",
+      "highSpeedDriverMonthly": "10000-13000",
+      "heavyLoadDriverMonthly": "15000-20000",
+      "annualBonus": "1-3万元",
+      "features": ["大秦线重载司机薪资全国顶尖"]
+    },
+    "benefits": ["五险一金", "工作餐", "宿舍", "煤炭经济复苏待遇提升"],
+    "features": ["专科机会多", "大秦线重载司机薪资全国顶尖", "工作强度大（重载列车）"],
+    "departments": ["太原站", "大同站", "太原机务段", "大秦铁路运输段"],
+    "checkupSpecial": ["重载司机需较强体能", "血压要求稳定"],
+    "contact": "0351-26XXXXX",
+    "lastUpdated": "2025-06"
+  },
+  {
+    "code": "wuhan",
+    "name": "中国铁路武汉局集团有限公司",
+    "shortName": "武汉局",
+    "tier": 2,
+    "tierLabel": "第二梯队",
+    "tierDesc": "中高待遇",
+    "headquarters": "湖北省武汉市",
+    "coverage": "湖北省全境及河南省、安徽省部分",
+    "mileage": "约6000公里",
+    "lines": ["京广高铁", "汉十高铁", "武九线"],
+    "recruitmentScale": "2500-3000人/年",
+    "competitionRatio": "15:1-30:1",
+    "difficulty": 3,
+    "difficultyLabel": "中等级",
+    "educationPreference": "专科及以上",
+    "juniorCollegeRatio": "约55%",
+    "salary": {
+      "undergraduateMonthly": "5500-7500",
+      "highSpeedDriverMonthly": "10000-15000",
+      "annualBonus": "1-3万元",
+      "features": ["九省通衢线路发达", "武汉铁路职院学生机会多"]
+    },
+    "benefits": ["五险一金", "宿舍", "工作餐", "节日福利"],
+    "features": ["九省通衢，线路发达", "武汉铁路职业技术学院学生机会较多"],
+    "departments": ["武汉站", "武昌站", "汉口站", "武汉机务段", "武汉动车段"],
+    "checkupSpecial": ["辨色力严格（信号工必查）"],
+    "contact": "027-511XXXXX",
+    "lastUpdated": "2025-06"
+  },
+  {
+    "code": "shenyang",
+    "name": "中国铁路沈阳局集团有限公司",
+    "shortName": "沈阳局",
+    "tier": 2,
+    "tierLabel": "第二梯队",
+    "tierDesc": "中高待遇",
+    "headquarters": "辽宁省沈阳市",
+    "coverage": "辽宁、吉林、黑龙江（一省两区）及内蒙古东部",
+    "mileage": "约1.3万公里（全国最多）",
+    "lines": ["京哈铁路", "哈大高铁", "沈山线"],
+    "recruitmentScale": "约4000人/年（全国最多之一）",
+    "competitionRatio": "10:1-30:1",
+    "difficulty": 3,
+    "difficultyLabel": "中等级",
+    "educationPreference": "专科及以上",
+    "juniorCollegeRatio": "约60%",
+    "salary": {
+      "undergraduateMonthly": "5000-7000",
+      "highSpeedDriverMonthly": "9000-13000",
+      "annualBonus": "1-2万元",
+      "features": ["管辖里程全国第一", "严寒补贴保障"]
+    },
+    "benefits": ["五险一金", "宿舍", "工作餐", "严寒补贴"],
+    "features": ["冬季严寒，需适应低温作业", "管辖里程全国第一", "站段数量多，招聘需求大", "专科生机会多"],
+    "departments": ["沈阳站", "大连站", "长春站", "哈尔滨站", "沈阳机务段", "沈阳动车段"],
+    "checkupSpecial": ["血红蛋白男≥140g/L（冬训期需更高）", "心电图寒冷气候适应性评估", "辨色力严格（信号工必查）"],
+    "contact": "024-620XXXXX",
+    "lastUpdated": "2025-06"
+  },
+  {
+    "code": "jinan",
+    "name": "中国铁路济南局集团有限公司",
+    "shortName": "济南局",
+    "tier": 2,
+    "tierLabel": "第二梯队",
+    "tierDesc": "中高待遇",
+    "headquarters": "山东省济南市",
+    "coverage": "山东省全境",
+    "mileage": "约6000公里",
+    "lines": ["京沪高铁", "胶济客专", "青荣城际"],
+    "recruitmentScale": "2000-2500人/年",
+    "competitionRatio": "10:1-25:1",
+    "difficulty": 3,
+    "difficultyLabel": "中等级",
+    "educationPreference": "专科及以上",
+    "juniorCollegeRatio": "约65%",
+    "salary": {
+      "undergraduateMonthly": "5500-7000",
+      "highSpeedDriverMonthly": "9000-13000",
+      "annualBonus": "1-2万元",
+      "features": ["山东地区经济发达", "胶东半岛福利完善"]
+    },
+    "benefits": ["五险一金", "山东地区经济较好，福利体系完善"],
+    "features": ["山东省生源优先", "专科机会较多", "济铁职院学生有优势"],
+    "departments": ["济南站", "青岛站", "济宁站", "济南机务段", "济南动车段"],
+    "checkupSpecial": ["矫正视力≥5.0", "辨色力严格"],
+    "contact": "0531-824XXXXX",
+    "lastUpdated": "2025-06"
+  },
+  {
+    "code": "zhengzhou",
+    "name": "中国铁路郑州局集团有限公司",
+    "shortName": "郑州局",
+    "tier": 2,
+    "tierLabel": "第二梯队",
+    "tierDesc": "中高待遇",
+    "headquarters": "河南省郑州市",
+    "coverage": "河南省全境及山西、安徽、山东部分",
+    "mileage": "约5000公里",
+    "lines": ["京广高铁", "陇海铁路（东西主干线）", "郑徐高铁"],
+    "recruitmentScale": "3000-3500人/年",
+    "competitionRatio": "15:1-30:1",
+    "difficulty": 3,
+    "difficultyLabel": "中等级",
+    "educationPreference": "专科及以上",
+    "juniorCollegeRatio": "约60%",
+    "salary": {
+      "undergraduateMonthly": "5500-7000",
+      "highSpeedDriverMonthly": "9000-14000",
+      "annualBonus": "1-2万元",
+      "features": ["中国铁路\"心脏\"地位", "郑州北站亚洲最大编组站"]
+    },
+    "benefits": ["五险一金", "宿舍", "工作餐"],
+    "features": ["中国铁路\"心脏\"", "郑州北站是亚洲最大编组站", "高铁/动车司机需求大"],
+    "departments": ["郑州站", "郑州东站", "洛阳站", "郑州机务段", "郑州动车段"],
+    "checkupSpecial": ["辨色力严格", "信号/车务/机务类需求大"],
+    "contact": "0371-683XXXXX",
+    "lastUpdated": "2025-06"
+  },
+  {
+    "code": "qingzang",
+    "name": "中国铁路青藏集团有限公司",
+    "shortName": "青藏集团",
+    "tier": 2,
+    "tierLabel": "第二梯队",
+    "tierDesc": "中高待遇（含高原补贴）",
+    "headquarters": "青海省西宁市",
+    "coverage": "青海省、西藏自治区",
+    "mileage": "高原铁路网络",
+    "lines": ["青藏铁路（世界上海拔最高、线路最长的高原铁路）", "拉林铁路"],
+    "altitude": "线路平均海拔4000-5000m，最高点唐古拉山口5072m",
+    "recruitmentScale": "约603人/年",
+    "competitionRatio": "3:1-8:1",
+    "difficulty": 1,
+    "difficultyLabel": "容易级",
+    "educationPreference": "本科及以上",
+    "juniorCollegeRatio": "约40%",
+    "salary": {
+      "undergraduateMonthly": "5000-7000",
+      "withSubsidyMonthly": "7500-11000",
+      "highSpeedDriverMonthly": "10000-15000（含高原补贴）",
+      "subsidies": {
+        "plateauAllowance": "1500-4000元/月"
+      },
+      "annualBonus": "0.5-1.5万元",
+      "features": ["高原补贴后收入可观"]
+    },
+    "benefits": ["免费宿舍", "高原休假制度", "免费医疗", "艰苦地区补贴"],
+    "features": ["世界上海拔最高的铁路局", "高原休假制度", "免费医疗保障"],
+    "departments": ["西宁站", "拉萨站", "格尔木站", "青藏铁路运输段"],
+    "checkupSpecial": ["血红蛋白男≥150g/L，女≥140g/L", "血氧饱和度≥95%", "心电图必须正常", "肺功能FVC≥80%预计值", "高原适应性体检"],
+    "medicalNote": "高原适应性体检为必查项目，包括血红蛋白、心电图、肺功能、血氧饱和度",
+    "contact": "0971-7XXXXXXX",
+    "lastUpdated": "2025-06"
+  },
+  {
+    "code": "wulumuqi",
+    "name": "中国铁路乌鲁木齐局集团有限公司",
+    "shortName": "乌鲁木齐局",
+    "tier": 2,
+    "tierLabel": "第二梯队",
+    "tierDesc": "中高待遇（含边疆补贴）",
+    "headquarters": "新疆乌鲁木齐市",
+    "coverage": "新疆全境（全国铁路网西北末端）",
+    "mileage": "新疆铁路网络",
+    "lines": ["兰新高铁（乌哈段）", "南疆铁路"],
+    "establishedDate": "1958年10月25日",
+    "recruitmentScale": "约745人/年",
+    "competitionRatio": "5:1-12:1",
+    "difficulty": 2,
+    "difficultyLabel": "较易级",
+    "educationPreference": "本科及以上",
+    "juniorCollegeRatio": "约30%",
+    "salary": {
+      "undergraduateMonthly": "4500-6500",
+      "withSubsidyMonthly": "7000-9000",
+      "highSpeedDriverMonthly": "9000-14000（含边疆补贴）",
+      "subsidies": {
+        "borderAllowance": "800-2000元/月"
+      },
+      "annualBonus": "0.5-1.5万元",
+      "features": ["边疆补贴800-2000元/月", "新疆战略地位重要"]
+    },
+    "benefits": ["边疆补贴", "艰苦地区津贴", "宿舍"],
+    "features": ["新疆战略地位重要", "铁路发展迅速", "边疆补贴后实际收入可观"],
+    "departments": ["乌鲁木齐站", "乌鲁木齐南站", "喀什站", "乌鲁木齐机务段"],
+    "checkupSpecial": ["高原/高海拔适应", "辨色力严格", "纹身严格（客运/乘务岗位）"],
+    "contact": "0991-7XXXXXXX",
+    "lastUpdated": "2025-06"
+  },
+  {
+    "code": "hohhot",
+    "name": "中国铁路呼和浩特局集团有限公司",
+    "shortName": "呼和浩特局",
+    "tier": 2,
+    "tierLabel": "第二梯队",
+    "tierDesc": "中高待遇（含边疆补贴）",
+    "headquarters": "内蒙古自治区呼和浩特市",
+    "coverage": "内蒙古中西部及蒙古国、俄罗斯边境",
+    "mileage": "约6000公里",
+    "lines": ["京包高铁（呼包段）", "集通铁路", "唐呼线"],
+    "establishedDate": "1958年11月1日",
+    "recruitmentScale": "1200-1500人/年",
+    "competitionRatio": "5:1-12:1",
+    "difficulty": 2,
+    "difficultyLabel": "较易级",
+    "educationPreference": "专科及以上",
+    "juniorCollegeRatio": "约65%",
+    "salary": {
+      "undergraduateMonthly": "4000-6000",
+      "withSubsidyMonthly": "7000-8000",
+      "highSpeedDriverMonthly": "7000-11000",
+      "annualBonus": "0.5-1.5万元",
+      "features": ["边疆津贴补充", "草原文化特色"]
+    },
+    "benefits": ["边疆津贴", "五险一金", "宿舍"],
+    "features": ["边疆铁路，外接蒙古国和俄罗斯", "草原文化", "边疆津贴补充收入"],
+    "departments": ["呼和浩特站", "包头站", "集宁站", "呼和浩特机务段"],
+    "checkupSpecial": ["边疆岗位竞争小但条件艰苦", "辨色力严格"],
+    "contact": "0471-2XXXXXXX",
+    "lastUpdated": "2025-06"
+  },
+  {
+    "code": "chengdu",
+    "name": "中国铁路成都局集团有限公司",
+    "shortName": "成都局",
+    "tier": 3,
+    "tierLabel": "第三梯队",
+    "tierDesc": "待遇中等偏下（招聘规模最大）",
+    "headquarters": "四川省成都市",
+    "coverage": "四川、重庆、贵州、云南（一市三省）",
+    "mileage": "约1万公里",
+    "lines": ["西成高铁", "成贵高铁", "成渝高铁", "中老铁路（国际段）"],
+    "recruitmentScale": "约5000人/年（全国最多）",
+    "competitionRatio": "10:1-20:1",
+    "difficulty": 3,
+    "difficultyLabel": "中等级",
+    "educationPreference": "专科及以上",
+    "juniorCollegeRatio": "约70%",
+    "salary": {
+      "undergraduateMonthly": "5000-7000",
+      "highSpeedDriverMonthly": "9000-14000",
+      "annualBonus": "0.8-2万元",
+      "features": ["西南山区艰苦补贴", "成都/重庆城市吸引力强"]
+    },
+    "benefits": ["五险一金", "宿舍", "工作餐", "西南山区补贴"],
+    "features": ["招聘规模大，专科机会多", "成都局校招为主要渠道", "川渝院校学生有优势", "成都/重庆城市吸引力强"],
+    "departments": ["成都站", "重庆站", "贵阳站", "成都机务段", "成都动车段"],
+    "checkupSpecial": ["山区/隧道多，信号工辨色力要求高", "肝功能ALT<40U/L"],
+    "contact": "028-864XXXXXX",
+    "lastUpdated": "2025-06"
+  },
+  {
+    "code": "lanzhou",
+    "name": "中国铁路兰州局集团有限公司",
+    "shortName": "兰州局",
+    "tier": 3,
+    "tierLabel": "第三梯队",
+    "tierDesc": "待遇中等偏下",
+    "headquarters": "甘肃省兰州市",
+    "coverage": "甘肃、青海、宁夏（一省两区）及新疆、内蒙古部分",
+    "mileage": "约5500公里",
+    "lines": ["兰新高铁", "兰渝铁路", "陇海铁路西段"],
+    "recruitmentScale": "2500-3000人/年",
+    "competitionRatio": "10:1-20:1",
+    "difficulty": 3,
+    "difficultyLabel": "中等级",
+    "educationPreference": "专科及以上",
+    "juniorCollegeRatio": "约70%",
+    "salary": {
+      "undergraduateMonthly": "4500-6500",
+      "highSpeedDriverMonthly": "8000-12000",
+      "annualBonus": "0.5-1.5万元",
+      "features": ["西北艰苦地区津贴", "兰新高铁连接内地与新疆"]
+    },
+    "benefits": ["五险一金", "艰苦补贴", "宿舍", "高原/高海拔补贴"],
+    "features": ["西北铁路枢纽", "兰新高铁连接内地与新疆", "兰州交通大学、兰州铁路学院是主要生源校"],
+    "departments": ["兰州站", "兰州西站", "银川站", "兰州机务段"],
+    "checkupSpecial": ["甘南/新疆山区岗位需肺功能筛查", "辨色力严格", "纹身严格"],
+    "contact": "0931-4XXXXXXX",
+    "lastUpdated": "2025-06"
+  },
+  {
+    "code": "xian",
+    "name": "中国铁路西安局集团有限公司",
+    "shortName": "西安局",
+    "tier": 3,
+    "tierLabel": "第三梯队",
+    "tierDesc": "待遇中等偏下",
+    "headquarters": "陕西省西安市",
+    "coverage": "陕西省全境及甘肃、内蒙古、山西、河南部分",
+    "mileage": "约5000公里",
+    "lines": ["郑西高铁", "西宝高铁", "西成高铁"],
+    "recruitmentScale": "2500-3000人/年",
+    "competitionRatio": "10:1-20:1",
+    "difficulty": 3,
+    "difficultyLabel": "中等级",
+    "educationPreference": "专科及以上",
+    "juniorCollegeRatio": "约60%",
+    "salary": {
+      "undergraduateMonthly": "5000-6500",
+      "highSpeedDriverMonthly": "9000-13000",
+      "annualBonus": "0.8-1.5万元",
+      "features": ["西成高铁穿越秦岭司机薪资高", "西北铁路枢纽地位重要"]
+    },
+    "benefits": ["五险一金", "宿舍", "工作餐"],
+    "features": ["西北铁路枢纽", "西成高铁穿越秦岭，工程难度世界级", "司机薪资较高", "西安/兰州铁路院校是主要生源"],
+    "departments": ["西安站", "西安北站", "宝鸡站", "西安机务段", "西安动车段"],
+    "checkupSpecial": ["辨色力严格", "山区线路信号工需求大"],
+    "contact": "029-8XXXXXXX",
+    "lastUpdated": "2025-06"
+  },
+  {
+    "code": "nanchang",
+    "name": "中国铁路南昌局集团有限公司",
+    "shortName": "南昌局",
+    "tier": 3,
+    "tierLabel": "第三梯队",
+    "tierDesc": "待遇中等偏下",
+    "headquarters": "江西省南昌市",
+    "coverage": "江西省全境及福建、湖南部分",
+    "mileage": "约5000公里",
+    "lines": ["沪昆高铁", "京九铁路", "赣瑞龙铁路"],
+    "recruitmentScale": "2000-2500人/年",
+    "competitionRatio": "8:1-20:1",
+    "difficulty": 3,
+    "difficultyLabel": "中等级",
+    "educationPreference": "专科及以上",
+    "juniorCollegeRatio": "约65%",
+    "salary": {
+      "undergraduateMonthly": "4500-6500",
+      "highSpeedDriverMonthly": "8000-13000",
+      "annualBonus": "0.5-1.5万元",
+      "features": ["昌福线/南龙线新线路司机需求大", "中部地区生活成本较低"]
+    },
+    "benefits": ["五险一金", "宿舍", "工作餐"],
+    "features": ["江西/福建院校学生有优势", "昌福线、南龙线新线路司机需求大"],
+    "departments": ["南昌站", "南昌西站", "福州站", "南昌机务段"],
+    "checkupSpecial": ["辨色力严格"],
+    "contact": "0791-8XXXXXXX",
+    "lastUpdated": "2025-06"
+  },
+  {
+    "code": "kunming",
+    "name": "中国铁路昆明局集团有限公司",
+    "shortName": "昆明局",
+    "tier": 3,
+    "tierLabel": "第三梯队",
+    "tierDesc": "待遇中等偏下（竞争较小）",
+    "headquarters": "云南省昆明市",
+    "coverage": "云南省全境及贵州、四川部分",
+    "mileage": "约5000公里",
+    "lines": ["沪昆高铁（昆明-贵阳段）", "中老铁路（昆明-磨憨段）", "昆玉河铁路"],
+    "recruitmentScale": "1500-2000人/年",
+    "competitionRatio": "5:1-15:1",
+    "difficulty": 2,
+    "difficultyLabel": "较易级",
+    "educationPreference": "专科及以上",
+    "juniorCollegeRatio": "约65%",
+    "salary": {
+      "undergraduateMonthly": "4500-6000",
+      "highSpeedDriverMonthly": "8000-12000",
+      "annualBonus": "0.5-1.5万元",
+      "features": ["中老铁路发展带来新机遇", "东南亚国际铁路发展前景好"]
+    },
+    "benefits": ["五险一金", "宿舍", "云南地区艰苦津贴"],
+    "features": ["中老铁路运营带来大量新岗位", "云南地区艰苦津贴", "东南亚国际铁路发展前景好", "招聘竞争相对较小"],
+    "departments": ["昆明站", "昆明南站", "大理站", "昆明机务段"],
+    "checkupSpecial": ["迪庆/丽江等高海拔岗位需肺功能+FVC", "辨色力严格"],
+    "contact": "0871-6XXXXXXX",
+    "lastUpdated": "2025-06"
+  },
+  {
+    "code": "harbin",
+    "name": "中国铁路哈尔滨局集团有限公司",
+    "shortName": "哈尔滨局",
+    "tier": 3,
+    "tierLabel": "第三梯队",
+    "tierDesc": "待遇中等偏下（竞争较小）",
+    "headquarters": "黑龙江省哈尔滨市",
+    "coverage": "黑龙江省全境及内蒙古呼伦贝尔市",
+    "mileage": "约8000公里",
+    "lines": ["哈大高铁（高寒型）", "滨洲铁路", "绥芬河口岸"],
+    "recruitmentScale": "约2000人/年",
+    "competitionRatio": "5:1-15:1",
+    "difficulty": 2,
+    "difficultyLabel": "较易级",
+    "educationPreference": "专科及以上",
+    "juniorCollegeRatio": "约60%",
+    "salary": {
+      "undergraduateMonthly": "4500-6000",
+      "highSpeedDriverMonthly": "8000-12000",
+      "annualBonus": "0.5-1.5万元",
+      "features": ["严寒补贴300-500元/月（冬季发放）", "中国最北铁路局"]
+    },
+    "benefits": ["五险一金", "宿舍", "严寒补贴"],
+    "features": ["中国最北铁路局", "冬季气温-30℃以下", "高寒高铁（哈大高铁）世界领先", "专科批竞争较小，机会多"],
+    "departments": ["哈尔滨站", "哈尔滨西站", "齐齐哈尔站", "哈尔滨机务段", "哈尔滨动车段"],
+    "checkupSpecial": ["血红蛋白男≥140g/L（冬训期需更高）", "心电图寒冷气候适应性评估", "辨色力严格"],
+    "contact": "0451-8XXXXXXX",
+    "lastUpdated": "2025-06"
+  },
+  {
+    "code": "nanning",
+    "name": "中国铁路南宁局集团有限公司",
+    "shortName": "南宁局",
+    "tier": 3,
+    "tierLabel": "第三梯队",
+    "tierDesc": "待遇中等偏下（竞争较小）",
+    "headquarters": "广西壮族自治区南宁市",
+    "coverage": "广西全境及湖南、贵州部分",
+    "mileage": "约6000公里",
+    "lines": ["南广高铁", "柳南客专", "湘桂铁路", "南凭铁路（对接东盟）"],
+    "recruitmentScale": "1500-2000人/年",
+    "competitionRatio": "5:1-12:1",
+    "difficulty": 2,
+    "difficultyLabel": "较易级",
+    "educationPreference": "专科及以上",
+    "juniorCollegeRatio": "约70%",
+    "salary": {
+      "undergraduateMonthly": "4000-5500",
+      "highSpeedDriverMonthly": "7000-11000",
+      "annualBonus": "0.3-1.2万元",
+      "features": ["边疆津贴补充", "南凭铁路通往东盟国际机遇"]
+    },
+    "benefits": ["五险一金", "宿舍", "工作餐"],
+    "features": ["广西是中国-东盟交流前沿", "南凭铁路通往越南", "边疆地理优势", "南方/广西院校学生优先"],
+    "departments": ["南宁站", "南宁东站", "柳州站", "桂林站", "南宁机务段"],
+    "checkupSpecial": ["南方夏季高温需心血管稳定", "纹身严格（客运/乘务岗位）"],
+    "contact": "0771-2XXXXXXX",
+    "lastUpdated": "2025-06"
+  }
+];
+
+// 初始化
+let allBureaus = BUREAUS_DATA;
+let currentFilter = 'all';
+
+// 渲染铁路局列表
+function renderBureaus() {
+  const container = document.getElementById('bureauContent');
+  const filtered = currentFilter === 'all' 
+    ? allBureaus 
+    : allBureaus.filter(b => b.tier === parseInt(currentFilter));
+  
+  if (filtered.length === 0) {
+    container.innerHTML = '<p style="text-align:center; color: var(--text-light); padding: 40px;">暂无数据</p>';
+    return;
+  }
+  
+  // 按梯队分组渲染
+  let html = '';
+  
+  if (currentFilter === 'all') {
+    const tierNames = { 1: '第一梯队', 2: '第二梯队', 3: '第三梯队' };
+    const tierDescs = { 1: '全国待遇最优', 2: '中高待遇', 3: '待遇中等偏下' };
+    const tierSalaries = { 1: '8000-20000元/月', 2: '4000-15000元/月', 3: '4000-12000元/月' };
+    
+    for (let tier = 1; tier <= 3; tier++) {
+      const tierBureaus = filtered.filter(b => b.tier === tier);
+      if (tierBureaus.length === 0) continue;
+      
+      html += `
+        <div class="tier-section tier-${tier}">
+          <div class="tier-header">
+            <span class="tier-badge">${tier === 1 ? '🥇' : tier === 2 ? '🥈' : '🥉'} ${tierNames[tier]}</span>
+            <span class="tier-desc">${tierDescs[tier]}</span>
+            <span class="tier-salary">💰 ${tierSalaries[tier]}</span>
+          </div>
+          <div class="bureau-grid">
+            ${tierBureaus.map(b => renderBureauCard(b)).join('')}
+          </div>
+        </div>
+      `;
+    }
+  } else {
+    const tier = parseInt(currentFilter);
+    const tierNames = { 1: '第一梯队', 2: '第二梯队', 3: '第三梯队' };
+    const tierDescs = { 1: '全国待遇最优', 2: '中高待遇', 3: '待遇中等偏下' };
+    const tierSalaries = { 1: '8000-20000元/月', 2: '4000-15000元/月', 3: '4000-12000元/月' };
+    
+    html += `
+      <div class="tier-section tier-${tier}">
+        <div class="tier-header">
+          <span class="tier-badge">${tier === 1 ? '🥇' : tier === 2 ? '🥈' : '🥉'} ${tierNames[tier]}</span>
+          <span class="tier-desc">${tierDescs[tier]}</span>
+          <span class="tier-salary">💰 ${tierSalaries[tier]}</span>
+        </div>
+        <div class="bureau-grid">
+          ${filtered.map(b => renderBureauCard(b)).join('')}
+        </div>
+      </div>
+    `;
+  }
+  
+  container.innerHTML = html;
+}
+
+// 渲染单个卡片
+function renderBureauCard(b) {
+  const difficultyClass = b.difficulty <= 2 ? 'easy' : (b.difficulty <= 3 ? 'medium' : 'hard');
+  
+  // 提取前两个特点标签
+  const features = b.features ? b.features.slice(0, 2) : [];
+  const featuresHtml = features.map(f => `<span class="feature-tag">${f}</span>`).join('');
+  
+  return `
+    <a href="bureau.html?code=${b.code}" class="bureau-card">
+      <div class="bureau-card-header">
+        <div class="bureau-avatar">🏢</div>
+        <div class="bureau-card-info">
+          <div class="bureau-card-name">${b.shortName}</div>
+          <div class="bureau-card-location">📍 ${b.headquarters}</div>
+        </div>
+        <span class="difficulty-badge ${difficultyClass}">${b.difficultyLabel}</span>
+      </div>
+      <div class="bureau-card-stats">
+        <div class="stat-item">
+          <div class="value">${b.recruitmentScale.split('/')[0]}</div>
+          <div class="label">年招人数</div>
+        </div>
+        <div class="stat-item">
+          <div class="value">${b.competitionRatio.split('-')[0] || b.competitionRatio}</div>
+          <div class="label">竞争比</div>
+        </div>
+        <div class="stat-item">
+          <div class="value">${b.salary.undergraduateMonthly}</div>
+          <div class="label">月薪(元)</div>
+        </div>
+      </div>
+      ${featuresHtml ? `<div class="bureau-features">${featuresHtml}</div>` : ''}
+      <div class="bureau-card-footer">
+        <span class="salary-preview">💰 ${b.salary.undergraduateMonthly}元/月起</span>
+        <span class="view-detail">查看详情 →</span>
+      </div>
+    </a>
+  `;
+}
+
+// 初始化筛选
+document.getElementById('filterTabs').addEventListener('click', (e) => {
+  const target = e.target.closest('.filter-tab');
+  if (target) {
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    target.classList.add('active');
+    currentFilter = target.dataset.filter;
+    renderBureaus();
+  }
+});
+
+// 启动 - 直接渲染
+renderBureaus();
+</script>
+</body>
+</html>

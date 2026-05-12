@@ -1,0 +1,30 @@
+{
+  "code": "kunming",
+  "name": "中国铁路昆明局集团有限公司",
+  "shortName": "昆明局",
+  "tier": 3,
+  "tierLabel": "第三梯队",
+  "tierDesc": "待遇中等偏下（竞争较小）",
+  "headquarters": "云南省昆明市",
+  "coverage": "云南省全境及贵州、四川部分",
+  "mileage": "约5000公里",
+  "lines": ["沪昆高铁（昆明-贵阳段）", "中老铁路（昆明-磨憨段）", "昆玉河铁路"],
+  "recruitmentScale": "1500-2000人/年",
+  "competitionRatio": "5:1-15:1",
+  "difficulty": 2,
+  "difficultyLabel": "较易级",
+  "educationPreference": "专科及以上",
+  "juniorCollegeRatio": "约65%",
+  "salary": {
+    "undergraduateMonthly": "4500-6000",
+    "highSpeedDriverMonthly": "8000-12000",
+    "annualBonus": "0.5-1.5万元",
+    "features": ["中老铁路发展带来新机遇", "东南亚国际铁路发展前景好"]
+  },
+  "benefits": ["五险一金", "宿舍", "云南地区艰苦津贴"],
+  "features": ["中老铁路运营带来大量新岗位", "云南地区艰苦津贴", "东南亚国际铁路发展前景好", "招聘竞争相对较小"],
+  "departments": ["昆明站", "昆明南站", "大理站", "昆明机务段"],
+  "checkupSpecial": ["迪庆/丽江等高海拔岗位需肺功能+FVC", "辨色力严格"],
+  "contact": "0871-6XXXXXXX",
+  "lastUpdated": "2025-06"
+}

@@ -1,0 +1,30 @@
+{
+  "code": "lanzhou",
+  "name": "中国铁路兰州局集团有限公司",
+  "shortName": "兰州局",
+  "tier": 3,
+  "tierLabel": "第三梯队",
+  "tierDesc": "待遇中等偏下",
+  "headquarters": "甘肃省兰州市",
+  "coverage": "甘肃、青海、宁夏（一省两区）及新疆、内蒙古部分",
+  "mileage": "约5500公里",
+  "lines": ["兰新高铁", "兰渝铁路", "陇海铁路西段"],
+  "recruitmentScale": "2500-3000人/年",
+  "competitionRatio": "10:1-20:1",
+  "difficulty": 3,
+  "difficultyLabel": "中等级",
+  "educationPreference": "专科及以上",
+  "juniorCollegeRatio": "约70%",
+  "salary": {
+    "undergraduateMonthly": "4500-6500",
+    "highSpeedDriverMonthly": "8000-12000",
+    "annualBonus": "0.5-1.5万元",
+    "features": ["西北艰苦地区津贴", "兰新高铁连接内地与新疆"]
+  },
+  "benefits": ["五险一金", "艰苦补贴", "宿舍", "高原/高海拔补贴"],
+  "features": ["西北铁路枢纽", "兰新高铁连接内地与新疆", "兰州交通大学、兰州铁路学院是主要生源校"],
+  "departments": ["兰州站", "兰州西站", "银川站", "兰州机务段"],
+  "checkupSpecial": ["甘南/新疆山区岗位需肺功能筛查", "辨色力严格", "纹身严格"],
+  "contact": "0931-4XXXXXXX",
+  "lastUpdated": "2025-06"
+}

@@ -1,0 +1,30 @@
+{
+  "code": "harbin",
+  "name": "中国铁路哈尔滨局集团有限公司",
+  "shortName": "哈尔滨局",
+  "tier": 3,
+  "tierLabel": "第三梯队",
+  "tierDesc": "待遇中等偏下（竞争较小）",
+  "headquarters": "黑龙江省哈尔滨市",
+  "coverage": "黑龙江省全境及内蒙古呼伦贝尔市",
+  "mileage": "约8000公里",
+  "lines": ["哈大高铁（高寒型）", "滨洲铁路", "绥芬河口岸"],
+  "recruitmentScale": "约2000人/年",
+  "competitionRatio": "5:1-15:1",
+  "difficulty": 2,
+  "difficultyLabel": "较易级",
+  "educationPreference": "专科及以上",
+  "juniorCollegeRatio": "约60%",
+  "salary": {
+    "undergraduateMonthly": "4500-6000",
+    "highSpeedDriverMonthly": "8000-12000",
+    "annualBonus": "0.5-1.5万元",
+    "features": ["严寒补贴300-500元/月（冬季发放）", "中国最北铁路局"]
+  },
+  "benefits": ["五险一金", "宿舍", "严寒补贴"],
+  "features": ["中国最北铁路局", "冬季气温-30℃以下", "高寒高铁（哈大高铁）世界领先", "专科批竞争较小，机会多"],
+  "departments": ["哈尔滨站", "哈尔滨西站", "齐齐哈尔站", "哈尔滨机务段", "哈尔滨动车段"],
+  "checkupSpecial": ["血红蛋白男≥140g/L（冬训期需更高）", "心电图寒冷气候适应性评估", "辨色力严格"],
+  "contact": "0451-8XXXXXXX",
+  "lastUpdated": "2025-06"
+}

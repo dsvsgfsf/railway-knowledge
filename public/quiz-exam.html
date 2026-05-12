@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>铁路专业考试</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Microsoft YaHei', 'PingFang SC', Arial, sans-serif;
+  background: linear-gradient(135deg, #0a1628 0%, #1a3a5c 100%);
+  min-height: 100vh;
+  color: #1a1a2e;
+}
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+/* 头部 */
+.header {
+  background: rgba(255,255,255,0.95);
+  border-radius: 16px;
+  padding: 20px 25px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+.header-left h1 {
+  font-size: 22px;
+  color: #1a1a2e;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.header-left .subtitle {
+  font-size: 13px;
+  color: #666;
+  margin-top: 5px;
+}
+.header-right {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+.timer {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: monospace;
+}
+.progress-text {
+  color: #fff;
+  font-size: 14px;
+  background: rgba(255,255,255,0.1);
+  padding: 8px 16px;
+  border-radius: 20px;
+}
+/* 进度条 */
+.progress-bar {
+  background: rgba(255,255,255,0.1);
+  height: 6px;
+  border-radius: 3px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #e74c3c, #f39c12);
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+/* 题目卡片 */
+.question-card {
+  background: rgba(255,255,255,0.97);
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+.question-no {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.type-badge {
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.type-badge.single {
+  background: linear-gradient(135deg, #3498db22, #2980b922);
+  color: #2980b9;
+}
+.type-badge.multi {
+  background: linear-gradient(135deg, #9b59b622, #8e44ad22);
+  color: #8e44ad;
+}
+.type-badge.judge {
+  background: linear-gradient(135deg, #27ae6022, #2ecc7122);
+  color: #27ae60;
+}
+.question-text {
+  font-size: 17px;
+  line-height: 1.7;
+  color: #1a1a2e;
+  margin-bottom: 20px;
+}
+/* 选项 */
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.option {
+  display: flex;
+  align-items: center;
+  padding: 14px 18px;
+  border: 2px solid #e8ecf1;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 15px;
+}
+.option:hover {
+  border-color: #3498db;
+  background: #f8fafc;
+}
+.option.selected {
+  border-color: #3498db;
+  background: linear-gradient(135deg, #3498db11, #2980b911);
+}
+.option.correct {
+  border-color: #27ae60;
+  background: linear-gradient(135deg, #27ae6022, #2ecc7122);
+}
+.option.wrong {
+  border-color: #e74c3c;
+  background: linear-gradient(135deg, #e74c3c22, #c0392b22);
+}
+.option .opt-letter {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f0f2f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  margin-right: 15px;
+  flex-shrink: 0;
+  font-size: 14px;
+  color: #555;
+}
+.option.selected .opt-letter {
+  background: #3498db;
+  color: #fff;
+}
+.option.correct .opt-letter {
+  background: #27ae60;
+  color: #fff;
+}
+.option.wrong .opt-letter {
+  background: #e74c3c;
+  color: #fff;
+}
+.option-text {
+  flex: 1;
+  color: #333;
+}
+.option-icon {
+  font-size: 20px;
+  margin-left: 10px;
+}
+input[type="radio"], input[type="checkbox"] {
+  display: none;
+}
+/* 底部按钮 */
+.footer {
+  background: rgba(255,255,255,0.95);
+  border-radius: 16px;
+  padding: 20px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  position: sticky;
+  bottom: 20px;
+}
+.btn {
+  padding: 12px 28px;
+  border-radius: 25px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: none;
+  font-family: inherit;
+}
+.btn-prev {
+  background: #f0f2f7;
+  color: #555;
+}
+.btn-prev:hover {
+  background: #e8ecf1;
+}
+.btn-prev:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.btn-next {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: #fff;
+}
+.btn-next:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(52,152,219,0.4);
+}
+.btn-submit {
+  background: linear-gradient(135deg, #27ae60, #2ecc71);
+  color: #fff;
+}
+.btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(39,174,96,0.4);
+}
+/* 结果页面 */
+.result-card {
+  background: rgba(255,255,255,0.97);
+  border-radius: 20px;
+  padding: 35px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+}
+.result-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+}
+.result-score {
+  font-size: 72px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #e74c3c, #f39c12);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+.result-score span {
+  font-size: 30px;
+  -webkit-text-fill-color: #999;
+}
+.result-status {
+  font-size: 24px;
+  margin: 15px 0;
+  color: #333;
+}
+.result-stats {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin: 25px 0;
+  flex-wrap: wrap;
+}
+.stat-box {
+  text-align: center;
+  padding: 15px 25px;
+  background: #f8f9fc;
+  border-radius: 12px;
+}
+.stat-box .num {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+.stat-box .label {
+  font-size: 13px;
+  color: #888;
+  margin-top: 5px;
+}
+.stat-box.correct .num { color: #27ae60; }
+.stat-box.wrong .num { color: #e74c3c; }
+.stat-box.unanswered .num { color: #f39c12; }
+/* 解析 */
+.analysis-section {
+  margin-top: 30px;
+  text-align: left;
+}
+.analysis-title {
+  font-size: 18px;
+  color: #1a1a2e;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e8ecf1;
+}
+.analysis-item {
+  background: #f8f9fc;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 15px;
+  border-left: 4px solid;
+}
+.analysis-item.correct { border-color: #27ae60; }
+.analysis-item.wrong { border-color: #e74c3c; }
+.analysis-item.unanswered { border-color: #f39c12; }
+.analysis-q {
+  font-size: 15px;
+  margin-bottom: 12px;
+  color: #333;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.analysis-ans {
+  font-size: 14px;
+  margin-bottom: 8px;
+  padding: 10px 12px;
+  background: #fff;
+  border-radius: 8px;
+}
+.analysis-exp {
+  font-size: 13px;
+  color: #666;
+  padding: 10px 12px;
+  background: #fff;
+  border-radius: 8px;
+  border-left: 3px solid #3498db;
+  line-height: 1.6;
+}
+.btn-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
+/* 多选提示 */
+.multi-hint {
+  font-size: 12px;
+  color: #8e44ad;
+  background: #9b59b622;
+  padding: 6px 12px;
+  border-radius: 15px;
+  margin-bottom: 15px;
+  display: inline-block;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="header-left">
+      <h1>📝 <span id="examTitle">考试</span></h1>
+      <div class="subtitle" id="examSubtitle"></div>
+    </div>
+    <div class="header-right">
+      <span class="progress-text" id="progressText">第 1/10 题</span>
+      <span class="timer" id="timer">⏱ 00:00</span>
+    </div>
+  </div>
+  
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill" style="width: 10%"></div>
+  </div>
+  
+  <div id="examContent"></div>
+  
+  <div class="footer" id="footer">
+    <button class="btn btn-prev" id="btnPrev" onclick="prevQuestion()" disabled>← 上一题</button>
+    <button class="btn btn-next" id="btnNext" onclick="nextQuestion()">下一题 →</button>
+  </div>
+</div>
+
+<script>
+// 考试数据 - 从父窗口或URL获取
+const urlParams = new URLSearchParams(window.location.search);
+const quizId = urlParams.get('id') || 'recruitment';
+const questionCount = parseInt(urlParams.get('count')) || 10;
+
+// 全局状态
+let questions = [];
+let currentIndex = 0;
+let userAnswers = [];
+let startTime = Date.now();
+let timerInterval = null;
+let submitted = false;
+
+// 题库数据（简化版，实际使用时应从主系统加载）
+const QUIZ_DATA = {
+  recruitment: {
+    title: '铁路局招聘综合考试',
+    subtitle: '行测 + 铁路基础 + 时事政治 + 专业知识',
+    questions: [
+      {q:'我国铁路的标准轨距为多少mm？',opts:['A. 1435mm','B. 1430mm','C. 1520mm','D. 1067mm'],ans:'A',type:'single',exp:'我国铁路采用1435mm（4英尺8.5英寸）标准轨距。'},
+      {q:'下列哪个不是铁路信号的基本颜色？',opts:['A. 红色','B. 黄色','C. 绿色','D. 白色'],ans:'D',type:'single',exp:'铁路信号基本颜色为红、黄、绿三色，不包括白色。'},
+      {q:'HXD型电力机车的传动方式为？',opts:['A. 交-直流','B. 直-直流','C. 交-直-交','D. 直-交流'],ans:'C',type:'single',exp:'HXD型机车采用交-直-交传动方式，驱动三相异步牵引电机。'},
+      {q:'道岔9号的侧向允许速度为？',opts:['A. 20km/h','B. 25km/h','C. 30km/h','D. 45km/h'],ans:'C',type:'single',exp:'9号道岔侧向允许速度为30km/h。'},
+      {q:'接触网的标准高度（接触线至轨面）为？',opts:['A. 5050mm','B. 5150mm','C. 5250mm','D. 5350mm'],ans:'B',type:'single',exp:'接触线高度标准值为5150mm，允许误差±30mm。'},
+      {q:'我国第一条高速铁路是？',opts:['A. 秦沈客运专线','B. 京沪高铁','C. 武广高铁','D. 京津城际'],ans:'A',type:'single',exp:'秦沈客运专线（2003年开通）是我国第一条高速铁路。'},
+      {q:'CRH380A型动车组的最高运营速度为？',opts:['A. 350km/h','B. 300km/h','C. 250km/h','D. 380km/h'],ans:'A',type:'single',exp:'CRH380A型动车组最高运营速度为350km/h。'},
+      {q:'我国高速铁路采用的列控系统最高等级是？',opts:['A. CTCS-0','B. CTCS-2','C. CTCS-3','D. CTCS-4'],ans:'C',type:'single',exp:'CTCS-3是中国高速铁路（300-350km/h）采用的最高等级列控系统。'},
+      {q:'铁路线路由哪几部分组成？',opts:['A. 钢轨、轨枕、道床、道岔','B. 钢轨、桥梁、隧道','C. 车站、区间、站台','D. 机车、车辆、信号'],ans:'A',type:'single',exp:'铁路线路由钢轨、轨枕、道床、道岔及联结零件组成。'},
+      {q:'ZPW-2000A轨道电路的载频有几种？',opts:['A. 2种','B. 4种','C. 6种','D. 8种'],ans:'B',type:'single',exp:'ZPW-2000A有4种载频：1700Hz、2000Hz、2300Hz、2600Hz。'},
+      {q:'铁路信号的基本颜色包括哪些？（多选）',opts:['A. 红色','B. 黄色','C. 白色','D. 蓝色','E. 绿色'],ans:['A','B','E'],type:'multi',exp:'铁路信号的基本颜色为红、黄、绿三色。'},
+      {q:'HXD型电力机车的特点包括？（多选）',opts:['A. 采用交-直-交传动','B. 使用三相异步牵引电机','C. 功率大','D. 采用直流牵引电机','E. 无变压器'],ans:['A','B','C'],type:'multi',exp:'HXD型机车采用交-直-交传动，驱动三相异步电机，功率可达9600kW。'},
+      {q:'我国高速铁路全部采用标准轨距。',opts:['A. 正确','B. 错误'],ans:'A',type:'judge',exp:'正确。我国高速铁路采用1435mm标准轨距。'},
+      {q:'9号道岔的侧向允许速度比12号道岔高。',opts:['A. 正确','B. 错误'],ans:'B',type:'judge',exp:'错误。9号道岔侧向限速30km/h，12号道岔侧向限速45km/h。'},
+      {q:'我国铁路电气化采用直流供电方式。',opts:['A. 正确','B. 错误'],ans:'B',type:'judge',exp:'错误。我国电气化铁路采用25kV、50Hz单相交流供电。'}
+    ]
+  },
+  signal: {
+    title: '铁路信号基础',
+    subtitle: '信号系统核心知识',
+    questions: [
+      {q:'铁路信号按发出方式分为哪两类？',opts:['A. 固定信号、移动信号','B. 色灯信号、臂板信号','C. 机车信号、手信号','D. 主体信号、辅助信号'],ans:'A',type:'single',exp:'铁路信号按发出方式分为固定信号和移动信号两类。'},
+      {q:'信号显示中，红灯表示？',opts:['A. 停车','B. 注意','C. 加速','D. 正常'],ans:'A',type:'single',exp:'红灯表示停车，禁止列车越过该信号机。'},
+      {q:'进站信号机有几个灯位？',opts:['A. 4个','B. 5个','C. 6个','D. 3个'],ans:'B',type:'single',exp:'进站信号机有5个灯位，是铁路信号机中灯位最多的。'},
+      {q:'ZPW-2000A轨道电路的载频有几种？',opts:['A. 2种','B. 4种','C. 6种','D. 8种'],ans:'B',type:'single',exp:'ZPW-2000A有4种载频：1700Hz、2000Hz、2300Hz、2600Hz。'},
+      {q:'计算机联锁系统的安全等级为？',opts:['A. SIL1','B. SIL2','C. SIL3','D. SIL4'],ans:'D',type:'single',exp:'计算机联锁系统要求达到SIL4级安全完整性等级。'},
+      {q:'CTCS-3的核心设备是？',opts:['A. 应答器','B. RBC和GSM-R','C. 轨道电路','D. 信号机'],ans:'B',type:'single',exp:'CTCS-3以RBC（无线闭塞中心）和GSM-R为核心设备。'},
+      {q:'轨道电路的基本工作状态包括哪些？（多选）',opts:['A. 调整状态','B. 占用状态','C. 故障状态','D. 休眠状态','E. 校准状态'],ans:['A','B','C'],type:'multi',exp:'轨道电路有调整、占用、故障三种基本工作状态。'},
+      {q:'联锁的基本原则包括？（多选）',opts:['A. 进路空闲','B. 道岔位置正确','C. 信号开放条件满足','D. 轨道电路正常','E. 电源正常'],ans:['A','B','C'],type:'multi',exp:'联锁必须满足进路空闲、道岔位置正确、信号开放条件满足三个基本原则。'},
+      {q:'闭塞的作用是保证区间行车安全。',opts:['A. 正确','B. 错误'],ans:'A',type:'judge',exp:'正确。闭塞设备的作用是保证区间行车安全，防止列车追尾。'},
+      {q:'四显示自动闭塞比三显示增加了绿黄灯显示。',opts:['A. 正确','B. 错误'],ans:'A',type:'judge',exp:'正确。四显示增加了绿黄灯，用于指示次一闭塞分区的速度信息。'}
+    ]
+  },
+  railwayIntro: {
+    title: '铁道概论',
+    subtitle: '铁路基础知识入门',
+    questions: [
+      {q:'世界上第一条铁路诞生于？',opts:['A. 英国','B. 美国','C. 法国','D. 德国'],ans:'A',type:'single',exp:'1825年英国斯托克顿至达灵顿铁路开通，是世界上第一条公用铁路。'},
+      {q:'中国第一条自主设计的铁路是？',opts:['A. 京张铁路','B. 唐胥铁路','C. 淞沪铁路','D. 宝成铁路'],ans:'A',type:'single',exp:'京张铁路（1909年通车）是我国第一条自主设计的铁路，由詹天佑主持修建。'},
+      {q:'我国标准轨距为多少mm？',opts:['A. 1430mm','B. 1435mm','C. 1520mm','D. 1600mm'],ans:'B',type:'single',exp:'标准轨距1435mm（4英尺8.5英寸），全球约60%铁路采用此轨距。'},
+      {q:'我国高铁运营里程居世界？',opts:['A. 第一','B. 第二','C. 第三','D. 第四'],ans:'A',type:'single',exp:'我国高铁营业里程超过4.6万公里，位居世界第一。'},
+      {q:'9号道岔的侧向允许速度为？',opts:['A. 20km/h','B. 25km/h','C. 30km/h','D. 45km/h'],ans:'C',type:'single',exp:'9号道岔侧向允许速度为30km/h。'},
+      {q:'铁路线路由哪些部分组成？（多选）',opts:['A. 钢轨','B. 轨枕','C. 道床','D. 道岔','E. 信号机'],ans:['A','B','C','D'],type:'multi',exp:'铁路线路由钢轨、轨枕、道床、道岔及联结零件组成。信号机不属于线路本体。'},
+      {q:'列车制动的方式包括？（多选）',opts:['A. 空气制动','B. 电阻制动','C. 再生制动','D. 磁轨制动','E. 液压制动'],ans:['A','B','C'],type:'multi',exp:'列车制动方式包括空气制动、电阻制动、再生制动。磁轨制动和液压制动不是主型制动方式。'},
+      {q:'我国高速铁路全部采用标准轨距。',opts:['A. 正确','B. 错误'],ans:'A',type:'judge',exp:'正确。我国高速铁路采用1435mm标准轨距。'},
+      {q:'复线铁路是指同一走行方向有两条线路并行的铁路。',opts:['A. 正确','B. 错误'],ans:'B',type:'judge',exp:'错误。复线是指同一路基上铺设两条正线，供上、下行列车分别使用。'},
+      {q:'无缝线路可以完全消除钢轨接头。',opts:['A. 正确','B. 错误'],ans:'B',type:'judge',exp:'错误。无缝线路减少了接头，但缓冲区仍存在短轨接头。'}
+    ]
+  },
+  // 添加更多题库...
+  trainOperation: {
+    title: '铁路行车组织',
+    subtitle: '行车调度与运输组织',
+    questions: [
+      {q:'列车运行图的横轴表示？',opts:['A. 距离','B. 时间','C. 速度','D. 运量'],ans:'B',type:'single',exp:'运行图的横轴表示时间，纵轴表示距离（车站）。'},
+      {q:'车站按技术作业分为？',opts:['A. 中间站、区段站、编组站','B. 客运站、货运站','C. 特等站、一等站、二等站','D. 编组站、区段站、中间站'],ans:'A',type:'single',exp:'车站按技术作业分为中间站、区段站、编组站三类。'},
+      {q:'CTC系统全称是？',opts:['A. 列车调度系统','B. 调度集中系统','C. 计算机调度系统','D. 中心调度系统'],ans:'B',type:'single',exp:'CTC是调度集中系统（Centralized Traffic Control），可集中控制车站信号设备。'},
+      {q:'调度命令号码按什么循环？',opts:['A. 月','B. 日','C. 班','D. 周'],ans:'B',type:'single',exp:'调度命令号码按日循环使用。'},
+      {q:'接发列车时，信号开放时机应满足哪些条件？（多选）',opts:['A. 进路准备妥当','B. 道岔位置正确','C. 进路空闲','D. 敌对进路未建立','E. 随时可取消'],ans:['A','B','C','D'],type:'multi',exp:'信号开放必须满足进路准备妥当、道岔位置正确、进路空闲、敌对进路未建立等条件。'},
+      {q:'CTC调度集中系统的功能包括？（多选）',opts:['A. 列车运行实时监控','B. 信号设备集中控制','C. 运行计划调整','D. 进路自动排列','E. 机车驾驶'],ans:['A','B','C','D'],type:'multi',exp:'CTC具有监控、控制、调整、自动排列进路等功能，但不负责机车驾驶。'},
+      {q:'双线区段车站不能相对方向同时接车。',opts:['A. 正确','B. 错误'],ans:'B',type:'judge',exp:'错误。双线区段在特定条件下可以相对方向同时接车，但须遵守相关规定。'},
+      {q:'车站中心线在运行图上用垂直线表示。',opts:['A. 正确','B. 错误'],ans:'A',type:'judge',exp:'正确。车站中心线在运行图上用垂直线表示，列车运行线用斜线表示。'}
+    ]
+  },
+  overheadLine: {
+    title: '接触网运行与检修',
+    subtitle: '牵引供电与接触网',
+    questions: [
+      {q:'我国电气化铁路采用的供电电压为？',opts:['A. 25kV直流','B. 25kV单相交流','C. 15kV交流','D. 10kV直流'],ans:'B',type:'single',exp:'我国电气化铁路采用25kV、50Hz单相交流供电。'},
+      {q:'接触线的标准高度为？',opts:['A. 5050mm','B. 5100mm','C. 5150mm','D. 5200mm'],ans:'C',type:'single',exp:'接触线高度标准值为5150mm，允许误差±30mm。'},
+      {q:'接触网作业的安全措施包括？（多选）',opts:['A. 停电','B. 验电','C. 接地','D. 悬挂警示牌','E. 设防护员'],ans:['A','B','C','D','E'],type:'multi',exp:'接触网作业必须严格执行停电、验电、接地、悬挂警示牌、设防护员等安全措施。'},
+      {q:'锚段的作用包括？（多选）',opts:['A. 缩小事故范围','B. 便于检修','C. 改善弛度','D. 张力补偿','E. 增加跨度'],ans:['A','B','C','D'],type:'multi',exp:'锚段的作用包括缩小事故范围、便于检修、改善弛度、张力补偿等。'},
+      {q:'接触网带电部分的安全距离为2000mm。',opts:['A. 正确','B. 错误'],ans:'A',type:'judge',exp:'正确。作业人员与接触网带电部分的安全距离不得小于2000mm。'},
+      {q:'电分相的作用是隔离不同相位。',opts:['A. 正确','B. 错误'],ans:'A',type:'judge',exp:'正确。电分相用于隔离接触网中不同相位的供电区段，防止相间短路。'}
+    ]
+  },
+  locomotiveRepair: {
+    title: '机车检修与故障处理',
+    subtitle: '电力机车维修技术',
+    questions: [
+      {q:'HXD型电力机车主电路的传动方式为？',opts:['A. 交-直流','B. 交-直-交','C. 直-直流','D. 直-交流'],ans:'B',type:'single',exp:'HXD型机车采用交-直-交传动方式，驱动三相异步牵引电机。'},
+      {q:'DK-1型制动机的大闸控制什么？',opts:['A. 机车','B. 全列车','C. 前后各半','D. 随机'],ans:'B',type:'single',exp:'大闸（电空制动控制器）控制全列车制动，小闸（空气制动阀）控制机车制动。'},
+      {q:'HXD型机车主电路的主要设备包括？（多选）',opts:['A. 受电弓','B. 主断路器','C. 主变压器','D. 变流器','E. 牵引电机'],ans:['A','B','C','D','E'],type:'multi',exp:'HXD型机车主电路包括受电弓、主断路器、主变压器、变流器、牵引电机等设备。'},
+      {q:'DK-1型制动机的主要部件包括？（多选）',opts:['A. 电空制动控制器（大闸）','B. 空气制动阀（小闸）','C. 电空阀','D. 中继阀','E. 分配阀'],ans:['A','B','C','D','E'],type:'multi',exp:'DK-1型制动机包括大闸、小闸、电空阀、中继阀、分配阀等主要部件。'},
+      {q:'常用制动最大减压量（货车）为140kPa。',opts:['A. 正确','B. 错误'],ans:'A',type:'judge',exp:'正确。货车列车管定压500kPa时，常用制动最大减压量为140kPa。'},
+      {q:'紧急制动时列车管压力降为0。',opts:['A. 正确','B. 错误'],ans:'A',type:'judge',exp:'正确。紧急制动位时列车管压力快速降至0，实现最大制动力。'}
+    ]
+  }
+};
+
+// 初始化考试
+function initExam() {
+  const data = QUIZ_DATA[quizId] || QUIZ_DATA.recruitment;
+  
+  document.getElementById('examTitle').textContent = data.title;
+  document.getElementById('examSubtitle').textContent = data.subtitle || '';
+  
+  // 打乱顺序并选取题目
+  questions = shuffleArray([...data.questions]).slice(0, Math.min(questionCount, data.questions.length));
+  userAnswers = new Array(questions.length).fill(null);
+  
+  // 启动计时器
+  startTimer();
+  
+  // 渲染第一题
+  renderQuestion();
+}
+
+// 打乱数组
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// 启动计时器
+function startTimer() {
+  timerInterval = setInterval(() => {
+    if (submitted) return;
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const min = Math.floor(elapsed / 60);
+    const sec = elapsed % 60;
+    document.getElementById('timer').textContent = 
+      `⏱ ${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+  }, 1000);
+}
+
+// 渲染题目
+function renderQuestion() {
+  const q = questions[currentIndex];
+  const total = questions.length;
+  
+  // 更新进度
+  document.getElementById('progressText').textContent = `第 ${currentIndex + 1}/${total} 题`;
+  document.getElementById('progressFill').style.width = `${((currentIndex + 1) / total) * 100}%`;
+  
+  // 更新按钮
+  document.getElementById('btnPrev').disabled = currentIndex === 0;
+  const btnNext = document.getElementById('btnNext');
+  if (currentIndex === total - 1) {
+    btnNext.textContent = '提交答卷';
+    btnNext.className = 'btn btn-submit';
+    btnNext.onclick = submitExam;
+  } else {
+    btnNext.textContent = '下一题 →';
+    btnNext.className = 'btn btn-next';
+    btnNext.onclick = nextQuestion;
+  }
+  
+  // 渲染题目
+  const typeLabels = { single: '单选', multi: '多选', judge: '判断' };
+  const content = document.getElementById('examContent');
+  
+  let html = `
+    <div class="question-card">
+      <div class="question-header">
+        <div class="question-no">
+          <span class="type-badge ${q.type}">${typeLabels[q.type]}</span>
+          <span>第${currentIndex + 1}题</span>
+        </div>
+      </div>
+      <div class="question-text">${q.q}</div>
+      ${q.type === 'multi' ? '<div class="multi-hint">💡 此题为多选题，请选择所有正确答案</div>' : ''}
+      <div class="options">
+  `;
+  
+  if (q.type === 'judge') {
+    const selected = userAnswers[currentIndex];
+    html += `
+      <label class="option ${selected === 'true' ? 'selected' : ''}" onclick="selectAnswer('true')">
+        <input type="radio" name="answer" value="true" ${selected === 'true' ? 'checked' : ''}>
+        <span class="opt-letter">A</span>
+        <span class="opt-text">✅ 正确</span>
+        ${selected === 'true' ? '<span class="option-icon">✓</span>' : ''}
+      </label>
+      <label class="option ${selected === 'false' ? 'selected' : ''}" onclick="selectAnswer('false')">
+        <input type="radio" name="answer" value="false" ${selected === 'false' ? 'checked' : ''}>
+        <span class="opt-letter">B</span>
+        <span class="opt-text">❌ 错误</span>
+        ${selected === 'false' ? '<span class="option-icon">✓</span>' : ''}
+      </label>
+    `;
+  } else {
+    q.opts.forEach((opt, i) => {
+      const val = opt[0];
+      let selected = false;
+      if (q.type === 'multi') {
+        selected = Array.isArray(userAnswers[currentIndex]) && userAnswers[currentIndex].includes(val);
+      } else {
+        selected = userAnswers[currentIndex] === val;
+      }
+      html += `
+        <label class="option ${selected ? 'selected' : ''}" onclick="${q.type === 'multi' ? `toggleMulti('${val}')` : `selectAnswer('${val}')`}">
+          <input type="${q.type === 'multi' ? 'checkbox' : 'radio'}" name="answer" value="${val}" ${selected ? 'checked' : ''}>
+          <span class="opt-letter">${String.fromCharCode(65 + i)}</span>
+          <span class="opt-text">${opt}</span>
+          ${selected ? '<span class="option-icon">✓</span>' : ''}
+        </label>
+      `;
+    });
+  }
+  
+  html += '</div></div>';
+  content.innerHTML = html;
+}
+
+// 选择答案
+function selectAnswer(val) {
+  userAnswers[currentIndex] = val;
+  renderQuestion();
+}
+
+// 多选切换
+function toggleMulti(val) {
+  if (!Array.isArray(userAnswers[currentIndex])) {
+    userAnswers[currentIndex] = [];
+  }
+  const idx = userAnswers[currentIndex].indexOf(val);
+  if (idx > -1) {
+    userAnswers[currentIndex].splice(idx, 1);
+  } else {
+    userAnswers[currentIndex].push(val);
+  }
+  userAnswers[currentIndex].sort();
+  renderQuestion();
+}
+
+// 上一题
+function prevQuestion() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    renderQuestion();
+  }
+}
+
+// 下一题
+function nextQuestion() {
+  if (currentIndex < questions.length - 1) {
+    currentIndex++;
+    renderQuestion();
+  }
+}
+
+// 提交考试
+function submitExam() {
+  if (submitted) return;
+  
+  const unanswered = userAnswers.filter(a => a === null).length;
+  if (unanswered > 0) {
+    if (!confirm(`还有${unanswered}道题未作答，确认提交吗？`)) {
+      return;
+    }
+  }
+  
+  submitted = true;
+  clearInterval(timerInterval);
+  
+  // 计算成绩
+  let correct = 0, wrong = 0, unansweredCount = 0;
+  const results = [];
+  
+  questions.forEach((q, i) => {
+    const userAns = userAnswers[i];
+    let isCorrect = false;
+    
+    if (userAns === null) {
+      unansweredCount++;
+    } else if (q.type === 'multi') {
+      const correctArr = Array.isArray(q.ans) ? q.ans.sort() : [q.ans];
+      isCorrect = JSON.stringify(userAns.sort()) === JSON.stringify(correctArr);
+    } else if (q.type === 'judge') {
+      isCorrect = String(userAns) === String(q.ans);
+    } else {
+      isCorrect = userAns === q.ans;
+    }
+    
+    if (userAns !== null) {
+      isCorrect ? correct++ : wrong++;
+    }
+    results.push({ q, userAns, isCorrect });
+  });
+  
+  const total = questions.length;
+  const score = Math.round((correct / total) * 100);
+  const passLine = 60;
+  const passed = score >= passLine;
+  const timeUsed = Math.floor((Date.now() - startTime) / 1000);
+  
+  // 渲染结果
+  const content = document.getElementById('examContent');
+  document.getElementById('footer').style.display = 'none';
+  document.querySelector('.progress-bar').style.display = 'none';
+  document.getElementById('progressText').textContent = '考试完成';
+  document.getElementById('progressFill').style.width = '100%';
+  
+  let html = `
+    <div class="result-card">
+      <div class="result-icon">${passed ? '🎉' : '💪'}</div>
+      <div class="result-status">${passed ? '恭喜通过考试！' : '继续加油！'}</div>
+      <div class="result-score">${score}<span>分</span></div>
+      <div class="result-stats">
+        <div class="stat-box correct">
+          <div class="num">${correct}</div>
+          <div class="label">答对</div>
+        </div>
+        <div class="stat-box wrong">
+          <div class="num">${wrong}</div>
+          <div class="label">答错</div>
+        </div>
+        <div class="stat-box unanswered">
+          <div class="num">${unansweredCount}</div>
+          <div class="label">未答</div>
+        </div>
+        <div class="stat-box">
+          <div class="num">${Math.floor(timeUsed/60)}分${(timeUsed%60).toString().padStart(2,'0')}秒</div>
+          <div class="label">用时</div>
+        </div>
+      </div>
+      <div class="btn-actions">
+        <button class="btn btn-prev" onclick="location.reload()">🔄 重新考试</button>
+        <button class="btn btn-next" onclick="showAnalysis()">📖 查看解析</button>
+      </div>
+    </div>
+    <div class="analysis-section" id="analysisSection" style="display:none">
+      <div class="analysis-title">📝 答题解析</div>
+      ${results.map((r, i) => {
+        const statusClass = r.userAns === null ? 'unanswered' : r.isCorrect ? 'correct' : 'wrong';
+        const statusIcon = r.userAns === null ? '⬜' : r.isCorrect ? '✅' : '❌';
+        const typeLabels = { single: '单选', multi: '多选', judge: '判断' };
+        
+        let userAnsDisplay = '未作答';
+        if (r.userAns !== null) {
+          if (r.q.type === 'judge') {
+            userAnsDisplay = r.userAns === 'true' ? '正确' : '错误';
+          } else if (r.q.type === 'multi') {
+            userAnsDisplay = Array.isArray(r.userAns) ? r.userAns.join('') : r.userAns;
+          } else {
+            userAnsDisplay = r.userAns;
+          }
+        }
+        
+        let correctAnsDisplay = '';
+        if (r.q.type === 'judge') {
+          correctAnsDisplay = r.q.ans ? '正确' : '错误';
+        } else if (r.q.type === 'multi') {
+          correctAnsDisplay = Array.isArray(r.q.ans) ? r.q.ans.join('') : r.q.ans;
+        } else {
+          correctAnsDisplay = r.q.ans;
+        }
+        
+        return `
+          <div class="analysis-item ${statusClass}">
+            <div class="analysis-q">
+              <span>${statusIcon}</span>
+              <span>[${typeLabels[r.q.type]}] 第${i+1}题：${r.q.q}</span>
+            </div>
+            <div class="analysis-ans">
+              你的答案：<strong>${userAnsDisplay}</strong>
+              ${!r.isCorrect && r.userAns !== null ? ` | 正确答案：<strong style="color:#27ae60">${correctAnsDisplay}</strong>` : ''}
+            </div>
+            <div class="analysis-exp">💡 ${r.q.exp || '暂无解析'}</div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+  
+  content.innerHTML = html;
+  
+  // 添加全局函数
+  window.showAnalysis = function() {
+    document.getElementById('analysisSection').style.display = 'block';
+    document.querySelector('.btn-actions').style.display = 'none';
+  };
+}
+
+// 初始化
+document.addEventListener('DOMContentLoaded', initExam);
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+{
+  "code": "nanning",
+  "name": "中国铁路南宁局集团有限公司",
+  "shortName": "南宁局",
+  "tier": 3,
+  "tierLabel": "第三梯队",
+  "tierDesc": "待遇中等偏下（竞争较小）",
+  "headquarters": "广西壮族自治区南宁市",
+  "coverage": "广西全境及湖南、贵州部分",
+  "mileage": "约6000公里",
+  "lines": ["南广高铁", "柳南客专", "湘桂铁路", "南凭铁路（对接东盟）"],
+  "recruitmentScale": "1500-2000人/年",
+  "competitionRatio": "5:1-12:1",
+  "difficulty": 2,
+  "difficultyLabel": "较易级",
+  "educationPreference": "专科及以上",
+  "juniorCollegeRatio": "约70%",
+  "salary": {
+    "undergraduateMonthly": "4000-5500",
+    "highSpeedDriverMonthly": "7000-11000",
+    "annualBonus": "0.3-1.2万元",
+    "features": ["边疆津贴补充", "南凭铁路通往东盟国际机遇"]
+  },
+  "benefits": ["五险一金", "宿舍", "工作餐"],
+  "features": ["广西是中国-东盟交流前沿", "南凭铁路通往越南", "边疆地理优势", "南方/广西院校学生优先"],
+  "departments": ["南宁站", "南宁东站", "柳州站", "桂林站", "南宁机务段"],
+  "checkupSpecial": ["南方夏季高温需心血管稳定", "纹身严格（客运/乘务岗位）"],
+  "contact": "0771-2XXXXXXX",
+  "lastUpdated": "2025-06"
+}

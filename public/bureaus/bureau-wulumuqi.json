@@ -1,0 +1,35 @@
+{
+  "code": "wulumuqi",
+  "name": "中国铁路乌鲁木齐局集团有限公司",
+  "shortName": "乌鲁木齐局",
+  "tier": 2,
+  "tierLabel": "第二梯队",
+  "tierDesc": "中高待遇（含边疆补贴）",
+  "headquarters": "新疆乌鲁木齐市",
+  "coverage": "新疆全境（全国铁路网西北末端）",
+  "mileage": "新疆铁路网络",
+  "lines": ["兰新高铁（乌哈段）", "南疆铁路"],
+  "establishedDate": "1958年10月25日",
+  "recruitmentScale": "约745人/年",
+  "competitionRatio": "5:1-12:1",
+  "difficulty": 2,
+  "difficultyLabel": "较易级",
+  "educationPreference": "本科及以上",
+  "juniorCollegeRatio": "约30%",
+  "salary": {
+    "undergraduateMonthly": "4500-6500",
+    "withSubsidyMonthly": "7000-9000",
+    "highSpeedDriverMonthly": "9000-14000（含边疆补贴）",
+    "subsidies": {
+      "borderAllowance": "800-2000元/月"
+    },
+    "annualBonus": "0.5-1.5万元",
+    "features": ["边疆补贴800-2000元/月", "新疆战略地位重要"]
+  },
+  "benefits": ["边疆补贴", "艰苦地区津贴", "宿舍"],
+  "features": ["新疆战略地位重要", "铁路发展迅速", "边疆补贴后实际收入可观"],
+  "departments": ["乌鲁木齐站", "乌鲁木齐南站", "喀什站", "乌鲁木齐机务段"],
+  "checkupSpecial": ["高原/高海拔适应", "辨色力严格", "纹身严格（客运/乘务岗位）"],
+  "contact": "0991-7XXXXXXX",
+  "lastUpdated": "2025-06"
+}

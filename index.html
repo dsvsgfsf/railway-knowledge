@@ -315,7 +315,7 @@ a { color: inherit; text-decoration: none; }
   </div>
 </header>
 
-<div id="sidebar-overlay" onclick="toggleMobileMenu()"></div>
+<div id="sidebar-overlay" onclick="toggleMobileMenu()" style="display:none;"></div>
 <div id="layout">
   <aside id="sidebar">
     <div class="sidebar-section">
@@ -470,13 +470,17 @@ a { color: inherit; text-decoration: none; }
 'use strict';
 
 /* ── Mobile Menu Toggle ── */
-function toggleMobileMenu(){
+window.toggleMobileMenu = function(){
   const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
   sidebar.classList.toggle('open');
+  if(overlay){
+    overlay.classList.toggle('show');
+  }
 }
 
 /* ── API Config Auto-save/load ── */
-function loadApiConfig(){
+window.loadApiConfig = function(){
   const saved = localStorage.getItem('railway_api_config');
   if(saved){
     try {
@@ -490,7 +494,7 @@ function loadApiConfig(){
   }
 }
 
-function saveApiConfig(){
+window.saveApiConfig = function(){
   const cfg = {
     key: document.getElementById('cfg-api-key').value.trim(),
     url: document.getElementById('cfg-api-url').value.trim() || 'https://api.deepseek.com/v1/chat/completions',

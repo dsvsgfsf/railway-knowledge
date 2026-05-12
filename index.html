@@ -336,7 +336,12 @@ a { color: inherit; text-decoration: none; }
         <input type="text" id="cfg-api-url" value="https://api.deepseek.com/v1/chat/completions" />
         <label>模型</label>
         <select id="cfg-model"><option value="deepseek-chat">deepseek-chat（推荐）</option><option value="deepseek-reasoner">deepseek-reasoner</option></select>
-        <button class="btn-save" onclick="saveApiConfig()">✓ 保存并测试连接</button>
+        <button class="btn-save" onclick="saveApiConfig()">✓ 保存配置</button>
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <button onclick="exportApiConfig()" style="flex:1;padding:6px;border-radius:6px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);font-size:11px;border:1px solid rgba(255,255,255,.15);cursor:pointer">📤 导出</button>
+          <button onclick="document.getElementById('import-api-file').click()" style="flex:1;padding:6px;border-radius:6px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);font-size:11px;border:1px solid rgba(255,255,255,.15);cursor:pointer">📥 导入</button>
+        </div>
+        <input type="file" id="import-api-file" accept=".json" style="display:none" onchange="importApiConfig(this)">
       </div>
     </div>
     <div class="sidebar-section">
@@ -355,15 +360,15 @@ a { color: inherit; text-decoration: none; }
       <a class="quick-link" onclick="quickAsk('推荐适合我当前年级和专业方向的课程书籍')"><span class="ql-icon">📚</span>课程书籍推荐</a>
       <a class="quick-link" onclick="quickAsk('请详细介绍全国各铁路局的招聘条件和要求')"><span class="ql-icon">🏢</span>铁路局招聘</a>
       <a class="quick-link" onclick="openBureauOverview()"><span class="ql-icon">🏛️</span>铁路局详情页</a>
-      <a class="quick-link" href="/public/hospital-map.html" target="_blank" style="color:#27ae60;"><span class="ql-icon">🏥</span>体检医院地图</a>
-      <a class="quick-link" href="/public/realtime-news.html" target="_blank" style="color:#e74c3c;"><span class="ql-icon">📡</span>实时铁路消息</a>
+      <a class="quick-link" href="public/hospital-map.html" target="_blank" style="color:#27ae60;"><span class="ql-icon">🏥</span>体检医院地图</a>
+      <a class="quick-link" href="public/realtime-news.html" target="_blank" style="color:#e74c3c;"><span class="ql-icon">📡</span>实时铁路消息</a>
       <a class="quick-link" href="hljtu-bookshelf.html" target="_blank" style="color:#C8A951;text-decoration:none"><span class="ql-icon">📖</span>教材书架</a>
       <a class="quick-link" onclick="openBookshelfModal()"><span class="ql-icon">📚</span>课程教材查询</a>
-      <a class="quick-link" href="/public/feedback.html" target="_blank" style="color:#f0a500;"><span class="ql-icon">💬</span>问题反馈</a>
+      <a class="quick-link" href="public/feedback.html" target="_blank" style="color:#f0a500;"><span class="ql-icon">💬</span>问题反馈</a>
       <a class="quick-link" onclick="quickAsk('查看题库目录')"><span class="ql-icon">📝</span>模拟考试</a>
-      <a class="quick-link" href="/public/railway-exam.html" target="_blank" style="color:#9b59b6;"><span class="ql-icon">📋</span>铁路模拟考试</a>
-      <a class="quick-link" href="/public/railway-game.html" target="_blank" style="color:#e74c3c;"><span class="ql-icon">🎮</span>司机模拟驾驶</a>
-      <a class="quick-link" href="/public/social.html" target="_blank" style="color:#27ae60;"><span class="ql-icon">💬</span>铁路社交平台</a>
+      <a class="quick-link" href="public/railway-exam.html" target="_blank" style="color:#9b59b6;"><span class="ql-icon">📋</span>铁路模拟考试</a>
+      <a class="quick-link" href="public/railway-game.html" target="_blank" style="color:#e74c3c;"><span class="ql-icon">🎮</span>司机模拟驾驶</a>
+      <a class="quick-link" href="public/social.html" target="_blank" style="color:#27ae60;"><span class="ql-icon">💬</span>铁路社交平台</a>
       <a class="quick-link" onclick="quickAsk('铁路实操演示')"><span class="ql-icon">📺</span>实操演示</a>
       <a class="quick-link" onclick="openVideoLearning()" style="color:#C8A951;"><span class="ql-icon">🎬</span>学习视频库</a>
     </div>
@@ -517,6 +522,53 @@ function updateApiStatus(){
     dot.className = 'dot';
     text.textContent = '未配置（仅语料库）';
   }
+}
+
+/* ── API配置导入/导出（跨设备同步） ── */
+window.exportApiConfig = function(){
+  const cfg = {
+    key: document.getElementById('cfg-api-key').value.trim(),
+    url: document.getElementById('cfg-api-url').value.trim(),
+    model: document.getElementById('cfg-model').value
+  };
+  if(!cfg.key){
+    showToast('请先填写API Key再导出', 'error');
+    return;
+  }
+  const blob = new Blob([JSON.stringify(cfg, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'railway-api-config.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('API配置已导出！可复制到其他设备导入', 'success');
+}
+
+window.importApiConfig = function(fileInput){
+  const file = fileInput.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try {
+      const cfg = JSON.parse(e.target.result);
+      if(cfg.key){
+        document.getElementById('cfg-api-key').value = cfg.key || '';
+        document.getElementById('cfg-api-url').value = cfg.url || 'https://api.deepseek.com/v1/chat/completions';
+        document.getElementById('cfg-model').value = cfg.model || 'deepseek-chat';
+        state.apiConfig = cfg;
+        localStorage.setItem('railway_api_config', JSON.stringify(cfg));
+        updateApiStatus();
+        showToast('API配置导入成功！', 'success');
+      } else {
+        showToast('导入失败：未找到有效的API Key', 'error');
+      }
+    } catch(err){
+      showToast('导入失败：文件格式错误', 'error');
+    }
+  };
+  reader.readAsText(file);
+  fileInput.value = '';
 }
 
 /* ── State ── */
@@ -1193,7 +1245,7 @@ ${s.campuses.map(c=>'📍 '+c).join('<br>')}
     html += `<p style="font-size:13px;color:#666;line-height:1.7;margin-bottom:12px">覆盖全国31个省份，包括各省份标志性三甲医院，点击医院名称可跳转高德地图导航</p>`;
     html += `<p style="font-size:13px;color:#c0392b;font-weight:600">⚠️ 建议到铁路局指定医院或二甲以上公立医院体检</p>`;
     html += `</div>`;
-    html += `<a href="/public/hospital-map.html" target="_blank" style="display:inline-block;padding:12px 24px;background:#003087;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px;margin-top:8px">`;
+    html += `<a href="public/hospital-map.html" target="_blank" style="display:inline-block;padding:12px 24px;background:#003087;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px;margin-top:8px">`;
     html += `🗺️ 打开体检医院地图</a>`;
     html += `<br><br><div style="font-size:12px;color:#666">按铁路局筛选：哈尔滨局/沈阳局/北京局/太原局/呼和浩特局/郑州局/武汉局/西安局/济南局/上海局/南昌局/广铁集团/成都局/兰州局/青藏集团/乌鲁木齐局</div>`;
     return html;
@@ -2184,7 +2236,7 @@ window.openVideoLearning = function(){
       </div>
       <div id="bs-book-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:14px"></div>
       <div style="text-align:center;margin-top:20px;padding-top:16px;border-top:1px solid rgba(200,169,81,.1)">
-        <a href="bookshelf.html" target="_blank" style="display:inline-block;padding:10px 28px;background:#C8A951;color:#0A1E3C;border-radius:10px;font-size:14px;font-weight:700;text-decoration:none">&#128218; 打开完整书架（搜索/筛选）</a>
+        <a href="hljtu-bookshelf.html" target="_blank" style="display:inline-block;padding:10px 28px;background:#C8A951;color:#0A1E3C;border-radius:10px;font-size:14px;font-weight:700;text-decoration:none">&#128218; 打开完整书架（搜索/筛选）</a>
       </div>
     </div>`;
     overlay.innerHTML = html;
@@ -2265,7 +2317,7 @@ window.openVideoLearning = function(){
       </div>`;
     });
     html += `</div>`;
-    html += `<br><a href="bookshelf.html" target="_blank" style="display:inline-block;padding:8px 20px;background:var(--primary);color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none">&#128218; 打开完整书架</a>`;
+    html += `<br><a href="hljtu-bookshelf.html" target="_blank" style="display:inline-block;padding:8px 20px;background:var(--primary);color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none">&#128218; 打开完整书架</a>`;
     html += ` <span class="tag-inline" onclick="openBookshelfModal()" style="cursor:pointer">📖 查看全部${books.length}种教材</span>`;
     return html;
   };

@@ -1,0 +1,30 @@
+{
+  "code": "wuhan",
+  "name": "中国铁路武汉局集团有限公司",
+  "shortName": "武汉局",
+  "tier": 2,
+  "tierLabel": "第二梯队",
+  "tierDesc": "中高待遇",
+  "headquarters": "湖北省武汉市",
+  "coverage": "湖北省全境及河南省、安徽省部分",
+  "mileage": "约6000公里",
+  "lines": ["京广高铁", "汉十高铁", "武九线"],
+  "recruitmentScale": "2500-3000人/年",
+  "competitionRatio": "15:1-30:1",
+  "difficulty": 3,
+  "difficultyLabel": "中等级",
+  "educationPreference": "专科及以上",
+  "juniorCollegeRatio": "约55%",
+  "salary": {
+    "undergraduateMonthly": "5500-7500",
+    "highSpeedDriverMonthly": "10000-15000",
+    "annualBonus": "1-3万元",
+    "features": ["九省通衢线路发达", "武汉铁路职院学生机会多"]
+  },
+  "benefits": ["五险一金", "宿舍", "工作餐", "节日福利"],
+  "features": ["九省通衢，线路发达", "武汉铁路职业技术学院学生机会较多"],
+  "departments": ["武汉站", "武昌站", "汉口站", "武汉机务段", "武汉动车段"],
+  "checkupSpecial": ["辨色力严格（信号工必查）"],
+  "contact": "027-511XXXXX",
+  "lastUpdated": "2025-06"
+}

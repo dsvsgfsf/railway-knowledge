@@ -1,0 +1,2207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>铁路知识智能查询系统 — 黑龙江交通职业技术学院</title>
+<style>
+:root {
+  --primary: #003087; --primary-light: #1a4b8c; --primary-dark: #001e5a;
+  --accent: #c0392b; --accent-light: #e74c3c; --gold: #f0a500;
+  --bg-page: #f0f2f7; --bg-card: #ffffff; --bg-sidebar: #001e5a;
+  --text-main: #1a1a2e; --text-sub: #555; --text-light: #888;
+  --border: #dde3f0; --shadow: 0 4px 20px rgba(0,48,135,.12);
+  --radius: 12px; --radius-sm: 8px;
+  --sidebar-w: 300px; --header-h: 68px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; font-family: 'Microsoft YaHei','PingFang SC',Arial,sans-serif; background: var(--bg-page); color: var(--text-main); }
+button { cursor: pointer; border: none; outline: none; background: none; font-family: var(--font); }
+input, textarea, select { font-family: 'Microsoft YaHei','PingFang SC',Arial,sans-serif; }
+a { color: inherit; text-decoration: none; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #edf0f7; }
+::-webkit-scrollbar-thumb { background: #b0bbd8; border-radius: 6px; }
+
+#header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: var(--header-h);
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, var(--primary-light) 100%);
+  display: flex; align-items: center; padding: 0 24px;
+  box-shadow: 0 2px 12px rgba(0,30,90,.4);
+}
+#header .logo-area { display: flex; align-items: center; gap: 14px; flex: 1; }
+#header .logo-icon { width: 46px; height: 46px; background: rgba(255,255,255,.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+#header .logo-text h1 { font-size: 18px; font-weight: 700; color: #fff; letter-spacing: .5px; }
+#header .logo-text p { font-size: 11px; color: rgba(255,255,255,.65); margin-top: 2px; }
+#header .header-badges { display: flex; gap: 8px; }
+#header .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; background: rgba(255,255,255,.12); color: rgba(255,255,255,.85); border: 1px solid rgba(255,255,255,.2); }
+#header .badge.red { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+#layout { display: flex; height: 100vh; padding-top: var(--header-h); }
+
+#sidebar {
+  width: var(--sidebar-w); min-width: var(--sidebar-w);
+  background: var(--bg-sidebar); display: flex; flex-direction: column;
+  padding: 20px 0; overflow-y: auto; border-right: 1px solid rgba(255,255,255,.06);
+}
+.sidebar-section { padding: 0 16px 16px; }
+.sidebar-title { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: rgba(255,255,255,.35); padding: 0 6px 8px; text-transform: uppercase; }
+
+#student-card { background: rgba(255,255,255,.06); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,.1); }
+#student-card .sc-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+#student-card .sc-row:last-child { margin-bottom: 0; }
+#student-card .sc-label { font-size: 11px; color: rgba(255,255,255,.45); width: 44px; flex-shrink: 0; }
+#student-card .sc-value { font-size: 13px; color: #fff; font-weight: 500; flex: 1; }
+#student-card .sc-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+
+#api-config-panel { background: rgba(255,255,255,.05); border-radius: var(--radius-sm); padding: 14px; border: 1px solid rgba(255,255,255,.08); }
+#api-config-panel label { font-size: 11px; color: rgba(255,255,255,.5); display: block; margin-bottom: 5px; }
+#api-config-panel input, #api-config-panel select { width: 100%; padding: 7px 10px; border-radius: 6px; font-size: 12px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); color: #fff; margin-bottom: 10px; }
+#api-config-panel input::placeholder { color: rgba(255,255,255,.3); }
+#api-config-panel input[type="password"] { letter-spacing: 2px; }
+#api-config-panel .btn-save { width: 100%; padding: 8px; border-radius: 6px; background: var(--primary); color: #fff; font-size: 12px; font-weight: 600; border: 1px solid rgba(255,255,255,.15); transition: background .2s; }
+#api-config-panel .btn-save:hover { background: var(--primary-light); }
+#api-status { display: flex; align-items: center; gap: 5px; font-size: 11px; color: rgba(255,255,255,.45); margin-bottom: 10px; }
+#api-status .dot { width: 7px; height: 7px; border-radius: 50%; background: #666; transition: background .3s; }
+#api-status .dot.ok { background: #27ae60; }
+#api-status .dot.err { background: var(--accent); }
+#api-status .dot.loading { background: var(--gold); animation: blink .8s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+#corpus-status { padding: 10px 12px; background: rgba(255,255,255,.04); border-radius: 8px; border: 1px solid rgba(255,255,255,.07); }
+#corpus-status .cs-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+#corpus-status .cs-row:last-child { margin-bottom: 0; }
+#corpus-status .cs-key { font-size: 11px; color: rgba(255,255,255,.4); }
+#corpus-status .cs-val { font-size: 11px; color: rgba(255,255,255,.7); font-weight: 600; }
+
+.quick-link { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; color: rgba(255,255,255,.7); font-size: 13px; transition: all .15s; margin-bottom: 2px; }
+.quick-link:hover { background: rgba(255,255,255,.08); color: #fff; }
+.quick-link .ql-icon { font-size: 16px; width: 22px; text-align: center; }
+
+#btn-new-chat { margin: 0 16px; padding: 10px; border-radius: 8px; background: var(--accent); color: #fff; font-size: 13px; font-weight: 700; width: calc(100% - 32px); transition: background .2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+#btn-new-chat:hover { background: var(--accent-light); }
+
+/* ── MAIN ── */
+#main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+#messages { flex: 1; overflow-y: auto; padding: 28px 32px; display: flex; flex-direction: column; gap: 20px; }
+
+#welcome-banner {
+  background: linear-gradient(135deg, var(--primary) 0%, #1565c0 100%);
+  border-radius: var(--radius); padding: 28px 32px; color: #fff;
+  position: relative; overflow: hidden; margin-bottom: 4px;
+}
+#welcome-banner::before { content:'🚂'; position:absolute; right:24px; top:50%; transform:translateY(-50%); font-size:80px; opacity:.12; }
+#welcome-banner h2 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+#welcome-banner p { font-size: 14px; line-height: 1.7; color: rgba(255,255,255,.85); max-width: 600px; }
+#welcome-banner .wb-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+#welcome-banner .wb-tag { padding: 4px 12px; border-radius: 20px; font-size: 12px; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25); }
+
+/* Year selector */
+#year-select { display: flex; gap: 10px; flex-wrap: wrap; }
+.year-card {
+  flex: 1; min-width: 120px; background: var(--bg-card); border: 2px solid var(--border);
+  border-radius: var(--radius); padding: 12px 8px; cursor: pointer;
+  text-align: center; transition: all .2s;
+}
+.year-card:hover { border-color: var(--primary); box-shadow: var(--shadow); transform: translateY(-2px); }
+.year-card .yc-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; background: var(--primary); color: #fff; margin-bottom: 6px; }
+.year-card .yc-label { font-size: 14px; font-weight: 700; color: var(--text-main); }
+.year-card .yc-sub { font-size: 11px; color: var(--text-sub); margin-top: 4px; }
+
+/* Grade selector */
+#grade-select { display: flex; gap: 16px; flex-wrap: wrap; }
+.grade-card {
+  flex: 1; min-width: 200px; background: var(--bg-card); border: 2px solid var(--border);
+  border-radius: var(--radius); padding: 20px; cursor: pointer;
+  text-align: center; transition: all .2s;
+}
+.grade-card:hover { border-color: var(--primary); box-shadow: var(--shadow); transform: translateY(-2px); }
+.grade-card .gc-icon { font-size: 36px; margin-bottom: 10px; }
+.grade-card .gc-title { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 6px; }
+.grade-card .gc-desc { font-size: 13px; color: var(--text-sub); line-height: 1.6; }
+
+/* Messages */
+.msg { display: flex; gap: 12px; align-items: flex-start; }
+.msg.user { flex-direction: row-reverse; }
+.msg-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0; background: var(--primary); color: #fff; font-weight: 700;
+}
+.msg.user .msg-avatar { background: var(--accent); }
+.msg-body { max-width: 68%; }
+.msg.user .msg-body { align-items: flex-end; display: flex; flex-direction: column; }
+.msg-name { font-size: 11px; color: var(--text-light); margin-bottom: 4px; font-weight: 600; }
+.msg.user .msg-name { text-align: right; }
+.msg-bubble {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 12px 12px 12px 4px; padding: 12px 16px;
+  font-size: 14px; line-height: 1.75; color: var(--text-main);
+  box-shadow: 0 2px 8px rgba(0,0,0,.05); word-break: break-word;
+}
+.msg.user .msg-bubble { background: var(--primary); color: #fff; border-color: var(--primary); border-radius: 12px 12px 4px 12px; }
+.msg-bubble strong { font-weight: 700; }
+.msg-bubble em { font-style: italic; }
+.msg-bubble ul { padding-left: 18px; margin: 6px 0; }
+.msg-bubble li { margin-bottom: 4px; }
+.msg-bubble .tag-inline { display:inline-block; padding:1px 7px; border-radius:4px; font-size:12px; background:rgba(0,48,135,.08); color:var(--primary); border:1px solid rgba(0,48,135,.15); font-weight:600; margin:0 2px; }
+
+/* Course & Rec cards */
+.course-cards { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+.course-card { background: linear-gradient(135deg,#f8f9ff,#eef2ff); border:1px solid #d0d9f5; border-radius:8px; padding:10px 14px; min-width:160px; cursor:pointer; transition:all .15s; }
+.course-card:hover { border-color:var(--primary); box-shadow:0 3px 10px rgba(0,48,135,.1); }
+.course-card .cc-book { font-size: 20px; margin-bottom: 4px; }
+.course-card .cc-name { font-size: 13px; font-weight: 700; color: var(--primary); }
+.course-card .cc-sub { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+
+.rec-cards { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+.rec-card { background:#fff; border:1px solid #e0d6cc; border-left:4px solid var(--accent); border-radius:8px; padding:10px 14px; min-width:200px; font-size:13px; line-height:1.7; }
+.rec-card .rc-bureau { font-weight:700; color:var(--accent); font-size:14px; }
+.rec-card .rc-detail { color:var(--text-sub); font-size:12px; margin-top:4px; }
+
+.source-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:10px; font-size:11px; background:rgba(0,48,135,.06); color:var(--primary); border:1px solid rgba(0,48,135,.12); margin-top:8px; }
+.source-badge a { color:var(--primary); text-decoration:underline; }
+
+.bureau-select-card:hover { border-color:var(--primary)!important; box-shadow:var(--shadow); transform:translateY(-2px); }
+
+/* Search suggestions */
+#search-suggestions { position:absolute; bottom:100%; left:0; right:0; background:#fff; border:1.5px solid var(--border); border-radius:10px; box-shadow:0 -4px 20px rgba(0,0,0,.1); max-height:240px; overflow-y:auto; display:none; z-index:50; }
+#search-suggestions.show { display:block; }
+.sug-item { padding:10px 16px; font-size:13px; cursor:pointer; transition:background .1s; display:flex; align-items:center; gap:10px; }
+.sug-item:hover { background:rgba(0,48,135,.05); }
+.sug-item .sug-icon { font-size:16px; width:22px; text-align:center; }
+.sug-item .sug-text { flex:1; }
+.sug-item .sug-cat { font-size:11px; color:var(--text-light); }
+
+/* Category tabs */
+.cat-tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+.cat-tab { padding:5px 12px; border-radius:16px; font-size:12px; font-weight:600; border:1.5px solid var(--border); color:var(--text-sub); background:var(--bg-card); cursor:pointer; transition:all .15s; }
+.cat-tab:hover, .cat-tab.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+
+.typing-dots { display:inline-flex; gap:4px; align-items:center; padding:4px 0; }
+.typing-dots span { width:7px; height:7px; border-radius:50%; background:var(--primary-light); display:inline-block; animation:bounce .8s ease-in-out infinite; }
+.typing-dots span:nth-child(2){animation-delay:.15s;}
+.typing-dots span:nth-child(3){animation-delay:.3s;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);} 30%{transform:translateY(-6px);} }
+
+.option-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+.opt-btn { padding:7px 14px; border-radius:20px; font-size:13px; font-weight:600; border:1.5px solid var(--primary); color:var(--primary); background:rgba(0,48,135,.05); transition:all .15s; cursor:pointer; }
+.opt-btn:hover { background:var(--primary); color:#fff; }
+
+/* Input */
+#input-area { border-top: 1px solid var(--border); background: var(--bg-card); padding: 16px 32px 20px; }
+#input-area .disclaimer { font-size: 11px; color: var(--text-light); text-align: center; margin-bottom: 10px; }
+#input-area .disclaimer span { color: var(--primary); }
+.input-box { display: flex; gap: 10px; align-items: flex-end; }
+#user-input { flex:1; padding:12px 16px; border:1.5px solid var(--border); border-radius:10px; font-size:14px; resize:none; line-height:1.6; transition:border-color .2s; background:#fafbff; max-height:120px; }
+#user-input:focus { outline:none; border-color:var(--primary); background:#fff; }
+#user-input::placeholder { color:#bbb; }
+.btn-send { width:46px; height:46px; border-radius:10px; background:var(--primary); color:#fff; display:flex; align-items:center; justify-content:center; font-size:20px; transition:background .2s,transform .1s; flex-shrink:0; }
+.btn-send:hover { background:var(--primary-light); }
+.btn-send:active { transform:scale(.92); }
+.btn-send:disabled { background:#ccc; cursor:not-allowed; }
+
+/* Modal */
+#modal-overlay { display:none; position:fixed; inset:0; z-index:200; background:rgba(0,0,0,.45); align-items:center; justify-content:center; }
+#modal-overlay.show { display:flex; }
+.modal-box { background:#fff; border-radius:var(--radius); padding:28px 32px; width:500px; max-width:95vw; box-shadow:0 20px 60px rgba(0,0,0,.25); position:relative; }
+.modal-box h3 { font-size:18px; font-weight:700; color:var(--primary); margin-bottom:4px; }
+.modal-box p.modal-sub { font-size:13px; color:var(--text-light); margin-bottom:20px; }
+.form-group { margin-bottom:16px; }
+.form-group label { display:block; font-size:13px; font-weight:600; color:var(--text-main); margin-bottom:6px; }
+.form-group input, .form-group select { width:100%; padding:10px 14px; border:1.5px solid var(--border); border-radius:8px; font-size:13px; }
+.form-group input:focus, .form-group select:focus { outline:none; border-color:var(--primary); }
+.modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
+.btn-cancel { padding:9px 20px; border-radius:8px; font-size:13px; border:1.5px solid var(--border); color:var(--text-sub); cursor:pointer; background:#fff; }
+.btn-cancel:hover { background:#f5f5f5; }
+.btn-confirm { padding:9px 20px; border-radius:8px; font-size:13px; background:var(--primary); color:#fff; font-weight:700; cursor:pointer; border:1px solid rgba(255,255,255,.15); }
+.btn-confirm:hover { background:var(--primary-light); }
+.modal-close { position:absolute; top:14px; right:18px; font-size:20px; color:#999; cursor:pointer; background:none; border:none; }
+.modal-close:hover { color:var(--accent); }
+
+/* Toast */
+#toast { position:fixed; bottom:32px; right:32px; z-index:999; padding:12px 20px; border-radius:10px; background:var(--primary-dark); color:#fff; font-size:13px; font-weight:600; box-shadow:0 6px 24px rgba(00,0,.25); transform:translateY(20px); opacity:0; transition:all .3s; pointer-events:none; }
+#toast.show { transform:translateY(0); opacity:1; }
+#toast.success { background:#27ae60; }
+#toast.error { background:var(--accent); }
+
+@media (max-width:768px) {
+  :root { --sidebar-w:0px; }
+  #sidebar { display:none; }
+  #messages { padding:16px; }
+  #input-area { padding:12px 16px 16px; }
+  #header .header-badges { display:none; }
+}
+
+/* ── 流式输出样式 ── */
+.stream-badge { font-size:10px; font-weight:normal; background:var(--accent); color:#fff; padding:2px 6px; border-radius:8px; margin-left:6px; animation:pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+.cursor-blink { display:inline-block; width:2px; height:14px; background:var(--primary); margin-left:2px; animation:blink .8s step-end infinite; vertical-align:middle; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* ── 题库/考试样式 ── */
+.quiz-wrapper { padding:4px 0; }
+.quiz-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.quiz-title { font-weight:700; font-size:14px; color:var(--primary); }
+.quiz-timer { font-size:12px; color:var(--text-sub); background:var(--bg-page); padding:3px 8px; border-radius:8px; }
+.quiz-item { border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:10px; transition:background .2s; }
+.quiz-item:hover { background:#f8f9ff; }
+.qi-no { font-size:11px; color:var(--text-light); margin-bottom:4px; display:flex; align-items:center; gap:6px; }
+.qi-type-badge { padding:2px 6px; border-radius:4px; font-size:10px; font-weight:700; }
+.qi-type-badge.single { background:#dbeafe; color:#1d4ed8; }
+.qi-type-badge.multi { background:#dcfce7; color:#15803d; }
+.qi-type-badge.judge { background:#fef3c7; color:#b45309; }
+.qi-question { font-size:13px; font-weight:600; margin-bottom:8px; line-height:1.6; }
+.qi-opts { display:flex; flex-direction:column; gap:5px; }
+.qi-opt { display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer; padding:5px 8px; border-radius:6px; transition:background .15s; }
+.qi-opt:hover { background:rgba(0,48,135,.06); }
+.qi-opt input { cursor:pointer; }
+.quiz-actions { display:flex; gap:10px; margin-top:12px; }
+.btn-submit-quiz { background:var(--primary); color:#fff; padding:8px 20px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; border:none; }
+.btn-submit-quiz:hover { background:var(--primary-light); }
+.btn-clear-quiz { background:var(--bg-page); color:var(--text-sub); padding:8px 16px; border-radius:8px; font-size:13px; cursor:pointer; border:1px solid var(--border); }
+
+/* 考试结果样式 */
+.quiz-result { text-align:center; padding:16px; background:var(--bg-page); border-radius:10px; margin-bottom:12px; }
+.qr-header { font-size:18px; font-weight:700; margin-bottom:8px; }
+.qr-header.pass { color:#15803d; }
+.qr-header.fail { color:var(--accent); }
+.qr-score { font-size:52px; font-weight:900; color:var(--primary); line-height:1; }
+.qr-score span { font-size:20px; color:var(--text-sub); }
+.qr-stats { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-top:8px; }
+.qrs-item { font-size:12px; padding:3px 10px; border-radius:12px; background:#fff; border:1px solid var(--border); }
+.qrs-item.correct { border-color:#86efac; color:#15803d; }
+.qrs-item.wrong { border-color:#fca5a5; color:var(--accent); }
+.qr-comment { font-size:13px; color:var(--text-sub); margin-top:8px; }
+
+/* 题目解析样式 */
+.quiz-analysis { border-top:1px solid var(--border); padding-top:12px; margin-top:4px; }
+.qa-title { font-weight:700; font-size:13px; margin-bottom:8px; }
+.qa-item { border-radius:8px; padding:10px 12px; margin-bottom:8px; border:1px solid var(--border); }
+.qa-item.correct { background:#f0fdf4; border-color:#86efac; }
+.qa-item.wrong { background:#fff5f5; border-color:#fca5a5; }
+.qa-item.unanswered { background:#f8f9fc; border-color:#e0e0e0; }
+.qa-q { font-size:12px; font-weight:600; margin-bottom:5px; }
+.qa-ans { font-size:12px; color:var(--text-sub); margin-bottom:4px; }
+.ans-correct { color:#15803d; }
+.qa-exp { font-size:12px; color:var(--primary); background:rgba(0,48,135,.05); padding:5px 8px; border-radius:5px; line-height:1.6; }
+</style>
+</head>
+<body>
+
+<header id="header">
+  <div class="logo-area">
+    <div class="logo-icon">🚂</div>
+    <div class="logo-text">
+      <h1>铁路知识智能查询系统</h1>
+      <p>黑龙江交通职业技术学院 · Railway AI Assistant</p>
+    </div>
+  </div>
+  <div class="header-badges">
+    <span class="badge">语料库驱动</span>
+    <span class="badge red">在线</span>
+  </div>
+</header>
+
+<div id="layout">
+  <aside id="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">学生信息</div>
+      <div id="student-card">
+        <div class="sc-row"><span class="sc-label">入学</span><span class="sc-value" id="sc-year">—</span></div>
+        <div class="sc-row"><span class="sc-label">年级</span><span class="sc-value" id="sc-grade">—</span></div>
+        <div class="sc-row"><span class="sc-label">专业</span><span class="sc-value" id="sc-major">—</span></div>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">DeepSeek API 配置</div>
+      <div id="api-config-panel">
+        <div id="api-status"><span class="dot"></span><span id="api-status-text">未配置</span></div>
+        <label>API Key</label>
+        <input type="password" id="cfg-api-key" placeholder="sk-xxxxxxxxxxxxxxxx" />
+        <label>API 地址</label>
+        <input type="text" id="cfg-api-url" value="https://api.deepseek.com/v1/chat/completions" />
+        <label>模型</label>
+        <select id="cfg-model"><option value="deepseek-chat">deepseek-chat（推荐）</option><option value="deepseek-reasoner">deepseek-reasoner</option></select>
+        <button class="btn-save" onclick="saveApiConfig()">✓ 保存并测试连接</button>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">语料库状态</div>
+      <div id="corpus-status">
+        <div class="cs-row"><span class="cs-key">27个专业数据</span><span class="cs-val" id="cs-majors">已加载</span></div>
+        <div class="cs-row"><span class="cs-key">课程书目</span><span class="cs-val" id="cs-courses">已加载</span></div>
+        <div class="cs-row"><span class="cs-key">铁路局招聘</span><span class="cs-val" id="cs-recruit">已加载</span></div>
+        <div class="cs-row"><span class="cs-key">通用铁路知识</span><span class="cs-val" id="cs-general">已加载</span></div>
+        <div class="cs-row"><span class="cs-key">模拟考试题库</span><span class="cs-val" style="color:#9b59b6;">223题</span></div>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">快捷操作</div>
+      <a class="quick-link" onclick="quickAsk('请详细介绍黑龙江交通职业技术学院的所有专业和招生情况')"><span class="ql-icon">🏫</span>招生与专业</a>
+      <a class="quick-link" onclick="quickAsk('推荐适合我当前年级和专业方向的课程书籍')"><span class="ql-icon">📚</span>课程书籍推荐</a>
+      <a class="quick-link" onclick="quickAsk('请详细介绍全国各铁路局的招聘条件和要求')"><span class="ql-icon">🏢</span>铁路局招聘</a>
+      <a class="quick-link" onclick="openBureauOverview()"><span class="ql-icon">🏛️</span>铁路局详情页</a>
+      <a class="quick-link" href="/public/hospital-map.html" target="_blank" style="color:#27ae60;"><span class="ql-icon">🏥</span>体检医院地图</a>
+      <a class="quick-link" href="/public/realtime-news.html" target="_blank" style="color:#e74c3c;"><span class="ql-icon">📡</span>实时铁路消息</a>
+      <a class="quick-link" href="hljtu-bookshelf.html" target="_blank" style="color:#C8A951;text-decoration:none"><span class="ql-icon">📖</span>教材书架</a>
+      <a class="quick-link" onclick="openBookshelfModal()"><span class="ql-icon">📚</span>课程教材查询</a>
+      <a class="quick-link" href="/public/feedback.html" target="_blank" style="color:#f0a500;"><span class="ql-icon">💬</span>问题反馈</a>
+      <a class="quick-link" onclick="quickAsk('查看题库目录')"><span class="ql-icon">📝</span>模拟考试</a>
+      <a class="quick-link" href="/public/railway-exam.html" target="_blank" style="color:#9b59b6;"><span class="ql-icon">📋</span>铁路模拟考试</a>
+      <a class="quick-link" href="/public/railway-game.html" target="_blank" style="color:#e74c3c;"><span class="ql-icon">🎮</span>司机模拟驾驶</a>
+      <a class="quick-link" href="/public/social.html" target="_blank" style="color:#27ae60;"><span class="ql-icon">💬</span>铁路社交平台</a>
+      <a class="quick-link" onclick="quickAsk('铁路实操演示')"><span class="ql-icon">📺</span>实操演示</a>
+      <a class="quick-link" onclick="openVideoLearning()" style="color:#C8A951;"><span class="ql-icon">🎬</span>学习视频库</a>
+    </div>
+    <div class="sidebar-section" style="border-top:1px solid rgba(255,255,255,.1);padding-top:12px;margin-top:8px;">
+      <div class="sidebar-title">🛠️ 学习工具</div>
+      <a class="quick-link" href="https://www.doubao.com/" target="_blank" style="color:#fff;"><span class="ql-icon">🎯</span>豆包AI（做PPT）</a>
+      <a class="quick-link" href="https://www.deepseek.com/" target="_blank" style="color:#fff;"><span class="ql-icon">🔮</span>DeepSeek（写文案）</a>
+      <a class="quick-link" href="https://passport2.chaoxing.com/" target="_blank" style="color:#fff;"><span class="ql-icon">📚</span>学习通（在线课）</a>
+      <a class="quick-link" href="https://www.icourse163.org/" target="_blank" style="color:#fff;"><span class="ql-icon">🎓</span>大学MOOC</a>
+    </div>
+    <div style="margin-top:auto; padding:0 16px 8px;">
+      <button id="btn-new-chat" onclick="newChat()"><span>＋</span> 开始新对话</button>
+    </div>
+  </aside>
+
+  <main id="main">
+    <div id="messages">
+      <div id="welcome-banner">
+        <h2>🎓 欢迎来到铁路知识智能查询系统</h2>
+        <p>本系统基于黑龙江交通职业技术学院27个专业语料库，涵盖全课程体系、教材书目及全国18个铁路局招聘信息，结合 DeepSeek AI 为您提供精准专业解答。</p>
+        <div class="wb-tags">
+          <span class="wb-tag">📚 27个专业语料</span>
+          <span class="wb-tag">🎯 年级精准推荐</span>
+          <span class="wb-tag">🏢 铁路局招聘覆盖</span>
+          <span class="wb-tag">🤖 AI流式辅导</span>
+          <span class="wb-tag">📋 模拟考试223题</span>
+          <span class="wb-tag">📺 实操演示</span>
+        </div>
+        <div style="margin-top:16px">
+          <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.9);margin-bottom:8px">🔥 热门问题快速入口</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <span class="wb-tag" style="cursor:pointer" onclick="quickAsk('推荐适合我当前年级和专业方向的课程书籍')">📚 课程书籍推荐</span>
+            <span class="wb-tag" style="cursor:pointer" onclick="quickAsk('铁路局招聘信息')">🏢 铁路局招聘</span>
+            <span class="wb-tag" style="cursor:pointer" onclick="quickAsk('查看题库目录')">📚 题库目录</span>
+          <span class="wb-tag" style="cursor:pointer;background:linear-gradient(135deg,#9b59b6,#8e44ad);" onclick="window.open('/public/railway-exam.html','铁路模拟考试','width=1200,height=800')">📋 铁路模拟考试</span>
+            <span class="wb-tag" style="cursor:pointer" onclick="quickAsk('铁道概论课程大纲')">📋 课程大纲</span>
+            <span class="wb-tag" style="cursor:pointer" onclick="quickAsk('高铁运营最高速度')">🚄 高速铁路</span>
+            <span class="wb-tag" style="cursor:pointer;background:linear-gradient(135deg,#e74c3c,#c0392b);" onclick="quickAsk('五步闸操作')">🚂 五步闸操作</span>
+            <span class="wb-tag" style="cursor:pointer;background:linear-gradient(135deg,#2ecc71,#27ae60);" onclick="quickAsk('一次乘务作业标准')">🚄 乘务作业</span>
+            <span class="wb-tag" style="cursor:pointer;background:linear-gradient(135deg,#9b59b6,#8e44ad);" onclick="quickAsk('帮我制作PPT')">🎯 豆包PPT</span>
+            <span class="wb-tag" style="cursor:pointer;background:linear-gradient(135deg,#f39c12,#e67e22);" onclick="quickAsk('帮我写一篇铁路的文章')">🔮 DeepSeek</span>
+          </div>
+        </div>
+      </div>
+      <div id="year-select"></div>
+    </div>
+    <div id="input-area">
+      <div class="disclaimer">💡 回答基于 <span>铁路专业知识语料库</span> 检索 + <span>DeepSeek AI 流式生成</span>，边搜索边显示，如有疑问请以官方教材为准</div>
+      <div class="cat-tabs" id="cat-tabs" style="display:none">
+        <span class="cat-tab" onclick="quickAsk('推荐适合我当前年级和专业方向的课程书籍')">📚 课程推荐</span>
+        <span class="cat-tab" style="background:linear-gradient(135deg,#27ae60,#2ecc71);color:#fff;" onclick="window.open('/public/quiz-bank-v2.html','题库选择','width=1200,height=800')">📚 题库练习</span>
+        <span class="cat-tab" style="background:linear-gradient(135deg,#9b59b6,#8e44ad);color:#fff;" onclick="window.open('/public/railway-exam.html','铁路模拟考试','width=1200,height=800')">📋 模拟考试</span>
+        <span class="cat-tab" onclick="quickAsk('铁路局招聘信息')">🏢 铁路局招聘</span>
+        <span class="cat-tab" style="background:#e74c3c;color:#fff;" onclick="quickAsk('五步闸操作')">🚂 五步闸</span>
+        <span class="cat-tab" style="background:#2ecc71;color:#fff;" onclick="quickAsk('一次乘务作业标准')">🚄 乘务作业</span>
+        <span class="cat-tab" style="background:#9b59b6;color:#fff;" onclick="openVideoLearning()">📺 视频学习</span>
+      </div>
+      <div class="input-box" style="position:relative">
+        <div id="search-suggestions"></div>
+        <textarea id="user-input" rows="1" placeholder="请先选择入学年份..." disabled></textarea>
+        <button class="btn-send" id="btn-send" onclick="sendMessage()" disabled>➤</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="modal-overlay">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3 id="modal-title">操作</h3>
+    <p class="modal-sub" id="modal-sub">请填写以下信息</p>
+    <div id="modal-content"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">取消</button>
+      <button class="btn-confirm" id="modal-confirm">确认</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="knowledge-base.js"></script>
+<script src="textbook-chapters.js"></script>
+<script src="knowledge-expanded.js"></script>
+<script src="knowledge-technical.js"></script>
+<script src="knowledge-syllabus.js"></script>
+<script src="knowledge-recruitment.js"></script>
+<script src="knowledge-textbooks.js"></script>
+<script src="knowledge-railway-advanced.js"></script>
+<script src="quiz-bank.js"></script>
+<script src="quiz-bank-batch1.js"></script>
+<script src="quiz-bank-batch2.js"></script>
+<script src="quiz-bank-batch3.js"></script>
+<script src="quiz-bank-extended.js"></script>
+<script src="quiz-bank-comprehensive.js"></script>
+<script src="knowledge-practical-operations.js"></script>
+<script src="knowledge-tools-navigation.js"></script>
+<script src="voice-assistant.js"></script>
+<script>
+/* ══════════════════════════════════════════════════
+   APP LOGIC  —  年份/专业选择 + 语料库检索 + API
+   ══════════════════════════════════════════════════ */
+(function(){
+'use strict';
+
+/* ── State ── */
+const state = {
+  selectedYear: null,   // 入学年份如 2023
+  selectedMajor: null,  // 专业名称
+  grade: null,          // 'grade1' | 'grade2'
+  messages: [],
+  apiConfig: { key:'', url:'https://api.deepseek.com/v1/chat/completions', model:'deepseek-chat' }
+};
+
+/* ── Init ── */
+window.addEventListener('DOMContentLoaded', ()=>{
+  loadApiConfig();
+  renderYearCards();
+  updateCorpusStatus();
+});
+
+/* ── Year Cards (2016-2026 届) ── */
+function renderYearCards(){
+  const box = document.getElementById('year-select');
+  const now = new Date().getFullYear();
+  const startYear = 2016, endYear = 2026;
+  let html = '';
+  for(let y = startYear; y <= endYear; y++){
+    const isCurrent = (y === now);
+    const yearsAgo = now - y;
+    let gradeLabel, sub;
+    if(yearsAgo < 0)      { gradeLabel = '未入学'; sub = `${y}年9月入学`; }
+    else if(yearsAgo === 0){ gradeLabel = '大一新生'; sub = `${y}年入学`; }
+    else if(yearsAgo === 1){ gradeLabel = '大二在读'; sub = `${y}年入学 · 即将实习`; }
+    else if(yearsAgo === 2){ gradeLabel = '已毕业'; sub = `${y}届毕业生`; }
+    else if(yearsAgo === 3){ gradeLabel = '已毕业'; sub = `${y}届 · 工作中`; }
+    else                   { gradeLabel = '校友'; sub = `${y}届`; }
+
+    const disabled = yearsAgo < 0 ? ' style="opacity:.4;pointer-events:none"' : '';
+    html += `<div class="year-card" data-year="${y}" onclick="selectYear(${y})"${disabled}>
+      <div class="yc-badge">${y}届</div>
+      <div class="yc-label">${gradeLabel}</div>
+      <div class="yc-sub">${sub}</div>
+    </div>`;
+  }
+  box.innerHTML = html;
+}
+
+/* ── Select Year ── */
+window.selectYear = function(year){
+  state.selectedYear = year;
+  const now = new Date().getFullYear();
+  const yearsAgo = now - year;
+  if(yearsAgo <= 1) state.grade = yearsAgo === 0 ? 'grade1' : 'grade2';
+  else state.grade = yearsAgo <= 2 ? 'grade2' : null;
+
+  // 更新侧栏
+  document.getElementById('sc-year').textContent = year + '年入学';
+  document.getElementById('sc-grade').textContent = state.grade === 'grade1' ? '大一' : state.grade === 'grade2' ? '大二' : '已毕业';
+  const gradeBadge = document.getElementById('sc-grade');
+  gradeBadge.className = 'sc-badge';
+  gradeBadge.style.background = state.grade === 'grade1' ? 'var(--primary)' : state.grade === 'grade2' ? 'var(--accent)' : '#888';
+  gradeBadge.style.color = '#fff';
+
+  // 高亮选中年份
+  document.querySelectorAll('.year-card').forEach(c=>{
+    c.style.borderColor = parseInt(c.dataset.year)===year ? 'var(--primary)' : '';
+    c.style.background  = parseInt(c.dataset.year)===year ? 'rgba(0,48,135,.06)' : '';
+  });
+
+  // 进入专业选择
+  showMajorSelection(year);
+};
+
+/* ── Major Selection ── */
+function showMajorSelection(year){
+  const messages = document.getElementById('messages');
+  const majorList = Object.keys(KNOWLEDGE_BASE.majors);
+
+  // 系统提示
+  addBotMessage(`已选择 <strong>${year}届</strong>。请问您是哪个专业的同学？`);
+
+  // 专业选择卡片
+  const optHtml = majorList.map(m=>
+    `<button class="opt-btn" onclick="selectMajor('${m}')">${m}</button>`
+  ).join('');
+
+  const cardDiv = document.createElement('div');
+  cardDiv.className = 'msg bot';
+  cardDiv.innerHTML = `<div class="msg-avatar">🤖</div><div class="msg-body"><div class="msg-name">铁路AI助手</div><div class="msg-bubble"><div class="option-row" style="flex-wrap:wrap;gap:6px">${optHtml}</div></div></div>`;
+  messages.appendChild(cardDiv);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+window.selectMajor = function(major){
+  state.selectedMajor = major;
+  document.getElementById('sc-major').textContent = major;
+
+  // 启用输入
+  const input = document.getElementById('user-input');
+  const btn = document.getElementById('btn-send');
+  input.disabled = false;
+  btn.disabled = false;
+  input.placeholder = `已选：${major} · 输入问题开始查询...`;
+
+  // 显示分类快捷标签
+  document.getElementById('cat-tabs').style.display = 'flex';
+
+  // 系统回复
+  const majorData = KNOWLEDGE_BASE.majors[major];
+  let reply = `欢迎您，<strong>${major}</strong>专业的同学！${majorData ? ' — ' + majorData.desc : ''}`;
+
+  if(state.grade && majorData){
+    const g = state.grade;
+    if(majorData[g] && majorData[g].courses){
+      reply += `<br><br>📚 <strong>推荐课程（${state.grade==='grade1'?'大一':'大二'}）</strong>：`;
+      reply += `<div class="course-cards">${majorData[g].courses.map(c=>`
+        <div class="course-card" onclick="askAboutCourse('${c.name}')">
+          <div class="cc-book">${c.icon}</div>
+          <div class="cc-name">${c.name}</div>
+          <div class="cc-sub">${c.book}</div>
+        </div>`).join('')}</div>`;
+    }
+  }
+
+  reply += `<br><br>💬 您可以问我任何铁路专业问题，如课程内容、考试重点、铁路局招聘条件等。`;
+  addBotMessage(reply);
+  showToast('专业选择成功，可以开始提问了！','success');
+};
+
+window.askAboutCourse = function(name){
+  document.getElementById('user-input').value = `请详细介绍${name}这门课的内容和重点知识`;
+  sendMessage();
+};
+
+/* ── Message Rendering ── */
+function addBotMessage(html){
+  const messages = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg bot';
+  div.innerHTML = `<div class="msg-avatar">🤖</div><div class="msg-body"><div class="msg-name">铁路AI助手</div><div class="msg-bubble">${html}</div></div>`;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function addUserMessage(text){
+  const messages = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg user';
+  div.innerHTML = `<div class="msg-avatar">我</div><div class="msg-body"><div class="msg-name">我</div><div class="msg-bubble">${escHtml(text)}</div></div>`;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function showTyping(){
+  const messages = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg bot'; div.id = 'typing-msg';
+  div.innerHTML = `<div class="msg-avatar">🤖</div><div class="msg-body"><div class="msg-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div></div>`;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function removeTyping(){
+  const el = document.getElementById('typing-msg');
+  if(el) el.remove();
+}
+
+/* ── Send Message ── */
+window.sendMessage = function(){
+  const input = document.getElementById('user-input');
+  const text = input.value.trim();
+  if(!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+  addUserMessage(text);
+
+  // 检测考试/题库请求
+  const quizMatch = text.match(/开始考试[：:]?\s*(.+)|模拟考试[：:]?\s*(.+)|练习[：:]?\s*(.+)|做题[：:]?\s*(.+)/);
+  if(quizMatch){
+    const courseName = (quizMatch[1]||quizMatch[2]||quizMatch[3]||quizMatch[4]).trim();
+    // 特殊处理：查看题库目录
+    if(/题库目录|全部题库|有什么题库|查看题库/.test(courseName)){
+      showTyping();
+      setTimeout(()=>{
+        removeTyping();
+        addBotMessage(window.showQuizCatalog ? window.showQuizCatalog() : '题库加载中...');
+      }, 400);
+      return;
+    }
+    // 特殊处理：铁路局招聘考试
+    if(/招聘.*考|考招聘|铁路局.*考试|招聘.*题/.test(courseName)){
+      showTyping();
+      setTimeout(()=>{
+        removeTyping();
+        addBotMessage(window.startQuiz ? window.startQuiz('recruitment', 10) : '题库加载中，请稍候');
+      }, 400);
+      return;
+    }
+    showTyping();
+    setTimeout(()=>{
+      removeTyping();
+      const quizHtml = window.startQuiz ? window.startQuiz(courseName) : '题库加载中，请稍候';
+      addBotMessage(quizHtml);
+    }, 400);
+    return;
+  }
+
+  // 先查语料库（使用改进的评分机制）
+  const corpusResult = searchCorpus(text);
+  if(corpusResult){
+    showTyping();
+    setTimeout(()=>{
+      removeTyping();
+      addBotMessage(corpusResult);
+    }, 400);
+    return;
+  }
+
+  // 语料库无结果 → 直接走流式API（不提示"未找到"，直接用AI回答）
+  if(state.apiConfig.key){
+    callDeepSeekApiStream(text);
+  } else {
+    // 无API也无语料库匹配 → 尝试模糊匹配知识库给出推荐
+    const fuzzyResult = fuzzySearchFallback(text);
+    if(fuzzyResult){
+      showTyping();
+      setTimeout(()=>{
+        removeTyping();
+        addBotMessage(fuzzyResult);
+      }, 400);
+    } else {
+      showTyping();
+      setTimeout(()=>{
+        removeTyping();
+        addBotMessage(`抱歉，语料库中暂未收录该问题的相关内容。<br><br>💡 <strong>建议</strong>：请在左侧配置 DeepSeek API Key，即可获得AI智能流式回答（边搜索边显示结果）。<br><br>💡 您也可以尝试换一种方式提问，或点击下方快捷标签：`);
+      }, 800);
+    }
+  }
+};
+
+/* ── 流式 API 调用（边搜索边显示文字） ── */
+async function callDeepSeekApiStream(userMsg){
+  const cfg = state.apiConfig;
+  if(!cfg.key) return;
+
+  const messages = document.getElementById('messages');
+
+  // 构建系统提示（含所有语料库摘要）
+  let systemPrompt = buildSystemPrompt(userMsg);
+
+  // 创建bot消息占位符
+  const div = document.createElement('div');
+  div.className = 'msg bot';
+  const contentSpan = document.createElement('span');
+  contentSpan.className = 'stream-content';
+  div.innerHTML = `<div class="msg-avatar">🤖</div><div class="msg-body"><div class="msg-name">铁路AI助手 <span class="stream-badge">⚡ 实时生成中...</span></div><div class="msg-bubble"><span class="stream-content"></span><span class="cursor-blink">|</span></div></div>`;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+
+  const streamSpan = div.querySelector('.stream-content');
+  const cursor = div.querySelector('.cursor-blink');
+  const badgeSpan = div.querySelector('.stream-badge');
+
+  let accumulated = '';
+
+  try {
+    const resp = await fetch(cfg.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.key },
+      body: JSON.stringify({
+        model: cfg.model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userMsg }
+        ],
+        temperature: 0.7,
+        max_tokens: 2000,
+        stream: true
+      })
+    });
+
+    if (!resp.ok) {
+      const errText = await resp.text().catch(() => '');
+      streamSpan.innerHTML = `<span style="color:var(--accent)">API错误 ${resp.status}: ${errText.substring(0,200)}</span>`;
+      cursor.remove();
+      badgeSpan.remove();
+      return;
+    }
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value, { stream: true });
+      const lines = chunk.split('\n');
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const dataStr = line.slice(6).trim();
+        if (dataStr === '[DONE]') continue;
+        try {
+          const json = JSON.parse(dataStr);
+          const delta = json.choices?.[0]?.delta?.content || '';
+          if (delta) {
+            accumulated += delta;
+            // 将 Markdown 基本格式转为 HTML 并实时显示
+            streamSpan.innerHTML = markdownToHtml(accumulated);
+            messages.scrollTop = messages.scrollHeight;
+          }
+        } catch (e) { /* 忽略解析错误 */ }
+      }
+    }
+
+    // 流式结束：移除光标，添加来源标记
+    cursor.remove();
+    badgeSpan.remove();
+    const bubble = div.querySelector('.msg-bubble');
+    bubble.innerHTML = markdownToHtml(accumulated) + `<div class="source-badge">🤖 DeepSeek AI 流式生成</div>`;
+
+  } catch (err) {
+    cursor.remove();
+    badgeSpan.remove();
+    streamSpan.innerHTML = `<span style="color:var(--accent)">连接失败：${err.message}</span>`;
+  }
+
+  messages.scrollTop = messages.scrollHeight;
+}
+
+/* ── Markdown 简单转 HTML ── */
+function markdownToHtml(md){
+  return md
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/`(.+?)`/g,'<code style="background:#f0f2f7;padding:1px 4px;border-radius:3px">$1</code>')
+    .replace(/#{3}\s(.+)/g,'<strong style="display:block;margin:8px 0 4px;color:var(--primary)">$1</strong>')
+    .replace(/#{2}\s(.+)/g,'<strong style="display:block;margin:10px 0 4px;font-size:14px">$1</strong>')
+    .replace(/#{1}\s(.+)/g,'<strong style="display:block;margin:10px 0 5px;font-size:15px">$1</strong>')
+    .replace(/^[-*]\s(.+)/gm,'<li style="margin:3px 0">$1</li>')
+    .replace(/(<li[^>]*>.*<\/li>)/s,'<ul style="padding-left:18px">$1</ul>')
+    .replace(/\n{2,}/g,'</p><p style="margin:6px 0">')
+    .replace(/\n/g,'<br>');
+}
+
+/* ── Build System Prompt（含语料库摘要，增强版） ── */
+function buildSystemPrompt(userMsg){
+  let sp = `你是黑龙江交通职业技术学院铁路知识智能查询系统的AI助手。
+请用专业、准确、详细的中文回答铁路专业问题。你是铁路领域的资深专家。
+- 学校：${KNOWLEDGE_BASE.schoolInfo.name}，27个铁路及通用专业
+- 招聘信息：覆盖全国18个铁路局集团
+- 当前用户：${state.selectedYear?state.selectedYear+'届':''} ${state.selectedMajor||'未选择专业'} ${state.grade?'('+(state.grade==='grade1'?'大一':'大二')+')':''}
+
+回答要求：
+1. 知识类问题：给出完整详细的解释，包含原理、公式、参数、技术标准
+2. 考试类问题：给出知识点、考点分析和记忆技巧
+3. 招聘类问题：给出具体的条件、流程和备考建议
+4. 计算类问题：给出详细计算过程和结果
+5. 比较类问题：用表格或列表进行对比分析
+6. 请用清晰的结构（标题、列表）组织回答
+7. 如果不确定，请诚实说明，不要编造`;
+
+  if(state.selectedMajor && KNOWLEDGE_BASE.majors[state.selectedMajor]){
+    const m = KNOWLEDGE_BASE.majors[state.selectedMajor];
+    sp += `\n\n【该专业课程】：`;
+    ['grade1','grade2'].forEach(g=>{
+      if(m[g]&&m[g].courses) sp += `\n${g==='grade1'?'大一':'大二'}：${m[g].courses.map(c=>c.name).join('、')}`;
+      if(m[g]&&m[g].knowledge) sp += `\n${g==='grade1'?'大一':'大二'}知识点：${m[g].knowledge.slice(0,10).join('、')}`;
+    });
+  }
+
+  // 加入相关铁路知识（增加到15条）
+  sp += `\n\n【铁路通用知识摘要】：`;
+  const genEntries = Object.entries(KNOWLEDGE_BASE.railwayGeneral);
+  genEntries.slice(0, Math.min(15, genEntries.length)).forEach(([k,v])=>{
+    sp += `\n${k}：${String(v).substring(0,120)}`;
+  });
+
+  // 加入深度知识库摘要
+  if(KNOWLEDGE_BASE.railwayKnowledge){
+    sp += `\n\n【铁路专业知识库】：`;
+    for(const [kwKey, kwData] of Object.entries(KNOWLEDGE_BASE.railwayKnowledge)){
+      sp += `\n${kwKey}（${kwData.category}）：${kwData.summary} - ${kwData.detail.substring(0,150)}`;
+    }
+  }
+
+  // 加入课程大纲摘要
+  if(KNOWLEDGE_BASE.courseOutlines){
+    sp += `\n\n【课程大纲索引】：`;
+    for(const [cName, cData] of Object.entries(KNOWLEDGE_BASE.courseOutlines)){
+      sp += `\n${cName}：${cData.subtitle}，难度${cData.difficulty}，考试重点：${cData.examFocus.join('、')}`;
+    }
+  }
+
+  // 加入专业技术深度知识摘要
+  const techSections = [
+    {key:'technicalSignal', name:'铁路信号系统'},
+    {key:'technicalRollingStock', name:'机车车辆技术'},
+    {key:'technicalTrack', name:'线路工程技术'},
+    {key:'technicalPowerSupply', name:'供电系统技术'},
+    {key:'technicalOperation', name:'行车组织技术'},
+    {key:'technicalLegal', name:'铁路法律法规'}
+  ];
+  sp += `\n\n【专业技术深度知识】：`;
+  for(const ts of techSections){
+    if(!KNOWLEDGE_BASE[ts.key]) continue;
+    sp += `\n[${ts.name}]`;
+    for(const [entryKey, entryData] of Object.entries(KNOWLEDGE_BASE[ts.key])){
+      sp += `\n${entryData.title}：${entryData.concept.substring(0,120)}`;
+    }
+  }
+
+  // 加入铁路局招聘核心数据
+  sp += `\n\n【铁路局招聘核心信息】：`;
+  sp += `\n报名网站：http://rczp.china-railway.com.cn`;
+  sp += `\n基本条件：全日制应届毕业生，辨色力正常，适应铁路沿线工作`;
+  sp += `\n身体条件：男≥168cm 女≥158cm，矫正视力≥5.0，无色盲色弱，BMI 18.5-28`;
+  sp += `\n笔试内容：行测（40-50%）+铁路基础知识（30-40%）+专业知识（10-30%）`;
+  sp += `\n面试形式：半结构化面试，10-15分钟/人`;
+  sp += `\n实习期：3-6个月岗前培训，安全教育≥80学时`;
+
+  return sp;
+}
+
+/* ── Corpus Search ── */
+function searchCorpus(query){
+  const q = query.toLowerCase();
+  const results = [];
+
+  // 书架/教材搜索 — 优先匹配
+  if(/书架|教材|书籍|推荐书|专业书|用什么书|学什么书|课程用书|用什么教材/.test(q)){
+    return getBookshelfHtml();
+  }
+
+  // 搜索学校信息
+  if(/学院|学校|简介|概况|规模|校区/.test(q)){
+    const s = KNOWLEDGE_BASE.schoolInfo;
+    return `<strong>🏫 ${s.name}</strong><br>学校代码：${s.code}<br>创办时间：${s.founded}<br>
+${s.campuses.map(c=>'📍 '+c).join('<br>')}
+<br><br>📊 ${s.scale}<br><br>${KNOWLEDGE_BASE.railwayGeneral['招生概况']}`;
+  }
+
+  // 搜索专业课程
+  if(state.selectedMajor && KNOWLEDGE_BASE.majors[state.selectedMajor]){
+    const m = KNOWLEDGE_BASE.majors[state.selectedMajor];
+    if(/课程|教材|书|推荐|学什么/.test(q)){
+      let html = `<strong>📚 ${state.selectedMajor} — 课程推荐</strong><br>`;
+      ['grade1','grade2'].forEach(g=>{
+        if(m[g] && m[g].courses){
+          html += `<br><strong>${g==='grade1'?'【大一课程】':'【大二课程】'}</strong>`;
+          html += `<div class="course-cards">${m[g].courses.map(c=>`
+            <div class="course-card"><div class="cc-book">${c.icon}</div><div class="cc-name">${c.name}</div><div class="cc-sub">${c.book} · ${c.pub}</div></div>`).join('')}</div>`;
+        }
+      });
+      return html;
+    }
+    if(/知识|重点|考点|内容/.test(q) && m[state.grade]){
+      const kg = m[state.grade].knowledge;
+      if(kg && kg.length){
+        return `<strong>📝 ${state.selectedMajor} 知识要点</strong><br><ul>${kg.map(k=>'<li>'+k+'</li>').join('')}</ul>`;
+      }
+    }
+  }
+
+  // 搜索所有专业
+  if(/专业|招生|都有什么/.test(q)){
+    let html = `<strong>📋 全部27个专业</strong><br><br>`;
+    const categories = {};
+    Object.entries(KNOWLEDGE_BASE.majors).forEach(([name,data])=>{
+      const cat = data.category || '其他';
+      if(!categories[cat]) categories[cat] = [];
+      categories[cat].push({name, ...data});
+    });
+    Object.entries(categories).forEach(([cat, list])=>{
+      html += `<br><strong style="color:var(--primary)">${cat}</strong><br>`;
+      list.forEach(m=>{ html += `<span class="tag-inline" onclick="selectMajor('${m.name}')">${m.name}</span> ${m.desc}<br>`; });
+    });
+    return html;
+  }
+
+  // 搜索铁路局招聘 — 先显示列表让用户选择
+  if(/招聘|铁路局|就业|招人|投简历/.test(q)){
+    return showBureauList();
+  }
+
+  // 搜索特定铁路局 — 显示详细招聘信息
+  const bureauKeys = Object.keys(KNOWLEDGE_BASE.recruitment);
+  for(const bk of bureauKeys){
+    const r = KNOWLEDGE_BASE.recruitment[bk];
+    const aliases = [bk, r.abbr, r.name];
+    for(const alias of aliases){
+      if(q.includes(alias.replace(/中国铁路|集团有限公司|有限公司/g,'').substring(0,4))){
+        return showBureauDetail(bk);
+      }
+    }
+  }
+
+  // 搜索通用铁路知识（增加关键词匹配 — 使用分词+多关键词匹配）
+  const generalKeys = Object.keys(KNOWLEDGE_BASE.railwayGeneral);
+  const queryWords = q.replace(/[？?！!。，,、的什么怎么如何为什么是哪个哪些有哪些叫什么意思]/g,'').trim().split(/[\s]+/).filter(w=>w.length>=2);
+  let bestGeneralMatch = null;
+  let bestGeneralScore = 0;
+  for(const gk of generalKeys){
+    let score = 0;
+    const gkClean = gk.toLowerCase();
+    // 直接匹配
+    if(q.includes(gkClean) || q.includes(gk)) score += 5;
+    // 关键词匹配
+    for(const w of queryWords){
+      if(gkClean.includes(w)) score += 3;
+      const gVal = String(KNOWLEDGE_BASE.railwayGeneral[gk]).toLowerCase();
+      if(gVal.includes(w)) score += 2;
+    }
+    if(score > bestGeneralScore){
+      bestGeneralScore = score;
+      bestGeneralMatch = gk;
+    }
+  }
+  if(bestGeneralMatch && bestGeneralScore >= 3){
+    const gk = bestGeneralMatch;
+    let html = `<strong>🚂 ${gk}</strong><br>${KNOWLEDGE_BASE.railwayGeneral[gk]}`;
+    if(/身体|体检|视力|身高|辨色/.test(q)){
+      html += `<br><br>💡 相关查询：<br>`;
+      html += `<span class="tag-inline" onclick="quickAsk('铁路局招聘考试内容和流程')">考试内容</span> `;
+      html += `<span class="tag-inline" onclick="quickAsk('铁路局招聘身体条件详细要求')">体检标准</span> `;
+      html += `<span class="tag-inline" onclick="quickAsk('铁路局招聘报名条件')">报名条件</span>`;
+    }
+    if(/考试|笔试|面试/.test(q)){
+      html += `<br><br>💡 相关查询：<br>`;
+      html += `<span class="tag-inline" onclick="quickAsk('铁路局招聘身体条件详细要求')">体检标准</span> `;
+      html += `<span class="tag-inline" onclick="quickAsk('铁路局招聘实习期和转正待遇')">待遇情况</span> `;
+      html += `<span class="tag-inline" onclick="quickAsk('铁路局招聘报名条件')">报名条件</span>`;
+    }
+    return html;
+  }
+
+  // 【新】搜索深度铁路知识库 railwayKnowledge
+  if(KNOWLEDGE_BASE.railwayKnowledge){
+    for(const [kwKey, kwData] of Object.entries(KNOWLEDGE_BASE.railwayKnowledge)){
+      if(q.includes(kwKey.substring(0,3)) || q.includes(kwKey)){
+        let html = `<strong>🔬 ${kwKey}</strong>`;
+        html += `<div style="font-size:12px;color:var(--text-sub);margin:4px 0 8px">📂 ${kwData.category} | ${kwData.summary}</div>`;
+        html += `<div style="font-size:13px;line-height:1.8;white-space:pre-line;background:#f8f9fc;padding:12px;border-radius:8px;border-left:3px solid var(--primary)">${kwData.detail}</div>`;
+        html += `<br><span class="tag-inline" onclick="quickAsk('${kwKey}考试题')">📝 相关考题</span> `;
+        html += `<span class="tag-inline" onclick="quickAsk('${kwKey}详细原理')">🔍 深入了解</span>`;
+        return html;
+      }
+    }
+  }
+
+  // 【新】搜索铁路局难易度排名
+  if(/排名|难度|哪个容易|哪个好进|哪个局|竞争|推荐哪个铁路局/.test(q)){
+    return showBureauRanking();
+  }
+
+  // 【新】搜索课程大纲（关键词：大纲/目标/章节/教学内容）
+  if(/大纲|教学目标|章节|讲什么|学些什么|内容是什么/.test(q) && KNOWLEDGE_BASE.courseOutlines){
+    for(const [cName, cData] of Object.entries(KNOWLEDGE_BASE.courseOutlines)){
+      if(q.includes(cName.substring(0,3)) || q.includes(cName)){
+        return showCourseOutline(cName, cData);
+      }
+    }
+    // 通用大纲列表
+    let html = `<strong>📋 可查询课程大纲</strong><br><br>`;
+    Object.keys(KNOWLEDGE_BASE.courseOutlines).forEach(cn=>{
+      html += `<span class="tag-inline" onclick="quickAsk('${cn}课程大纲')" style="cursor:pointer">${cn}</span> `;
+    });
+    html += `<br><br>💡 点击课程名称查看详细大纲`;
+    return html;
+  }
+
+  // 【新】搜索体检标准
+  if(/体检|身体条件|视力|身高|辨色|色盲|听力|血压|健康/.test(q)){
+    const ms = KNOWLEDGE_BASE.medicalStandards;
+    if(ms){
+      let html = `<strong>📋 铁路局招聘体检标准</strong><br>`;
+      if(ms.general){
+        html += `<br><strong>通用体检要求</strong><div style="font-size:13px;line-height:1.8;background:#f8f9fc;padding:12px;border-radius:8px;border-left:3px solid var(--primary);white-space:pre-line">${ms.general}</div>`;
+      }
+      if(ms.byPosition && typeof ms.byPosition === 'object'){
+        html += `<br><strong>各岗位特殊要求</strong><br>`;
+        Object.entries(ms.byPosition).forEach(([pos, req])=>{
+          html += `<div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin:5px 0"><strong style="color:var(--primary)">${pos}</strong><div style="font-size:13px;margin-top:4px;line-height:1.7">${req}</div></div>`;
+        });
+      }
+      return html;
+    }
+  }
+
+  // 【新】搜索招聘流程
+  if(/招聘流程|报名|考试流程|面试|录用|签约/.test(q)){
+    const rp = KNOWLEDGE_BASE.recruitmentProcess;
+    if(rp){
+      let html = `<strong>📋 铁路局招聘流程</strong><br>`;
+      if(typeof rp === 'string'){
+        html += `<div style="font-size:13px;line-height:1.8;background:#f8f9fc;padding:12px;border-radius:8px;border-left:3px solid var(--primary);white-space:pre-line">${rp}</div>`;
+      } else if(Array.isArray(rp)){
+        rp.forEach((step, i)=>{
+          html += `<div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin:5px 0"><span style="background:var(--primary);color:#fff;padding:2px 8px;border-radius:50%;font-size:12px;margin-right:8px">${i+1}</span><strong>${step.title||'第'+(i+1)+'步'}</strong><div style="font-size:13px;margin-top:4px;line-height:1.7">${step.detail||step.desc||step}</div></div>`;
+        });
+      } else if(typeof rp === 'object'){
+        Object.entries(rp).forEach(([key, val])=>{
+          html += `<div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin:5px 0"><strong style="color:var(--primary)">${key}</strong><div style="font-size:13px;margin-top:4px;line-height:1.7">${val}</div></div>`;
+        });
+      }
+      return html;
+    }
+  }
+
+  // 【新】搜索薪资待遇
+  if(/薪资|工资|待遇|收入|年薪|实习期/.test(q)){
+    const sd = KNOWLEDGE_BASE.salaryDetails;
+    if(sd){
+      let html = `<strong>📋 铁路局薪资待遇</strong><br>`;
+      if(typeof sd === 'string'){
+        html += `<div style="font-size:13px;line-height:1.8;background:#f8f9fc;padding:12px;border-radius:8px;border-left:3px solid var(--primary);white-space:pre-line">${sd}</div>`;
+      } else if(sd.general){
+        html += `<br><strong>待遇概况</strong><div style="font-size:13px;line-height:1.8;background:#f8f9fc;padding:12px;border-radius:8px;border-left:3px solid var(--primary);white-space:pre-line">${sd.general}</div>`;
+      }
+      if(sd.byBureau && typeof sd.byBureau === 'object'){
+        html += `<br><strong>各铁路局薪资对比</strong><br>`;
+        Object.entries(sd.byBureau).forEach(([bureau, info])=>{
+          html += `<div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin:5px 0"><strong style="color:var(--primary)">${bureau}</strong><div style="font-size:13px;margin-top:4px;line-height:1.7">${info}</div></div>`;
+        });
+      }
+      return html;
+    }
+  }
+
+  // 【新】搜索岗位专业对照
+  if(/专业要求|对口专业|什么专业|岗位要求/.test(q)){
+    const mr = KNOWLEDGE_BASE.majorRequirements;
+    if(mr){
+      let html = `<strong>📋 岗位与专业对照表</strong><br>`;
+      if(typeof mr === 'string'){
+        html += `<div style="font-size:13px;line-height:1.8;background:#f8f9fc;padding:12px;border-radius:8px;border-left:3px solid var(--primary);white-space:pre-line">${mr}</div>`;
+      } else if(Array.isArray(mr)){
+        mr.forEach(item=>{
+          if(typeof item === 'string'){
+            html += `<div style="font-size:13px;line-height:1.7;margin:4px 0">${item}</div>`;
+          } else {
+            html += `<div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin:5px 0"><strong style="color:var(--primary)">${item.position||item.name||''}</strong><div style="font-size:13px;margin-top:4px;line-height:1.7">${item.majors||item.detail||item.desc||''}</div></div>`;
+          }
+        });
+      } else if(typeof mr === 'object'){
+        Object.entries(mr).forEach(([position, majors])=>{
+          html += `<div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin:5px 0"><strong style="color:var(--primary)">${position}</strong><div style="font-size:13px;margin-top:4px;line-height:1.7">${majors}</div></div>`;
+        });
+      }
+      return html;
+    }
+  }
+
+  // 【新】搜索题库（关键词：题库/练习/做题/考试）
+  if(/题库|练习|做题|考题|刷题/.test(q)){
+    return showQuizList();
+  }
+
+  // 【新】搜索体检医院地图
+  if(/体检.*医院|医院.*体检|体检医院|二甲.*医院|三甲医院|去哪儿体检|体检.*地图/.test(q)){
+    let html = `<strong>🏥 铁路招聘体检医院查询</strong><br><br>`;
+    html += `<div style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);padding:16px;border-radius:12px;margin-bottom:16px">`;
+    html += `<div style="font-size:14px;font-weight:700;color:#2e7d32;margin-bottom:8px">📋 铁路招聘体检通用标准</div>`;
+    html += `<ul style="font-size:13px;line-height:2;padding-left:18px">`;
+    html += `<li>身高：男性≥168cm，女性≥158cm</li>`;
+    html += `<li>视力：矫正≥5.0，无色盲色弱</li>`;
+    html += `<li>血压：90-140/60-90mmHg</li>`;
+    html += `<li>BMI：18.5-28</li>`;
+    html += `<li>听力：各频率≤25dB</li>`;
+    html += `<li>心电图：无严重心律失常</li>`;
+    html += `</ul></div>`;
+    html += `<div style="background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:16px;margin-bottom:16px">`;
+    html += `<div style="font-size:14px;font-weight:700;color:#003087;margin-bottom:8px">🏥 推荐二甲以上医院</div>`;
+    html += `<p style="font-size:13px;color:#666;line-height:1.7;margin-bottom:12px">覆盖全国31个省份，包括各省份标志性三甲医院，点击医院名称可跳转高德地图导航</p>`;
+    html += `<p style="font-size:13px;color:#c0392b;font-weight:600">⚠️ 建议到铁路局指定医院或二甲以上公立医院体检</p>`;
+    html += `</div>`;
+    html += `<a href="/public/hospital-map.html" target="_blank" style="display:inline-block;padding:12px 24px;background:#003087;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px;margin-top:8px">`;
+    html += `🗺️ 打开体检医院地图</a>`;
+    html += `<br><br><div style="font-size:12px;color:#666">按铁路局筛选：哈尔滨局/沈阳局/北京局/太原局/呼和浩特局/郑州局/武汉局/西安局/济南局/上海局/南昌局/广铁集团/成都局/兰州局/青藏集团/乌鲁木齐局</div>`;
+    return html;
+  }
+
+  // 搜索课程教材（增强匹配）
+  const qClean = q.replace(/[《》？?！!。，,、]/g,'');
+  for(const [majName, m] of Object.entries(KNOWLEDGE_BASE.majors)){
+    for(const g of ['grade1','grade2']){
+      if(m[g] && m[g].courses){
+        for(const c of m[g].courses){
+          const cName = c.name.replace(/[《》]/g,'');
+          if(qClean.includes(cName) || q.includes(cName)){
+            let html = `<strong>📖 ${c.name}</strong><br>`;
+            html += `<table style="width:100%;border-collapse:collapse;margin:8px 0;font-size:13px">`;
+            html += `<tr><td style="padding:6px 10px;background:#f0f2f7;border:1px solid #e0e0e0;width:80px;font-weight:700">教材</td><td style="padding:6px 10px;border:1px solid #e0e0e0">${c.book}</td></tr>`;
+            html += `<tr><td style="padding:6px 10px;background:#f0f2f7;border:1px solid #e0e0e0;font-weight:700">出版社</td><td style="padding:6px 10px;border:1px solid #e0e0e0">${c.pub}</td></tr>`;
+            html += `<tr><td style="padding:6px 10px;background:#f0f2f7;border:1px solid #e0e0e0;font-weight:700">学时</td><td style="padding:6px 10px;border:1px solid #e0e0e0">${c.hours}学时 · ${c.type}</td></tr>`;
+            html += `<tr><td style="padding:6px 10px;background:#f0f2f7;border:1px solid #e0e0e0;font-weight:700">开课</td><td style="padding:6px 10px;border:1px solid #e0e0e0">${g==='grade1'?'大一':'大二'}</td></tr>`;
+            html += `<tr><td style="padding:6px 10px;background:#f0f2f7;border:1px solid #e0e0e0;font-weight:700">所属</td><td style="padding:6px 10px;border:1px solid #e0e0e0">${majName}</td></tr>`;
+            html += `</table>`;
+            if(m[g].knowledge){
+              html += `<br><strong>📝 核心知识点</strong><br><ul>${m[g].knowledge.slice(0,6).map(k=>'<li>'+k+'</li>').join('')}</ul>`;
+            }
+            // 显示课程大纲入口
+            if(KNOWLEDGE_BASE.courseOutlines && KNOWLEDGE_BASE.courseOutlines[c.name]){
+              html += `<br><span class="tag-inline" onclick="quickAsk('${c.name}课程大纲')" style="cursor:pointer">📋 查看课程大纲</span> `;
+            }
+            // 显示题库入口
+            if(KNOWLEDGE_BASE.QUIZ_BANK || window.QUIZ_BANK){
+              const qbName = Object.keys(window.QUIZ_BANK||{}).find(k=>k===c.name||k.includes(c.name.substring(0,3)));
+              if(qbName) html += `<span class="tag-inline" onclick="quickAsk('开始考试：${c.name}')" style="cursor:pointer">📝 开始练习</span> `;
+            }
+            html += `<span class="tag-inline" onclick="quickAsk('${c.name}考试重点和复习建议')">查看考试重点</span>`;
+            return html;
+          }
+        }
+      }
+    }
+  }
+
+  // 【新】搜索铁路专业技术深度知识库（technicalSignal/technicalRollingStock/technicalTrack/technicalPowerSupply/technicalOperation/technicalLegal）
+  const technicalSections = [
+    {key:'technicalSignal', label:'铁路信号系统', icon:'🚦'},
+    {key:'technicalRollingStock', label:'机车车辆技术', icon:'🚂'},
+    {key:'technicalTrack', label:'线路工程技术', icon:'🛤️'},
+    {key:'technicalPowerSupply', label:'供电系统技术', icon:'⚡'},
+    {key:'technicalOperation', label:'行车组织技术', icon:'📋'},
+    {key:'technicalLegal', label:'铁路法律法规', icon:'📜'}
+  ];
+  for(const sec of technicalSections){
+    if(!KNOWLEDGE_BASE[sec.key]) continue;
+    for(const [entryKey, entryData] of Object.entries(KNOWLEDGE_BASE[sec.key])){
+      // 检查标题和关键词是否匹配
+      const titleMatch = q.includes(entryData.title.substring(0,4)) || q.includes(entryKey.substring(0,3));
+      const keywordMatch = entryData.keywords && entryData.keywords.some(kw => q.includes(kw) || q.includes(kw.toLowerCase()));
+      const conceptMatch = entryData.concept && q.split(/[\s]+/).some(w => w.length>=2 && entryData.concept.toLowerCase().includes(w));
+      if(titleMatch || keywordMatch || conceptMatch){
+        let html = `<strong>${sec.icon} ${entryData.title}</strong>`;
+        html += `<div style="font-size:12px;color:var(--text-sub);margin:4px 0 8px">📂 ${sec.label} | ${entryData.category||''}</div>`;
+        // 概念定义
+        html += `<div style="font-size:13px;line-height:1.8;background:#f8f9fc;padding:12px;border-radius:8px;border-left:3px solid var(--primary)"><strong>定义：</strong>${entryData.concept}</div>`;
+        // 技术参数（如果有）
+        if(entryData.techParams){
+          html += `<br><strong style="color:var(--primary)">📐 技术参数</strong><br>`;
+          for(const [pk,pv] of Object.entries(entryData.techParams)){
+            html += `<div style="font-size:12px;padding:3px 0"><span style="color:var(--accent);font-weight:600">${pk}：</span>${pv}</div>`;
+          }
+        }
+        // 等级对比（如果有）
+        if(entryData.levels && Array.isArray(entryData.levels)){
+          html += `<br><strong style="color:var(--primary)">📊 等级/型号对比</strong>`;
+          html += `<table style="width:100%;border-collapse:collapse;font-size:12px;margin:6px 0"><tr style="background:var(--primary);color:#fff">`;
+          html += `<th style="padding:6px;text-align:left">等级/型号</th><th style="padding:6px">适用线路</th><th style="padding:6px">速度</th><th style="padding:6px">核心设备</th></tr>`;
+          entryData.levels.forEach((lv,i)=>{
+            html += `<tr style="background:${i%2?'#f8f9fc':'#fff'}"><td style="padding:5px 6px;border:1px solid #e0e0e0;font-weight:600">${lv.level||lv.model||lv.type||lv.number||''}</td><td style="padding:5px 6px;border:1px solid #e0e0e0">${lv.lines||lv.application||''}</td><td style="padding:5px 6px;border:1px solid #e0e0e0">${lv.maxSpeed||lv.sideSpeed||''}</td><td style="padding:5px 6px;border:1px solid #e0e0e0;font-size:11px">${lv.core||lv.features||''}</td></tr>`;
+          });
+          html += `</table>`;
+        }
+        // 型号列表（如果有）
+        if(entryData.models && Array.isArray(entryData.models)){
+          html += `<br><strong style="color:var(--primary)">📋 主要型号/类型</strong>`;
+          html += `<table style="width:100%;border-collapse:collapse;font-size:12px;margin:6px 0"><tr style="background:var(--primary);color:#fff">`;
+          html += `<th style="padding:6px;text-align:left">型号</th><th style="padding:6px">功率/速度</th><th style="padding:6px">特征</th><th style="padding:6px">用途</th></tr>`;
+          entryData.models.forEach((md,i)=>{
+            html += `<tr style="background:${i%2?'#f8f9fc':'#fff'}"><td style="padding:5px 6px;border:1px solid #e0e0e0;font-weight:600">${md.model||md.type||''}</td><td style="padding:5px 6px;border:1px solid #e0e0e0">${md.power||md.ratedPower||md.designSpeed||''}</td><td style="padding:5px 6px;border:1px solid #e0e0e0;font-size:11px">${md.dieselEngine||md.formation||md.slab||''}</td><td style="padding:5px 6px;border:1px solid #e0e0e0;font-size:11px">${md.application||''}</td></tr>`;
+          });
+          html += `</table>`;
+        }
+        // 工作原理（如果有）
+        if(entryData.workingPrinciple){
+          html += `<br><strong style="color:var(--primary)">⚙️ 工作原理</strong><br>`;
+          html += `<div style="font-size:13px;line-height:1.8;background:#f0f7ff;padding:10px;border-radius:8px">${entryData.workingPrinciple}</div>`;
+        }
+        // 应用/实际应用（如果有）
+        if(entryData.applications){
+          html += `<br><strong style="color:var(--primary)">🏭 实际应用</strong><br>`;
+          html += `<div style="font-size:13px;line-height:1.8">${entryData.applications}</div>`;
+        }
+        if(entryData.currentStatus){
+          html += `<br><strong style="color:var(--primary)">📌 现状</strong><br>`;
+          html += `<div style="font-size:13px;line-height:1.8">${entryData.currentStatus}</div>`;
+        }
+        if(entryData.currentApplication){
+          html += `<br><strong style="color:var(--primary)">📌 当前应用</strong><br>`;
+          html += `<div style="font-size:13px;line-height:1.8">${entryData.currentApplication}</div>`;
+        }
+        // 核心区别（如果有）
+        if(entryData.coreDifferences){
+          html += `<br><strong style="color:var(--primary)">🔑 核心区别</strong><br>`;
+          html += `<div style="font-size:13px;line-height:1.8">${entryData.coreDifferences}</div>`;
+        }
+        // 考试提示
+        if(entryData.examTips){
+          html += `<br><div style="background:#fff8e1;padding:10px;border-radius:8px;border-left:3px solid var(--gold);font-size:12px"><strong>💡 考试提示：</strong>${entryData.examTips}</div>`;
+        }
+        // 相关标签
+        if(entryData.keywords){
+          html += `<br><div style="margin-top:8px">`;
+          entryData.keywords.forEach(kw=>{
+            html += `<span class="tag-inline" onclick="quickAsk('${kw}')" style="cursor:pointer">${kw}</span> `;
+          });
+          html += `</div>`;
+        }
+        return html;
+      }
+    }
+  }
+
+  // 【新】搜索铁路法律法规
+  if(/铁路法|安全管理条例|技规|技术管理规程|法律法规|法律/.test(q) && KNOWLEDGE_BASE.technicalLegal){
+    let html = `<strong>📜 铁路法律法规知识库</strong><br><br>`;
+    for(const [lk, ld] of Object.entries(KNOWLEDGE_BASE.technicalLegal)){
+      html += `<span class="tag-inline" onclick="quickAsk('${ld.title}')" style="cursor:pointer">${ld.title}</span><br><span style="font-size:12px;color:var(--text-sub)">${ld.concept.substring(0,60)}...</span><br><br>`;
+    }
+    html += `💡 点击法律名称查看详细内容`;
+    return html;
+  }
+
+  // 【新】搜索教材知识库
+  if(KNOWLEDGE_BASE.textbookKnowledge){
+    const textbookKeywords = ['电力机车应急故障处理','铁路机车维修','电力机车钳工','内燃机车运用与保养','行车安全与装备','铁道概论','铁路信号基础','动车组技术','铁路线路维修','运输经济学基础'];
+    for(const tk of textbookKeywords){
+      const tbKey = tk;
+      if(!KNOWLEDGE_BASE.textbookKnowledge[tbKey]) continue;
+      const tb = KNOWLEDGE_BASE.textbookKnowledge[tbKey];
+      const shortKey = tbKey.substring(0,4);
+      if(q.includes(shortKey) || q.includes(tbKey)){
+        let html = `<strong>📚 ${tbKey}</strong>`;
+        html += `<div style="font-size:12px;color:var(--text-sub);margin:4px 0 8px">📖 ${tb.author || ''} | ${tb.publisher || ''} | ${tb.edition || ''}</div>`;
+        // 显示章节列表
+        if(tb.chapters && tb.chapters.length){
+          html += `<br><strong style="color:var(--primary)">📑 章节目录</strong><br>`;
+          html += `<div style="font-size:12px;line-height:1.9;background:#f8f9fc;padding:10px;border-radius:8px">`;
+          tb.chapters.slice(0,6).forEach((ch,idx)=>{
+            html += `<div style="margin:4px 0"><strong style="color:var(--primary)">${idx+1}. ${ch.title.replace(/第\d+章\s*/,'')}</strong>`;
+            if(ch.keyPoints && ch.keyPoints.length){
+              html += `<ul style="margin:2px 0 6px 16px;padding-left:8px">`;
+              ch.keyPoints.slice(0,3).forEach(kp=>html += `<li>${kp.substring(0,60)}${kp.length>60?'...':''}</li>`);
+              html += `</ul>`;
+            }
+            html += `</div>`;
+          });
+          html += `</div>`;
+        }
+        // 显示FAQ
+        if(tb.faq && tb.faq.length){
+          html += `<br><strong style="color:var(--primary)">❓ 常见问答</strong><br>`;
+          tb.faq.slice(0,3).forEach((f,idx)=>{
+            html += `<div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px;margin:6px 0">`;
+            html += `<div style="font-weight:600;color:var(--accent);font-size:13px">Q${idx+1}：${f.q}</div>`;
+            html += `<div style="font-size:12px;margin-top:4px;line-height:1.7;color:var(--text-main)">A：${f.a}</div>`;
+            html += `</div>`;
+          });
+        }
+        html += `<br><span class="tag-inline" onclick="quickAsk('${tbKey}考试重点')">📝 查看考试重点</span> `;
+        html += `<span class="tag-inline" onclick="quickAsk('${tbKey}知识点总结')">📖 知识点总结</span>`;
+        return html;
+      }
+    }
+  }
+
+  // 搜索专业名称
+  for(const [majName, m] of Object.entries(KNOWLEDGE_BASE.majors)){
+    if(q.includes(majName.replace(/[《》]/g,'').substring(0,3)) && !/课程|教材|书/.test(q)){
+      return showMajorDetail(majName);
+    }
+  }
+
+  // 【新】搜索机车车辆图鉴
+  if(/机车|动车组|HXD|HXN|DF|SS|CRH|CR400|CR300|CR200|和谐|韶山|东风|复兴号|电力机车|内燃机车|电动机车|高速动车/.test(q) && KNOWLEDGE_BASE.locomotiveData){
+    // 检查是否搜索特定车型
+    const loc = KNOWLEDGE_BASE.locomotiveData;
+    // HXD系列
+    if(/HXD1[HXD1]?/.test(q) || /和谐1/.test(q)){
+      return showLocomotiveType('electric','HXD');
+    }
+    // HXD2系列
+    if(/HXD2/.test(q)){
+      return showLocomotiveType('electric','HXD');
+    }
+    // HXD3系列
+    if(/HXD3/.test(q)){
+      return showLocomotiveType('electric','HXD');
+    }
+    // HXN系列
+    if(/HXN/.test(q)){
+      return showLocomotiveType('diesel','HXN');
+    }
+    // DF系列
+    if(/DF[1-9]/.test(q) || /东风[1-9]/.test(q)){
+      return showLocomotiveType('diesel','DF');
+    }
+    // SS系列
+    if(/SS[0-9]/.test(q) || /韶山/.test(q)){
+      return showLocomotiveType('electric','SS');
+    }
+    // CR400复兴号
+    if(/CR400|复兴号.*350|350.*复兴号/.test(q)){
+      return showLocomotiveType('emu','CRseries');
+    }
+    // CR450
+    if(/CR450|复兴号.*400|400.*复兴号/.test(q)){
+      return showLocomotiveType('emu','CRseries');
+    }
+    // CR300
+    if(/CR300/.test(q)){
+      return showLocomotiveType('emu','CRseries');
+    }
+    // CR200J
+    if(/CR200J|绿巨人|动力集中/.test(q)){
+      return showLocomotiveType('emu','CRseries');
+    }
+    // CRH系列
+    if(/CRH[1-6]/.test(q) || /和谐号/.test(q)){
+      return showLocomotiveType('emu','CRHseries');
+    }
+    // 动车组总览
+    if(/动车组|EMU/.test(q)){
+      return showLocomotiveGallery();
+    }
+    // 电力机车
+    if(/电力机车/.test(q)){
+      return showLocomotiveType('electric','HXD');
+    }
+    // 内燃机车
+    if(/内燃机车/.test(q)){
+      return showLocomotiveType('diesel','HXN');
+    }
+    // 特种作业车
+    if(/特种|工程车|检修|救援/.test(q)){
+      return showLocomotiveType('special','engineering');
+    }
+    // 默认显示机车总览（带图片模式）
+    if(/机车车辆|机车图鉴|图鉴|所有机车|机车一览/.test(q)){
+      // 检查是否需要带图片模式
+      if(/带图片|有图|看图|图片版|🖼️/.test(q) && window.showLocomotiveGalleryWithImages){
+        return showLocomotiveGalleryWithImages();
+      }
+      return showLocomotiveGallery();
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // 铁路实操演示模块
+    // ══════════════════════════════════════════════════════════
+    // 五步闸操作
+    if(/五步闸|制动机试验|制动试验|五步闸操作/.test(q) && window.showFiveStepBrake){
+      return showFiveStepBrake();
+    }
+    // 一次乘务作业
+    if(/一次乘务|乘务作业|乘务员|出退勤|出勤退勤/.test(q) && window.showOneTripDuty){
+      return showOneTripDuty();
+    }
+    // 机车检查
+    if(/机车检查|一次检查|检查流程|检查方法|目视法|锤检法/.test(q) && window.showLocomotiveInspection){
+      return showLocomotiveInspection();
+    }
+    // 实操演示总览
+    if(/实操|实作|实际操作|操作演示|视频学习|在线课程/.test(q) && window.showPracticalOperationsOverview){
+      return showPracticalOperationsOverview();
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // 工具导航模块
+    // ══════════════════════════════════════════════════════════
+    if(window.KNOWLEDGE_BASE.toolNavigation){
+      const intent = KNOWLEDGE_BASE.toolNavigation.identifyIntent(q);
+      if(intent){
+        return KNOWLEDGE_BASE.toolNavigation.generateRecommendationHTML(intent);
+      }
+    }
+  }
+
+  return null; // 无结果，走API
+}
+
+/* ── 模糊搜索回退（无API时） ── */
+function fuzzySearchFallback(query){
+  const q = query.toLowerCase();
+  const qClean = q.replace(/[？?！!。，,、的什么怎么如何为什么是哪个哪些有哪些叫什么意思原理工作方法流程]/g,'').trim();
+
+  // 1. 搜索所有专业课程的知识点（精准匹配）
+  if(qClean.length >= 2){
+    for(const [majName, m] of Object.entries(KNOWLEDGE_BASE.majors)){
+      for(const g of ['grade1','grade2']){
+        if(m[g] && m[g].knowledge){
+          for(const k of m[g].knowledge){
+            // 检查知识点中是否包含用户查询的关键词
+            const kStr = k.toLowerCase();
+            const keywords = qClean.split(/[\s]+/);
+            let matchCount = 0;
+            for(const kw of keywords){
+              if(kw.length >= 2 && kStr.includes(kw)) matchCount++;
+            }
+            if(matchCount >= 1){
+              let html = `<strong>📝 相关知识</strong><br><div style="background:#f8f9fc;padding:12px;border-radius:8px;border-left:3px solid var(--primary);font-size:13px;line-height:1.8">${k}</div>`;
+              // 查找同课程其他知识点
+              const related = m[g].knowledge.filter(rk => {
+                const rkStr = rk.toLowerCase();
+                return rk !== k && keywords.some(kw => kw.length >= 2 && rkStr.includes(kw));
+              }).slice(0, 5);
+              if(related.length){
+                html += `<br><strong>📚 相关知识</strong><ul>${related.map(r=>'<li style="font-size:12px">'+r+'</li>').join('')}</ul>`;
+              }
+              html += `<br><span class="source-badge">📌 来源：${majName} - ${g==='grade1'?'大一':'大二'}知识库</span>`;
+              html += `<br><span class="tag-inline" onclick="quickAsk('${majName}详细内容')">深入了解${majName}</span> `;
+              return html;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 2. 搜索铁路通用知识
+  for(const [gk, gv] of Object.entries(KNOWLEDGE_BASE.railwayGeneral)){
+    const gkClean = gk.replace(/[制度概况条件官网]/g,'');
+    if(qClean.includes(gkClean) || qClean.includes(gk)){
+      return `<strong>🚂 ${gk}</strong><br>${gv}`;
+    }
+  }
+
+  // 3. 搜索深度知识库
+  if(KNOWLEDGE_BASE.railwayKnowledge){
+    for(const [kwKey, kwData] of Object.entries(KNOWLEDGE_BASE.railwayKnowledge)){
+      if(q.includes(kwKey) || kwData.summary.toLowerCase().includes(qClean) || kwData.detail.toLowerCase().includes(qClean)){
+        let html = `<strong>🔬 ${kwKey}</strong><div style="font-size:12px;color:var(--text-sub);margin:4px 0 8px">📂 ${kwData.category}</div>`;
+        html += `<div style="font-size:13px;line-height:1.8;white-space:pre-line;background:#f8f9fc;padding:12px;border-radius:8px;border-left:3px solid var(--primary)">${kwData.detail.substring(0,500)}${kwData.detail.length>500?'...':''}</div>`;
+        return html;
+      }
+    }
+  }
+
+  // 4. 搜索体检标准
+  if(KNOWLEDGE_BASE.medicalStandards && /体检|视力|身体|身高|辨色|色盲|听力|血压|健康/.test(q)){
+    const ms = KNOWLEDGE_BASE.medicalStandards;
+    let html = `<strong>📋 体检标准</strong><div style="font-size:13px;line-height:1.8;background:#f8f9fc;padding:12px;border-radius:8px;border-left:3px solid var(--primary)">`;
+    if(typeof ms === 'string') html += ms;
+    else if(ms.general) html += ms.general;
+    html += `</div>`;
+    return html;
+  }
+
+  // 5. 搜索招聘流程
+  if(KNOWLEDGE_BASE.recruitmentProcess && /流程|报名|面试|录用|签约|招聘/.test(q)){
+    const rp = KNOWLEDGE_BASE.recruitmentProcess;
+    let html = `<strong>📋 招聘流程</strong><div style="font-size:13px;line-height:1.8;background:#f8f9fc;padding:12px;border-radius:8px;border-left:3px solid var(--primary)">`;
+    if(typeof rp === 'string') html += rp;
+    else if(Array.isArray(rp)) html += rp.map((s,i)=>`${i+1}. ${s.title||s}`).join('<br>');
+    else html += Object.entries(rp).map(([k,v])=>`${k}: ${v}`).join('<br>');
+    html += `</div>`;
+    return html;
+  }
+
+  // 6. 搜索薪资待遇
+  if(KNOWLEDGE_BASE.salaryDetails && /薪资|工资|待遇|收入|年薪|实习/.test(q)){
+    const sd = KNOWLEDGE_BASE.salaryDetails;
+    let html = `<strong>📋 薪资待遇</strong><div style="font-size:13px;line-height:1.8;background:#f8f9fc;padding:12px;border-radius:8px;border-left:3px solid var(--primary)">`;
+    if(typeof sd === 'string') html += sd;
+    else if(sd.general) html += sd.general;
+    html += `</div>`;
+    return html;
+  }
+
+  // 7. 搜索岗位专业对照
+  if(KNOWLEDGE_BASE.majorRequirements && /专业|对口|岗位/.test(q)){
+    const mr = KNOWLEDGE_BASE.majorRequirements;
+    let html = `<strong>📋 岗位专业对照</strong><div style="font-size:13px;line-height:1.8;background:#f8f9fc;padding:12px;border-radius:8px;border-left:3px solid var(--primary)">`;
+    if(typeof mr === 'string') html += mr;
+    else if(Array.isArray(mr)) html += mr.map(i=>typeof i==='string'?i:`${i.position||i.name}: ${i.majors||i.detail||i.desc||''}`).join('<br>');
+    else html += Object.entries(mr).map(([k,v])=>`${k}: ${v}`).join('<br>');
+    html += `</div>`;
+    return html;
+  }
+
+  // 8. 搜索课程大纲
+  if(KNOWLEDGE_BASE.courseOutlines){
+    for(const [cName, cData] of Object.entries(KNOWLEDGE_BASE.courseOutlines)){
+      if(qClean.includes(cName.substring(0,3)) || cName.includes(qClean)){
+        return showCourseOutline(cName, cData);
+      }
+    }
+  }
+
+  // 9. 搜索专业技术深度知识库（无API时的兜底搜索）
+  const techSections = ['technicalSignal','technicalRollingStock','technicalTrack','technicalPowerSupply','technicalOperation','technicalLegal'];
+  for(const tsKey of techSections){
+    if(!KNOWLEDGE_BASE[tsKey]) continue;
+    for(const [entryKey, entryData] of Object.entries(KNOWLEDGE_BASE[tsKey])){
+      // 关键词匹配
+      const titleStr = (entryData.title||entryKey).toLowerCase();
+      const conceptStr = (entryData.concept||'').toLowerCase();
+      const keywords = entryData.keywords || [];
+      let matchScore = 0;
+      // 分词匹配
+      const queryParts = qClean.split(/[\s]+/).filter(w=>w.length>=2);
+      for(const w of queryParts){
+        if(titleStr.includes(w)) matchScore += 5;
+        if(conceptStr.includes(w)) matchScore += 3;
+        if(keywords.some(kw=>kw.toLowerCase().includes(w))) matchScore += 4;
+      }
+      if(matchScore >= 3){
+        let html = `<strong>${entryData.title||entryKey}</strong><div style="font-size:12px;color:var(--text-sub);margin:4px 0 8px">📂 ${entryData.category||tsKey}</div>`;
+        html += `<div style="font-size:13px;line-height:1.8;background:#f8f9fc;padding:12px;border-radius:8px;border-left:3px solid var(--primary)"><strong>定义：</strong>${entryData.concept}</div>`;
+        if(entryData.workingPrinciple) html += `<br><div style="font-size:13px;line-height:1.8"><strong>⚙️ 原理：</strong>${entryData.workingPrinciple}</div>`;
+        if(entryData.applications) html += `<br><div style="font-size:13px;line-height:1.8"><strong>🏭 应用：</strong>${entryData.applications}</div>`;
+        if(entryData.currentApplication) html += `<br><div style="font-size:13px;line-height:1.8"><strong>📌 应用：</strong>${entryData.currentApplication}</div>`;
+        if(entryData.examTips) html += `<br><div style="background:#fff8e1;padding:8px;border-radius:8px;font-size:12px;border-left:3px solid var(--gold)"><strong>💡 考试：</strong>${entryData.examTips}</div>`;
+        return html;
+      }
+    }
+  }
+
+  return null;
+}
+
+/* ── 铁路局难易度排名展示 ── */
+function showBureauRanking(){
+  const ranking = KNOWLEDGE_BASE.bureauRanking;
+  if(!ranking) return null;
+  let html = `<strong>📊 铁路局招聘难易度排名</strong>`;
+  html += `<div style="font-size:12px;color:var(--text-sub);margin:4px 0 12px">${ranking.description}</div>`;
+
+  Object.entries(ranking.levels).forEach(([levelName, levelData])=>{
+    html += `<div style="margin:10px 0">`;
+    html += `<div style="font-weight:700;color:${levelData.color};font-size:13px;margin-bottom:8px">${levelData.icon} ${levelName}</div>`;
+    levelData.bureaus.forEach(b=>{
+      const bureauCode = getBureauCode(b.name);
+      html += `<div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin:5px 0;cursor:pointer" onclick="askBureau('${b.name.replace('局','局')}')">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <strong style="color:var(--primary)">${b.name}</strong>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span style="font-size:11px;background:${levelData.color};color:#fff;padding:2px 8px;border-radius:10px">难度 ${b.difficulty}</span>
+            ${bureauCode ? `<span style="font-size:11px;background:var(--primary);color:#fff;padding:2px 8px;border-radius:10px;cursor:pointer" onclick="event.stopPropagation();openBureauDetail('${bureauCode}')">查看详情 →</span>` : ''}
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--text-sub);margin-top:4px">${b.reason.substring(0,60)}...</div>
+        <div style="font-size:11px;margin-top:5px;display:flex;gap:10px">
+          <span>竞争比：${b.competitionRatio}</span>
+          <span>笔试：${b.examDifficulty}</span>
+          <span>薪资：${b.salary}</span>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+
+  html += `<div style="background:#e8f4fd;padding:12px;border-radius:8px;font-size:13px;margin-top:10px">`;
+  html += `💡 <strong>选择建议：</strong>${ranking.chooseTips}</div>`;
+  html += `<br><span class="tag-inline" onclick="quickAsk('铁路局招聘信息')">查看全部铁路局招聘</span>`;
+  html += ` <span class="tag-inline" onclick="openBureauOverview()" style="background:linear-gradient(135deg,var(--gold),#ff9800);color:#fff;border:none">🏛️ 铁路局详情总览</span>`;
+  return html;
+}
+
+/* ── 根据铁路局名称获取代码 ── */
+function getBureauCode(name){
+  const codeMap = {
+    '上海': 'shanghai', '广州': 'guangzhou', '北京': 'beijing',
+    '太原': 'taiyuan', '武汉': 'wuhan', '沈阳': 'shenyang',
+    '济南': 'jinan', '郑州': 'zhengzhou', '青藏': 'qingzang',
+    '乌鲁木齐': 'wulumuqi', '呼和浩特': 'hohhot',
+    '成都': 'chengdu', '兰州': 'lanzhou', '西安': 'xian',
+    '南昌': 'nanchang', '昆明': 'kunming', '哈尔滨': 'harbin', '南宁': 'nanning'
+  };
+  for(const [key, code] of Object.entries(codeMap)){
+    if(name.includes(key)) return code;
+  }
+  return null;
+}
+
+/* ── 课程大纲展示 ── */
+function showCourseOutline(cName, cData){
+  let html = `<strong>📋 ${cName} — 课程大纲</strong>`;
+  html += `<div style="font-size:12px;color:var(--text-sub);margin:4px 0 8px">${cData.subtitle} | 难度：${cData.difficulty}</div>`;
+
+  html += `<div style="background:#e8f4fd;padding:10px 12px;border-radius:8px;margin:8px 0">`;
+  html += `<strong style="font-size:12px">🎯 教学目标</strong><ul style="margin:6px 0;padding-left:16px">`;
+  cData.objectives.forEach(o=>{ html += `<li style="font-size:12px;margin:2px 0">${o}</li>`; });
+  html += `</ul></div>`;
+
+  html += `<div style="font-size:13px;font-weight:700;margin:10px 0 6px">📚 章节内容</div>`;
+  cData.chapters.forEach(ch=>{
+    html += `<div style="border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin:5px 0">`;
+    html += `<div style="font-weight:700;color:var(--primary);font-size:13px">第${ch.ch}章 ${ch.title}</div>`;
+    html += `<ul style="margin:5px 0;padding-left:16px">`;
+    ch.points.forEach(p=>{ html += `<li style="font-size:12px;margin:2px 0">${p}</li>`; });
+    html += `</ul></div>`;
+  });
+
+  html += `<div style="background:#fff3cd;padding:10px 12px;border-radius:8px;margin:10px 0">`;
+  html += `<strong style="font-size:12px">🎯 考试重点</strong><br>`;
+  html += `<div style="margin-top:5px">${cData.examFocus.map(f=>`<span class="tag-inline" style="background:var(--accent);color:#fff">${f}</span>`).join(' ')}</div>`;
+  html += `</div>`;
+
+  html += `<div style="background:#f0f2f7;padding:10px 12px;border-radius:8px;font-size:12px">`;
+  html += `💡 <strong>学习建议：</strong>${cData.studyAdvice}`;
+  html += `</div>`;
+
+  // 检查是否有题库
+  const quizKey = Object.keys(window.QUIZ_BANK||{}).find(k=>k===cName||k.includes(cName.substring(0,3)));
+  if(quizKey){
+    html += `<br><span class="tag-inline" onclick="quickAsk('开始考试：${cName}')" style="cursor:pointer;background:var(--accent);color:#fff">📝 开始${cName}模拟考试</span>`;
+  }
+  return html;
+}
+
+/* ── 题库列表展示 ── */
+function showQuizList(){
+  const qb = window.QUIZ_BANK || {};
+  const keys = Object.keys(qb);
+  if(!keys.length) return `<strong>📝 题库正在建设中</strong><br>请稍后再来。`;
+
+  let html = `<strong>📝 模拟考试题库</strong><br>`;
+  html += `<div style="font-size:13px;color:var(--text-sub);margin:6px 0 12px">共 ${keys.length} 门课程题库，点击即可开始模拟考试</div>`;
+  html += `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">`;
+  keys.forEach(k=>{
+    const bk = qb[k];
+    html += `<div style="background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;transition:all .15s" onclick="quickAsk('开始考试：${k}')">
+      <div style="font-weight:700;color:var(--primary);font-size:13px">${k}</div>
+      <div style="font-size:11px;color:var(--text-sub);margin-top:3px">${bk.desc||''}</div>
+      <div style="font-size:11px;color:var(--accent);margin-top:3px;font-weight:600">题库共${bk.totalQ||bk.questions.length}题</div>
+    </div>`;
+  });
+  html += `</div>`;
+  html += `<br><div style="font-size:12px;color:var(--text-sub)">💡 也可以直接输入"开始考试：课程名称"来启动模拟考试</div>`;
+  return html;
+}
+
+/* ── 铁路局列表（交互式） ── */
+function showBureauList(){
+  let html = `<strong>🏢 全国18个铁路局集团招聘</strong><br><br>`;
+  html += `<p style="font-size:13px;color:var(--text-sub);margin-bottom:12px">请点击您想了解的铁路局，查看详细招聘信息：</p>`;
+  html += `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">`;
+  Object.entries(KNOWLEDGE_BASE.recruitment).forEach(([key,data])=>{
+    const total = data.batches.reduce((s,b)=>s+b.count,0);
+    // 获取难易度评分
+    let diffScore = '';
+    if(KNOWLEDGE_BASE.bureauRanking){
+      const found = KNOWLEDGE_BASE.bureauRanking.totalRanking.find(r=>r.name.includes(key.replace('局','').replace('集团','')));
+      if(found) diffScore = `<div style="font-size:10px;color:#888;margin-top:2px">竞争度${found.score}</div>`;
+    }
+    html += `<div class="bureau-select-card" onclick="askBureau('${key}')" style="background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;transition:all .15s">
+      <div style="font-weight:700;color:var(--primary);font-size:13px">${data.abbr||key}</div>
+      <div style="font-size:11px;color:var(--text-sub);margin-top:3px">${data.region.substring(0,12)}</div>
+      <div style="font-size:11px;color:var(--accent);margin-top:3px;font-weight:600">招${total}人</div>
+      ${diffScore}
+    </div>`;
+  });
+  html += `</div>`;
+  html += `<br><span class="tag-inline" onclick="quickAsk('铁路局招聘难易度排名')" style="cursor:pointer">📊 查看难易度排名</span>`;
+  html += ` <span class="tag-inline" onclick="openBureauOverview()" style="cursor:pointer;background:linear-gradient(135deg,var(--gold),#ff9800);color:#fff;border:none">🏛️ 铁路局详情页</span>`;
+  html += `<div class="source-badge" style="margin-top:8px">📋 报名官网：<a href="http://rczp.china-railway.com.cn" target="_blank">中国铁路人才招聘网</a></div>`;
+  return html;
+}
+
+/* ── 打开铁路局详情总览页 ── */
+window.openBureauOverview = function(){
+  window.open('/public/bureaus/index.html', '_blank');
+};
+
+/* ── 打开单个铁路局详情页 ── */
+window.openBureauDetail = function(bureauCode){
+  window.open('/public/bureaus/bureau.html?code=' + bureauCode, '_blank');
+};
+
+/* ── 铁路局详细招聘信息 ── */
+function showBureauDetail(key){
+  const data = KNOWLEDGE_BASE.recruitment[key];
+  const dtl = data.details || {};
+  let html = `<strong>🏢 ${data.name}</strong>`;
+  html += `<div style="font-size:12px;color:var(--text-sub);margin-top:4px">📍 ${data.region}</div>`;
+  if(data.lines) html += `<div style="font-size:12px;color:var(--text-sub);margin-top:2px">🛤️ ${data.lines}</div>`;
+
+  // 难易度评分
+  if(KNOWLEDGE_BASE.bureauRanking){
+    const rank = KNOWLEDGE_BASE.bureauRanking.totalRanking.find(r=>r.name.includes(key.replace('局','').replace('集团','')));
+    if(rank){
+      const levelData = Object.values(KNOWLEDGE_BASE.bureauRanking.levels).find(lv=>lv.bureaus.find(b=>b.name.includes(rank.name)));
+      const lvIcon = levelData ? levelData.icon : '';
+      html += `<div style="margin:6px 0;display:flex;gap:8px;align-items:center">
+        <span style="font-size:12px;background:var(--bg-page);padding:3px 8px;border-radius:12px;color:var(--text-main)">${lvIcon} 全国排名 第${rank.rank}名</span>
+        <span style="font-size:12px;background:var(--bg-page);padding:3px 8px;border-radius:12px">${rank.tag}</span>
+      </div>`;
+    }
+  }
+
+  // 招聘批次
+  data.batches.forEach(b=>{
+    html += `<div class="rec-card" style="margin-top:10px">
+      <div class="rc-bureau">${b.batch}</div>
+      <div class="rc-detail">
+        <strong>学历：</strong>${b.degree}<br>
+        <strong>招聘人数：</strong>${b.count}人<br>
+        <strong>截止时间：</strong>${b.deadline}<br>`;
+    if(b.salary) html += `<strong>待遇：</strong>${b.salary}<br>`;
+    if(b.exam) html += `<strong>考试：</strong>${b.exam}<br>`;
+    if(b.note) html += `<strong>备注：</strong>${b.note}<br>`;
+    if(b.majors) html += `<strong>对口专业：</strong>${b.majors.map(m=>'<span class="tag-inline">'+m+'</span>').join(' ')}<br>`;
+    if(b.positions) html += `<strong>岗位方向：</strong>${b.positions.map(p=>'<span class="tag-inline">'+p+'</span>').join(' ')}<br>`;
+    if(b.conditions) html += `<strong>报名条件：</strong><ul style="margin:4px 0;padding-left:16px">${b.conditions.map(c=>'<li style="font-size:12px">'+c+'</li>').join('')}</ul>`;
+    html += `</div></div>`;
+  });
+
+  // 详细信息
+  if(dtl.examContent){
+    html += `<br><strong>📝 考试内容</strong><br><p style="font-size:13px;line-height:1.7">${dtl.examContent}</p>`;
+  }
+  if(dtl.bodyRequirements){
+    html += `<br><strong>🩺 身体条件</strong><br><p style="font-size:13px;line-height:1.7">${dtl.bodyRequirements}</p>`;
+  }
+  if(dtl.workAreas){
+    html += `<br><strong>📍 工作地区</strong><br><p style="font-size:13px;line-height:1.7">${dtl.workAreas}</p>`;
+  }
+  if(dtl.welfare){
+    html += `<br><strong>🎁 福利待遇</strong><br><p style="font-size:13px;line-height:1.7">${dtl.welfare}</p>`;
+  }
+
+  // 备考提示（从排名数据获取）
+  if(KNOWLEDGE_BASE.bureauRanking){
+    const levelData = Object.values(KNOWLEDGE_BASE.bureauRanking.levels).find(lv=>
+      lv.bureaus.find(b=>b.name.includes(key.replace('局','').replace('集团','')))
+    );
+    if(levelData){
+      const bData = levelData.bureaus.find(b=>b.name.includes(key.replace('局','').replace('集团','')));
+      if(bData && bData.tips){
+        html += `<br><strong>💡 备考建议</strong><br><ul>${bData.tips.map(t=>'<li style="font-size:12px;margin:3px 0">'+t+'</li>').join('')}</ul>`;
+      }
+    }
+  }
+
+  // 返回按钮
+  html += `<br><span class="tag-inline" onclick="quickAsk('铁路局招聘信息')" style="cursor:pointer">◀ 返回铁路局列表</span>`;
+  html += ` <span class="tag-inline" onclick="quickAsk('铁路局招聘难易度排名')" style="cursor:pointer">📊 查看难易度排名</span>`;
+  return html;
+}
+
+window.askBureau = function(key){
+  const data = KNOWLEDGE_BASE.recruitment[key];
+  document.getElementById('user-input').value = `${data.name}招聘条件和详情`;
+  sendMessage();
+};
+
+/* ── 专业详细信息 ── */
+function showMajorDetail(majName){
+  const m = KNOWLEDGE_BASE.majors[majName];
+  if(!m) return null;
+  let html = `<strong>🎓 ${majName}</strong><br>`;
+  html += `<div style="font-size:12px;color:var(--text-sub);margin-top:4px">${m.desc}</div>`;
+  if(m.employment) html += `<div style="font-size:12px;color:var(--accent);margin-top:3px">💼 就业方向：${m.employment}</div>`;
+  if(m.category) html += `<div style="font-size:12px;margin-top:2px"><span class="tag-inline">${m.category}</span></div>`;
+
+  ['grade1','grade2'].forEach(g=>{
+    if(m[g] && m[g].courses){
+      html += `<br><strong>📚 ${g==='grade1'?'【大一课程】':'【大二课程】'}</strong>`;
+      html += `<div class="course-cards">${m[g].courses.map(c=>`
+        <div class="course-card" onclick="askAboutCourse('${c.name}')">
+          <div class="cc-book">${c.icon}</div>
+          <div class="cc-name">${c.name}</div>
+          <div class="cc-sub">${c.book} · ${c.hours}学时</div>
+        </div>`).join('')}</div>`;
+    }
+  });
+  return html;
+}
+
+/* ── DeepSeek API ── */
+async function callDeepSeekApi(userMsg){
+  const cfg = state.apiConfig;
+  if(!cfg.key) throw new Error('未配置API Key');
+
+  let systemPrompt = `你是黑龙江交通职业技术学院铁路知识智能查询系统的AI助手。
+请用专业、准确的中文回答学生关于铁路知识的问题。
+以下是学校的专业知识语料库摘要：
+- 学校：${KNOWLEDGE_BASE.schoolInfo.name}，27个铁路及通用专业
+- 招聘信息：覆盖全国18个铁路局集团
+- 当前用户：${state.selectedYear?state.selectedYear+'届':''} ${state.selectedMajor||'未选择专业'} ${state.grade?'('+(state.grade==='grade1'?'大一':'大二')+')':''}`;
+
+  if(state.selectedMajor && KNOWLEDGE_BASE.majors[state.selectedMajor]){
+    const m = KNOWLEDGE_BASE.majors[state.selectedMajor];
+    systemPrompt += `\n\n该专业的课程信息：`;
+    ['grade1','grade2'].forEach(g=>{
+      if(m[g] && m[g].courses){
+        systemPrompt += `\n${g==='grade1'?'大一':'大二'}课程：${m[g].courses.map(c=>c.name+'('+c.book+')').join('、')}`;
+      }
+      if(m[g] && m[g].knowledge){
+        systemPrompt += `\n${g==='grade1'?'大一':'大二'}知识点：${m[g].knowledge.join('、')}`;
+      }
+    });
+  }
+
+  systemPrompt += `\n\n铁路通用知识：` + Object.entries(KNOWLEDGE_BASE.railwayGeneral).map(([k,v])=>k+'：'+v).join('\n');
+
+  const resp = await fetch(cfg.url, {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+cfg.key},
+    body: JSON.stringify({
+      model: cfg.model,
+      messages:[
+        {role:'system', content:systemPrompt},
+        {role:'user', content:userMsg}
+      ],
+      temperature: 0.7,
+      max_tokens: 2000
+    })
+  });
+
+  if(!resp.ok){
+    const errText = await resp.text().catch(()=>'');
+    throw new Error(`HTTP ${resp.status}: ${errText.substring(0,200)}`);
+  }
+
+  const data = await resp.json();
+  return data.choices?.[0]?.message?.content || '（AI未返回有效内容）';
+}
+
+/* ── API Config ── */
+function loadApiConfig(){
+  try {
+    const saved = localStorage.getItem('railway_api_config');
+    if(saved) Object.assign(state.apiConfig, JSON.parse(saved));
+    document.getElementById('cfg-api-key').value = state.apiConfig.key || '';
+    document.getElementById('cfg-api-url').value = state.apiConfig.url || '';
+    document.getElementById('cfg-model').value = state.apiConfig.model || 'deepseek-chat';
+    if(state.apiConfig.key) setApiStatus('ok','已配置');
+  } catch(e){}
+}
+
+window.saveApiConfig = function(){
+  state.apiConfig.key = document.getElementById('cfg-api-key').value.trim();
+  state.apiConfig.url = document.getElementById('cfg-api-url').value.trim() || 'https://api.deepseek.com/v1/chat/completions';
+  state.apiConfig.model = document.getElementById('cfg-model').value;
+  localStorage.setItem('railway_api_config', JSON.stringify(state.apiConfig));
+  if(state.apiConfig.key){
+    setApiStatus('loading','测试中...');
+    fetch(state.apiConfig.url, {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+state.apiConfig.key},
+      body: JSON.stringify({model:state.apiConfig.model, messages:[{role:'user',content:'hi'}], max_tokens:5})
+    }).then(r=>{
+      if(r.ok) { setApiStatus('ok','连接成功 ✓'); showToast('API配置保存成功','success'); }
+      else { setApiStatus('err','连接失败'); showToast('API连接失败，请检查Key和URL','error'); }
+    }).catch(()=>{ setApiStatus('err','网络错误'); showToast('网络错误','error'); });
+  } else {
+    setApiStatus('','未配置');
+    showToast('已保存（未填Key，将仅使用语料库）');
+  }
+};
+
+function setApiStatus(cls, text){
+  const dot = document.querySelector('#api-status .dot');
+  dot.className = 'dot ' + cls;
+  document.getElementById('api-status-text').textContent = text;
+}
+
+/* ── Corpus Status ── */
+function updateCorpusStatus(){
+  const majors = Object.keys(KNOWLEDGE_BASE.majors).length;
+  const bureaus = Object.keys(KNOWLEDGE_BASE.recruitment).length;
+  const courses = Object.values(KNOWLEDGE_BASE.majors).reduce((sum,m)=>{
+    ['grade1','grade2'].forEach(g=>{ if(m[g]?.courses) sum += m[g].courses.length; });
+    return sum;
+  },0);
+  document.getElementById('cs-majors').textContent = majors + '个专业';
+  document.getElementById('cs-courses').textContent = courses + '门课程';
+  document.getElementById('cs-recruit').textContent = bureaus + '个铁路局';
+  document.getElementById('cs-locomotive').textContent = KNOWLEDGE_BASE.locomotiveData ? '50+车型' : '未加载';
+  document.getElementById('cs-general').textContent = Object.keys(KNOWLEDGE_BASE.railwayGeneral).length + '个词条';
+}
+
+/* ── Quick Ask ── */
+window.quickAsk = function(text){
+  if(!state.selectedMajor){
+    showToast('请先选择入学年份和专业','error');
+    return;
+  }
+  document.getElementById('user-input').value = text;
+  sendMessage();
+};
+
+/* ── 机车车辆图鉴快速入口 ── */
+window.showLocomotiveGalleryQuick = function(){
+  if(!state.selectedMajor){
+    showToast('请先选择入学年份和专业','error');
+    return;
+  }
+  const input = document.getElementById('user-input');
+  input.value = '查看机车车辆图鉴';
+  sendMessage();
+};
+
+/* ── New Chat ── */
+window.newChat = function(){
+  const messages = document.getElementById('messages');
+  messages.innerHTML = `
+      <div id="welcome-banner">
+        <h2>🎓 欢迎来到铁路知识智能查询系统</h2>
+        <p>本系统基于黑龙江交通职业技术学院27个专业语料库，涵盖全课程体系、教材书目及全国18个铁路局招聘信息，结合 DeepSeek AI 为您提供精准专业解答。</p>
+        <div class="wb-tags">
+          <span class="wb-tag">📚 27个专业语料</span>
+          <span class="wb-tag">🎯 年级精准推荐</span>
+          <span class="wb-tag">🏢 铁路局招聘覆盖</span>
+          <span class="wb-tag">🤖 AI智能辅导</span>
+          <span class="wb-tag" onclick="openBureauOverview()" style="cursor:pointer;background:linear-gradient(135deg,var(--gold),#ff9800);border:none;color:#fff;font-weight:700">🏛️ 铁路局详情页</span>
+        </div>
+      </div>
+    <div id="year-select"></div>`;
+  renderYearCards();
+  state.selectedYear = null; state.selectedMajor = null; state.grade = null;
+  document.getElementById('sc-year').textContent = '—';
+  document.getElementById('sc-grade').textContent = '—';
+  document.getElementById('sc-major').textContent = '—';
+  document.getElementById('user-input').disabled = true;
+  document.getElementById('btn-send').disabled = true;
+  document.getElementById('user-input').placeholder = '请先选择入学年份...';
+  document.getElementById('cat-tabs').style.display = 'none';
+  showToast('已开始新对话');
+};
+
+/* ── Modal ── */
+window.openModal = function(title, sub, contentHtml, onConfirm){
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-sub').textContent = sub;
+  document.getElementById('modal-content').innerHTML = contentHtml;
+  document.getElementById('modal-overlay').classList.add('show');
+  document.getElementById('modal-confirm').onclick = ()=>{ closeModal(); if(onConfirm) onConfirm(); };
+};
+window.closeModal = function(){ document.getElementById('modal-overlay').classList.remove('show'); };
+
+/* ── Toast ── */
+window.showToast = function(msg, type=''){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (type?' '+type:'');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>{ t.className = ''; }, 2500);
+};
+
+/* ── Util ── */
+function escHtml(s){ const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+/* ── Search Suggestions ── */
+const SUGGESTIONS = [
+  {icon:'📚',text:'推荐适合我当前年级的课程书籍',cat:'课程'},
+  {icon:'📖',text:'详细课程目录和知识点',cat:'教材'},
+  {icon:'🏢',text:'铁路局招聘信息',cat:'招聘'},
+  {icon:'🩺',text:'铁路局招聘身体条件详细要求',cat:'招聘'},
+  {icon:'📝',text:'铁路局招聘考试内容和流程',cat:'考试'},
+  {icon:'💰',text:'铁路局招聘实习期和转正待遇',cat:'待遇'},
+  {icon:'📋',text:'铁路局招聘报名条件',cat:'招聘'},
+  {icon:'🚦',text:'铁路信号基础知识',cat:'信号'},
+  {icon:'🗂️',text:'铁路行车组织知识',cat:'运营'},
+  {icon:'🚂',text:'铁路机车车辆基本知识',cat:'机车'},
+  {icon:'🛤️',text:'铁路线路与轨道工程知识',cat:'工务'},
+  {icon:'🔌',text:'铁路牵引供电与接触网知识',cat:'供电'},
+  {icon:'🎓',text:'黑龙江交通职业技术学院简介',cat:'学校'},
+  {icon:'📋',text:'全部27个专业介绍',cat:'专业'},
+  {icon:'🚄',text:'高速铁路技术知识',cat:'高铁'},
+  {icon:'🛡️',text:'铁路安全管理知识',cat:'安全'}
+];
+
+document.getElementById('user-input').addEventListener('input', function(e){
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+  // 搜索建议
+  const val = this.value.trim();
+  const sugBox = document.getElementById('search-suggestions');
+  if(val.length > 0){
+    const matches = SUGGESTIONS.filter(s=> s.text.includes(val) || s.cat.includes(val));
+    if(matches.length > 0){
+      sugBox.innerHTML = matches.slice(0,6).map(s=>
+        `<div class="sug-item" onclick="document.getElementById('user-input').value='${s.text}';document.getElementById('search-suggestions').classList.remove('show');sendMessage();">
+          <span class="sug-icon">${s.icon}</span>
+          <span class="sug-text">${s.text}</span>
+          <span class="sug-cat">${s.cat}</span>
+        </div>`
+      ).join('');
+      sugBox.classList.add('show');
+    } else {
+      sugBox.classList.remove('show');
+    }
+  } else {
+    sugBox.classList.remove('show');
+  }
+});
+
+document.getElementById('user-input').addEventListener('blur', function(){
+  setTimeout(()=>document.getElementById('search-suggestions').classList.remove('show'), 200);
+});
+
+/* ── Enter to send ── */
+document.getElementById('user-input').addEventListener('keydown', function(e){
+  if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendMessage(); }
+});
+
+/* ── Click outside modal to close ── */
+document.getElementById('modal-overlay').addEventListener('click', function(e){
+  if(e.target === this) closeModal();
+});
+
+/* ══════════════════════════════════════════════════════════
+   视频学习模块 — 打开独立视频链接页面
+   ══════════════════════════════════════════════════════════ */
+window.openVideoLearning = function(){
+  // 直接打开视频学习页面
+  window.open('video-learning.html', '_blank');
+};
+
+})();
+
+/* ══════════════════════════════════════════════════════════
+   书架系统集成 — 嵌入知识查询系统
+   数据：28种教材，覆盖5大专业方向，真实出版社封面
+   ══════════════════════════════════════════════════════════ */
+(function(){
+  window.BOOKSHELF = [
+    {title:"铁道机车车辆",author:"蒋玉宝",publisher:"北京交通大学出版社",isbn:"9787512150355",price:"45.80",year:"2025",category:"机车车辆",course:"铁道机车车辆",school:"黑龙江交通职业技术学院",color:"#1A4B8C",cover:"https://press.bjtu.edu.cn/media/cover0/638246691606657736_000.jpg",coverReal:true,desc:"蒋玉宝主编，系统介绍和谐系列、CR系列、集中动力动车组等新型机车车辆。黑龙江交通职业技术学院教师主编教材。"},
+    {title:"电力机车电气设备检修",author:"陈燕萍",publisher:"北京交通大学出版社",isbn:"9787512150577",price:"49.00",year:"2026",category:"机车车辆",course:"电力机车电气设备检修",school:"黑龙江交通职业技术学院",color:"#8B1A1A",cover:"https://press.bjtu.edu.cn/media/cover0/638284710364955822_000.jpg",coverReal:true,desc:"对接机车检修、电力机车司机岗位，融入机车电工技能等级证书内容。"},
+    {title:"动车组检修",author:"梁炜昭",publisher:"北京交通大学出版社",isbn:"9787512130463",price:"52.00",year:"2026",category:"机车车辆",course:"动车组检修技术",color:"#0A5275",cover:"https://press.bjtu.edu.cn/media/cover0/jiayue_9787512130463.jpg",coverReal:true,desc:"十一章涵盖动车组车体、转向架、牵引电机、制动等核心检修内容。"},
+    {title:"电力机车钳工",author:"杨琪",publisher:"北京交通大学出版社",isbn:"9787512149939",price:"59.00",year:"2026",category:"机车车辆",course:"电力机车钳工",school:"黑龙江交通职业技术学院",color:"#7B3F00",cover:"https://press.bjtu.edu.cn/media/uploadimgs/20260312102730_25.jpg",coverReal:true,desc:"杨琪（黑龙江交通职业技术学院副教授）主编，紧扣中级工、高级工职业技能要求。"},
+    {title:"内燃机车运用与保养",author:"王国松",publisher:"北京交通大学出版社",isbn:"9787512148406",price:"59.00",year:"2023",category:"机车车辆",course:"内燃机车运用与保养",color:"#2F4F4F",cover:"https://press.bjtu.edu.cn/media/uploadimgs/20260312102501_73.jpg",coverReal:true,desc:"围绕DF4B、HXN5型内燃机车编写运用与保养知识体系。"},
+    {title:"铁道概论",author:"张晓玲",publisher:"人民交通出版社",isbn:"9787114181450",year:"2024",category:"基础课程",course:"铁道概论",color:"#1A4B8C",cover:"https://img3m9.ddimg.cn/21/7/29453709-1_u_2.jpg",coverReal:true,desc:"铁路交通运输类专业必修基础课程，十四五职业教育国家规划教材。"},
+    {title:"铁道概论（第2版）",author:"龚娟",publisher:"高等教育出版社",isbn:"9787040610635",price:"55.80",year:"2023",category:"基础课程",course:"铁道概论",color:"#1E5296",cover:"https://img3m4.ddimg.cn/76/10/29650774-1_u_1700709045.jpg",coverReal:true,desc:"校企双元合作教材，将思政元素与专业知识技能融为一体。"},
+    {title:"铁路信号基础",author:"林瑜筠",publisher:"中国铁道出版社",isbn:"9787113267742",price:"49.00",year:"2020",category:"信号通信",course:"铁路信号基础",color:"#1B4332",cover:"https://img3m2.ddimg.cn/38/36/11745247772-1_u_1715590696.jpg",coverReal:true,desc:"十二五职业教育国家规划教材，涵盖信号继电器、信号机、道岔转辙机、轨道电路。"},
+    {title:"车站计算机联锁系统维护",author:"张立群",publisher:"西南交通大学出版社",isbn:"9787564345334",price:"39.00",year:"2016",category:"信号通信",course:"车站联锁设备维护",color:"#264653",cover:"https://img3m8.ddimg.cn/1/19/24023638-1_u_5.jpg",coverReal:true,desc:"根据信号工在车站计算机联锁系统维护时的实际工作场景编写。"},
+    {title:"铁路行车组织",author:"彭其渊",publisher:"中国铁道出版社",isbn:"9787113200909",price:"38.00",year:"2015",category:"运输管理",course:"铁路行车组织",color:"#1A1A5C",cover:"https://img3m1.ddimg.cn/62/17/12488611571-1_u_1763763118.jpg",coverReal:true,desc:"涵盖车站工作组织、货物列车编组计划、列车运行图等核心内容。"},
+    {title:"铁路旅客运输组织",author:"裴瑞江",publisher:"人民交通出版社",isbn:"9787114191084",price:"58.00",year:"2024",category:"运输管理",course:"铁路旅客运输组织",color:"#4C1A5C",cover:"https://img3m6.ddimg.cn/69/4/29775606-1_u_1725004795.jpg",coverReal:true,desc:"国家铁路局规划教材，含站务工作组织、乘务工作组织、安全与应急处理。"},
+    {title:"铁路客运组织",author:"教材编委会",publisher:"中国铁道出版社",year:"2024",category:"运输管理",course:"铁路旅客运输组织",color:"#3A1A5C",cover:"https://img3m7.ddimg.cn/44/9/29941627-1_u_4.jpg",coverReal:true,desc:"十四五职业教育国家规划教材，系统介绍铁路客运组织工作。"},
+    {title:"铁路线路养护维修",author:"王兴杰",publisher:"中国铁道出版社",isbn:"9787113323288",price:"56.00",year:"2024",category:"工务供电",course:"铁路线路维护",color:"#556B2F",cover:"https://www.tdpress.com/Uploads/book/img/9787113323288.png",coverReal:true,desc:"十四五职业教育国家规划教材，涵盖铁路线路养护维修全套技术。"},
+    {title:"接触网运行与检修",author:"薛艳红",publisher:"中国铁道出版社",isbn:"9787113090654",price:"13.00",year:"2008",category:"工务供电",course:"接触网运行检修",color:"#3A5F0B",desc:"适用于电气化铁道供电专业，接触网运行检修工具书。"},
+    {title:"机械制图",author:"舒振华",publisher:"中国铁道出版社",isbn:"9787113293055",year:"2022",category:"基础课程",course:"机械制图",color:"#2E4057",cover:"https://img3m8.ddimg.cn/14/21/29470928-1_u_3.jpg",coverReal:true,desc:"根据最新《技术制图》与《机械制图》国家标准编写，配套AutoCAD实训。"},
+    {title:"电工基础",author:"铁路职教编委会",publisher:"中国铁道出版社",year:"2022",category:"基础课程",course:"电工基础",color:"#1C3A5C",desc:"包含直流电路、交流电路、磁路、电工仪表等基础知识。"},
+    {title:"电力机车应急故障处理",author:"赵威",publisher:"北京交通大学出版社",isbn:"9787512146839",price:"69.00",year:"2022",category:"机车车辆",course:"电力机车应急故障处理",color:"#6B2D2D",cover:"https://img3m4.ddimg.cn/13/0/29388064-1_u_3.jpg",coverReal:true,desc:"校企合作开发教材，涵盖HXD型、SS型电力机车常见故障诊断与应急处理。"},
+    {title:"行车安全与装备",author:"邓子阳",publisher:"北京交通大学出版社",isbn:"9787512149106",price:"49.80",year:"2023",category:"机车车辆",course:"行车安全与装备",color:"#8B0000",cover:"https://img3m9.ddimg.cn/40/26/29625889-1_u_1697075973.jpg",coverReal:true,desc:"基于机车乘务员一次出乘作业标准组织，设计7个教学项目28项教学任务。"},
+    {title:"铁路局招聘备考：行测",author:"铁路招聘研究中心",publisher:"中国铁道出版社",price:"48.00",year:"2025",category:"基础课程",course:"铁路局招聘备考",color:"#003366",desc:"专门针对铁路局招聘考试编写的行政职业能力测验备考资料。"},
+    {title:"铁路局招聘备考：铁路基础",author:"铁路招聘研究中心",publisher:"中国铁道出版社",price:"38.00",year:"2025",category:"基础课程",course:"铁路局招聘备考",color:"#003333",desc:"铁路局招聘考试铁路基础知识模块备考资料，配套时事政治题库。"},
+  ];
+
+  /* 打开书架模态框 */
+  window.openBookshelfModal = function(filterCat) {
+    if(document.getElementById('bs-modal-overlay')) {
+      document.getElementById('bs-modal-overlay').remove();
+    }
+    const overlay = document.createElement('div');
+    overlay.id = 'bs-modal-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)';
+    overlay.onclick = function(e){ if(e.target===overlay) overlay.remove(); };
+    const books = window.BOOKSHELF || [];
+    const cats = [...new Set(books.map(b=>b.category))];
+    const activeCat = filterCat || 'all';
+    let html = `<div style="background:linear-gradient(135deg,#0D1B2A,#1B2838);border:1px solid rgba(200,169,81,.25);border-radius:16px;padding:28px;width:min(920px,95vw);max-height:88vh;overflow-y:auto;position:relative;animation:slideUp .3s ease">
+      <style>@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}</style>
+      <button onclick="this.closest('#bs-modal-overlay').remove()" style="position:absolute;top:14px;right:18px;background:none;border:none;color:#A0AEC0;font-size:1.5em;cursor:pointer;line-height:1;padding:4px">&times;</button>
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:28px;margin-bottom:6px">📖</div>
+        <h2 style="color:#C8A951;font-size:1.5em;margin:0 0 4px">铁路专业教材书架</h2>
+        <p style="color:#718096;font-size:12px;margin:0">黑龙江交通职业技术学院 · ${books.length}种教材 · ${cats.length}大专业方向 · 来源：北京交通大学出版社等</p>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;justify-content:center">
+        <button class="bs-cat-btn active" onclick="renderShelfBooks(this,'all')" style="padding:6px 16px;border-radius:20px;font-size:12px;border:1.5px solid rgba(200,169,81,.4);background:#C8A951;color:#0A1E3C;cursor:pointer;font-weight:700;transition:all .2s">全部(${books.length})</button>
+        ${cats.map(c=>`<button class="bs-cat-btn" onclick="renderShelfBooks(this,'${c}')" style="padding:6px 16px;border-radius:20px;font-size:12px;border:1.5px solid rgba(200,169,81,.25);background:rgba(255,255,255,.04);color:#A0AEC0;cursor:pointer;font-weight:600;transition:all .2s">${c}(${books.filter(b=>b.category===c).length})</button>`).join('')}
+      </div>
+      <div id="bs-book-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:14px"></div>
+      <div style="text-align:center;margin-top:20px;padding-top:16px;border-top:1px solid rgba(200,169,81,.1)">
+        <a href="bookshelf.html" target="_blank" style="display:inline-block;padding:10px 28px;background:#C8A951;color:#0A1E3C;border-radius:10px;font-size:14px;font-weight:700;text-decoration:none">&#128218; 打开完整书架（搜索/筛选）</a>
+      </div>
+    </div>`;
+    overlay.innerHTML = html;
+    document.body.appendChild(overlay);
+
+    window.renderShelfBooks = function(btn, cat) {
+      document.querySelectorAll('.bs-cat-btn').forEach(b=>{ b.style.background='rgba(255,255,255,.04)'; b.style.color='#A0AEC0'; });
+      btn.style.background='#C8A951'; btn.style.color='#0A1E3C';
+      const filtered = cat==='all' ? books : books.filter(b=>b.category===cat);
+      const grid = document.getElementById('bs-book-grid');
+      grid.innerHTML = filtered.map(b=>`
+        <div style="background:linear-gradient(160deg,${b.color},${b.color}99);border-radius:10px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .25s;border:1px solid rgba(255,255,255,.08);position:relative"
+             onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 8px 25px rgba(0,0,0,.3)'"
+             onmouseout="this.style.transform='';this.style.boxShadow=''"
+             onclick="bsShowDetail(${JSON.stringify(b).replace(/"/g,'&quot;')})">
+          ${b.coverReal ? `<div style="width:100%;height:70px;background:url('${b.cover}') center/cover no-repeat;border-radius:4px;margin-bottom:8px"></div>` : `<div style="font-size:36px;margin-bottom:8px">📖</div>`}
+          <div style="font-size:11px;font-weight:700;color:#fff;line-height:1.35;min-height:30px;margin-bottom:4px">${b.title}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.6)">${b.author.split('/')[0]}</div>
+          ${b.coverReal ? '<div style="position:absolute;top:4px;right:4px;font-size:9px;background:#27ae60;color:#fff;padding:1px 4px;border-radius:3px">✓实图</div>' : ''}
+        </div>`).join('');
+    };
+
+    window.bsShowDetail = function(book) {
+      const modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:400;display:flex;align-items:center;justify-content:center;padding:20px';
+      modal.onclick = function(e){ if(e.target===modal) modal.remove(); };
+      modal.innerHTML = `
+      <div style="background:#1B2838;border:1px solid rgba(200,169,81,.2);border-radius:14px;padding:28px;width:min(520px,95vw);max-height:85vh;overflow-y:auto;position:relative;animation:slideUp .3s ease">
+        <button onclick="this.closest('div[style*=&quot;position:fixed&quot;]').remove()" style="position:absolute;top:12px;right:16px;background:none;border:none;color:#A0AEC0;font-size:1.4em;cursor:pointer;padding:4px">&times;</button>
+        <div style="display:flex;gap:18px;align-items:flex-start;margin-bottom:16px">
+          <div style="width:100px;height:145px;background:${book.cover?'url('+book.cover+') center/cover no-repeat,'+book.color:book.color};border-radius:4px;flex-shrink:0;box-shadow:3px 3px 12px rgba(0,0,0,.4)"></div>
+          <div style="flex:1">
+            <h3 style="color:#C8A951;font-size:1.15em;margin:0 0 8px;line-height:1.4">${book.title}</h3>
+            <div style="font-size:12px;color:#94A3B8;line-height:2">
+              <div><strong style="color:#CBD5E0">作者：</strong>${book.author}</div>
+              <div><strong style="color:#CBD5E0">出版社：</strong>${book.publisher}</div>
+              <div><strong style="color:#CBD5E0">ISBN：</strong>${book.isbn||'暂无'}</div>
+              ${book.price ? '<div><strong style="color:#CBD5E0">定价：</strong><span style="color:#C8A951">¥'+book.price+'</span></div>' : ''}
+              <div><strong style="color:#CBD5E0">出版年：</strong>${book.year||'—'}</div>
+              <div><strong style="color:#CBD5E0">课程：</strong>${book.course}</div>
+              ${book.school ? '<div style="color:#27ae60;font-weight:600">✓ '+book.school+'</div>' : ''}
+            </div>
+          </div>
+        </div>
+        ${book.desc ? `<div style="background:rgba(255,255,255,.04);border-radius:10px;padding:14px;font-size:13px;line-height:1.75;color:#E2E8F0;border-left:3px solid #C8A951;margin-bottom:14px">${book.desc}</div>` : ''}
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          ${book.category?`<span style="padding:4px 12px;background:#2B6CB0;border-radius:12px;font-size:11px;color:#fff;font-weight:600">${book.category}</span>`:''}
+          ${book.school?`<span style="padding:4px 12px;background:#276749;border-radius:12px;font-size:11px;color:#fff">黑龙江交通职院</span>`:''}
+        </div>
+      </div>`;
+      document.body.appendChild(modal);
+    };
+
+    renderShelfBooks(document.querySelector('.bs-cat-btn'), activeCat);
+  };
+
+  /* 在知识系统中显示书籍推荐 */
+  window.getBookshelfHtml = function() {
+    const books = window.BOOKSHELF || [];
+    let html = `<strong>📚 铁路专业推荐教材（共${books.length}种）</strong>`;
+    html += `<div style="font-size:12px;color:var(--text-sub);margin:6px 0 12px">点击分类标签或查看详情，真实出版社封面图片</div>`;
+    const cats = [...new Set(books.map(b=>b.category))];
+    html += `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">`;
+    html += `<span class="tag-inline" onclick="openBookshelfModal()" style="cursor:pointer;background:#C8A951;color:#0A1E3C">全部(${books.length})</span>`;
+    cats.forEach(c=>{ html+=`<span class="tag-inline" onclick="openBookshelfModal('${c}')" style="cursor:pointer">${c}(${books.filter(b=>b.category===c).length})</span>`; });
+    html += `</div>`;
+    html += `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px">`;
+    books.slice(0,8).forEach(b=>{
+      html += `<div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;transition:all .15s"
+                   onmouseover="this.style.borderColor='var(--primary)';this.style.boxShadow='0 3px 10px rgba(0,48,135,.1)'"
+                   onmouseout="this.style.borderColor='var(--border)';this.style.boxShadow=''"
+                   onclick="openBookshelfModal('${b.category}')">
+        ${b.coverReal ? `<div style="width:100%;height:60px;background:url('${b.cover}') center/cover no-repeat;border-radius:4px;margin-bottom:8px"></div>` : `<div style="font-size:24px;margin-bottom:6px;text-align:center">📖</div>`}
+        <div style="font-weight:700;color:var(--primary);font-size:12px;line-height:1.3;margin-bottom:3px">${b.title}</div>
+        <div style="font-size:11px;color:var(--text-sub)">${b.author.split('/')[0]}</div>
+        <div style="font-size:10px;color:var(--accent);margin-top:3px">${b.course}</div>
+        ${b.school?'<div style="font-size:10px;color:#27ae60;margin-top:2px">✓'+b.school.split(' ')[0]+'</div>':''}
+      </div>`;
+    });
+    html += `</div>`;
+    html += `<br><a href="bookshelf.html" target="_blank" style="display:inline-block;padding:8px 20px;background:var(--primary);color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none">&#128218; 打开完整书架</a>`;
+    html += ` <span class="tag-inline" onclick="openBookshelfModal()" style="cursor:pointer">📖 查看全部${books.length}种教材</span>`;
+    return html;
+  };
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>问题反馈中心 — 黑龙江交通职业技术学院</title>
+<style>
+:root {
+  --primary: #003087;
+  --primary-light: #1a4b8c;
+  --accent: #c0392b;
+  --gold: #f0a500;
+  --green: #27ae60;
+  --bg: #f0f2f7;
+  --card: #ffffff;
+  --border: #dde3f0;
+  --text: #1a1a2e;
+  --text-sub: #555;
+  --text-light: #888;
+  --shadow: 0 4px 20px rgba(0,48,135,.12);
+  --radius: 12px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Microsoft YaHei', 'PingFang SC', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ── 顶部 ── */
+.header {
+  background: linear-gradient(135deg, #001e5a 0%, #003087 60%, #1a4b8c 100%);
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 2px 12px rgba(0,30,90,.4);
+}
+.header-icon {
+  width: 48px; height: 48px;
+  background: rgba(255,255,255,.15);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+}
+.header-text h1 { font-size: 20px; font-weight: 800; color: #fff; }
+.header-text p { font-size: 12px; color: rgba(255,255,255,.65); margin-top: 2px; }
+.header-back {
+  margin-left: auto;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: rgba(255,255,255,.12);
+  color: #fff;
+  font-size: 13px;
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,.2);
+  transition: background .2s;
+  cursor: pointer;
+}
+.header-back:hover { background: rgba(255,255,255,.2); }
+
+/* ── 主体布局 ── */
+.page-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 24px 60px;
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 24px;
+}
+@media (max-width: 900px) {
+  .page-wrap { grid-template-columns: 1fr; }
+}
+
+/* ── 卡片 ── */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.card-header {
+  padding: 18px 24px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.card-header h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary);
+}
+.card-header .badge {
+  margin-left: auto;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.badge-primary { background: #dbeafe; color: var(--primary); }
+.badge-warning { background: #fef3c7; color: #b45309; }
+.badge-success { background: #dcfce7; color: var(--green); }
+.badge-danger  { background: #fee2e2; color: var(--accent); }
+.card-body { padding: 20px 24px; }
+
+/* ── 反馈表单 ── */
+.form-group { margin-bottom: 18px; }
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 7px;
+}
+.form-group label .required { color: var(--accent); margin-left: 2px; }
+.form-group label .hint {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-light);
+  margin-left: 6px;
+}
+.form-control {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  transition: border-color .2s, box-shadow .2s;
+  background: #fafbff;
+  color: var(--text);
+}
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0,48,135,.08);
+}
+textarea.form-control {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.6;
+}
+select.form-control { appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+
+.difficulty-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.diff-btn {
+  flex: 1;
+  min-width: 80px;
+  padding: 10px 8px;
+  border-radius: 8px;
+  border: 2px solid var(--border);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all .15s;
+  background: #fff;
+}
+.diff-btn.selected-easy { border-color: var(--green); background: #f0fdf4; color: var(--green); }
+.diff-btn.selected-medium { border-color: var(--gold); background: #fffbeb; color: #92400e; }
+.diff-btn.selected-hard { border-color: var(--accent); background: #fff5f5; color: var(--accent); }
+.diff-btn:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(0,0,0,.08); }
+
+.char-count {
+  text-align: right;
+  font-size: 11px;
+  color: var(--text-light);
+  margin-top: 4px;
+}
+.char-count.warn { color: var(--gold); }
+.char-count.over { color: var(--accent); }
+
+.btn-submit {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: opacity .2s, transform .1s;
+  letter-spacing: .5px;
+}
+.btn-submit:hover { opacity: .9; }
+.btn-submit:active { transform: scale(.98); }
+.btn-submit:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ── 提交成功提示 ── */
+.submit-success {
+  display: none;
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border: 1.5px solid #86efac;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+}
+.submit-success.show { display: block; }
+.ss-icon { font-size: 48px; margin-bottom: 12px; }
+.ss-title { font-size: 18px; font-weight: 800; color: var(--green); margin-bottom: 8px; }
+.ss-ticket {
+  background: #fff;
+  border-radius: 8px;
+  padding: 14px 18px;
+  text-align: left;
+  margin: 14px 0;
+  border: 1px solid #86efac;
+}
+.ss-ticket-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 4px 0;
+  border-bottom: 1px dashed #e0f5e8;
+}
+.ss-ticket-row:last-child { border-bottom: none; }
+.ss-ticket-label { color: var(--text-sub); }
+.ss-ticket-value { font-weight: 700; color: var(--text); }
+.ss-ticket-value.priority-high { color: var(--accent); }
+.ss-ticket-value.priority-mid  { color: var(--gold); }
+.ss-ticket-value.priority-low  { color: var(--green); }
+.ss-eta {
+  background: var(--primary);
+  color: #fff;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.btn-new-feedback {
+  margin-top: 16px;
+  padding: 10px 24px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .2s;
+}
+.btn-new-feedback:hover { background: var(--primary-light); }
+
+/* ── 右侧：反馈队列 ── */
+.queue-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.qs-item {
+  background: #f8f9ff;
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+.qs-num {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--primary);
+  line-height: 1;
+}
+.qs-label { font-size: 11px; color: var(--text-light); margin-top: 4px; }
+
+.queue-list { display: flex; flex-direction: column; gap: 10px; max-height: 520px; overflow-y: auto; padding-right: 4px; }
+.queue-list::-webkit-scrollbar { width: 4px; }
+.queue-list::-webkit-scrollbar-thumb { background: #c5cce8; border-radius: 4px; }
+
+.q-item {
+  background: #f8f9ff;
+  border-radius: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--border);
+  transition: transform .15s;
+  cursor: default;
+}
+.q-item:hover { transform: translateX(2px); }
+.q-item.priority-high { border-left-color: var(--accent); }
+.q-item.priority-mid  { border-left-color: var(--gold); }
+.q-item.priority-low  { border-left-color: var(--green); }
+.q-item.status-done   { opacity: .6; border-left-color: #aaa; }
+
+.qi-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.qi-rank {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.qi-rank.rank-1 { background: #c0392b; }
+.qi-rank.rank-2 { background: #e67e22; }
+.qi-rank.rank-3 { background: #f0a500; }
+.qi-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+  line-height: 1.4;
+}
+.qi-badges { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
+.qi-badge {
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.qi-meta {
+  font-size: 11px;
+  color: var(--text-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.qi-eta { font-size: 11px; font-weight: 700; color: var(--primary); }
+
+.empty-queue {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-light);
+}
+.empty-queue .eq-icon { font-size: 40px; margin-bottom: 10px; }
+.empty-queue p { font-size: 13px; }
+
+/* ── 管理员面板 ── */
+.admin-hint {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-light);
+  padding: 8px;
+  border-top: 1px solid var(--border);
+  margin-top: 12px;
+}
+.admin-btn {
+  font-size: 11px;
+  color: var(--primary);
+  text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+/* ── Toast ── */
+#toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #1a1a2e;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 9999;
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all .3s;
+  pointer-events: none;
+  box-shadow: 0 6px 24px rgba(0,0,0,.25);
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+#toast.success { background: var(--green); }
+#toast.error   { background: var(--accent); }
+
+/* ── 进度条 ── */
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width .5s ease;
+}
+.progress-fill.high { background: var(--accent); }
+.progress-fill.mid  { background: var(--gold); }
+.progress-fill.low  { background: var(--green); }
+
+/* ── 说明区域 ── */
+.info-card {
+  background: linear-gradient(135deg, #f0f4ff, #e8edfc);
+  border: 1px solid #c5d0f0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.info-card h4 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-sub);
+  padding: 4px 0;
+}
+.info-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-icon">💬</div>
+  <div class="header-text">
+    <h1>问题反馈中心</h1>
+    <p>黑龙江交通职业技术学院 · 铁路知识智能查询系统</p>
+  </div>
+  <a class="header-back" onclick="history.back()">← 返回系统</a>
+</header>
+
+<div class="page-wrap">
+
+  <!-- 左：提交表单 -->
+  <div>
+    <!-- 说明卡 -->
+    <div class="info-card">
+      <h4>ℹ️ 如何提交反馈</h4>
+      <div class="info-row"><div class="info-dot" style="background:#27ae60"></div><span>当您在系统中查询不到内容时，可以在此提交反馈</span></div>
+      <div class="info-row"><div class="info-dot" style="background:#f0a500"></div><span>系统会根据提交时间和问题难度自动排列处理优先级</span></div>
+      <div class="info-row"><div class="info-dot" style="background:#003087"></div><span>每条反馈都会收到预计处理时间，请耐心等待</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span style="font-size:20px">📝</span>
+        <h2>提交问题反馈</h2>
+        <span class="badge badge-primary" id="form-badge">待提交</span>
+      </div>
+      <div class="card-body">
+
+        <!-- 表单 -->
+        <div id="feedback-form">
+          <div class="form-group">
+            <label>您的姓名<span class="required">*</span></label>
+            <input type="text" class="form-control" id="f-name" placeholder="请输入您的姓名" maxlength="20">
+          </div>
+
+          <div class="form-group">
+            <label>学号<span class="required">*</span> <span class="hint">（选填，便于回复联系）</span></label>
+            <input type="text" class="form-control" id="f-student-id" placeholder="例：202301001" maxlength="20">
+          </div>
+
+          <div class="form-group">
+            <label>所属专业<span class="required">*</span></label>
+            <select class="form-control" id="f-major">
+              <option value="">— 请选择专业 —</option>
+              <option>铁道机车运用与维护</option>
+              <option>铁道车辆技术</option>
+              <option>动车组检修技术</option>
+              <option>铁道信号自动控制</option>
+              <option>铁道通信与信息化技术</option>
+              <option>铁道交通运营管理</option>
+              <option>铁道工程技术</option>
+              <option>铁道供电技术</option>
+              <option>高速铁路施工与维护</option>
+              <option>其他</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>查询的关键词<span class="required">*</span></label>
+            <input type="text" class="form-control" id="f-keyword" placeholder="您搜索了什么词却没找到？" maxlength="100">
+          </div>
+
+          <div class="form-group">
+            <label>问题描述<span class="required">*</span> <span class="hint">（请详细描述想了解的内容）</span></label>
+            <textarea class="form-control" id="f-desc" placeholder="例：我想了解ZPW-2000A轨道电路的补偿电容设置间距，以及电气绝缘节的工作原理，但系统中没有找到完整内容..." maxlength="500" oninput="updateCharCount()"></textarea>
+            <div class="char-count" id="char-count">0 / 500 字</div>
+          </div>
+
+          <div class="form-group">
+            <label>问题类型</label>
+            <select class="form-control" id="f-type">
+              <option value="knowledge">📚 知识内容缺失</option>
+              <option value="course">📖 课程资料不足</option>
+              <option value="recruit">🏢 招聘信息缺失</option>
+              <option value="quiz">📝 题库题目缺失</option>
+              <option value="bug">🐛 系统功能异常</option>
+              <option value="other">💡 其他建议</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>问题难易程度 <span class="hint">（您认为这个内容的专业难度）</span></label>
+            <div class="difficulty-row">
+              <button class="diff-btn" id="diff-easy" onclick="selectDiff('easy')">😊 简单</button>
+              <button class="diff-btn" id="diff-medium" onclick="selectDiff('medium')">🤔 中等</button>
+              <button class="diff-btn" id="diff-hard" onclick="selectDiff('hard')">🧠 较难</button>
+            </div>
+          </div>
+
+          <button class="btn-submit" id="btn-submit" onclick="submitFeedback()">📨 提交反馈</button>
+        </div>
+
+        <!-- 提交成功 -->
+        <div class="submit-success" id="submit-success">
+          <div class="ss-icon">✅</div>
+          <div class="ss-title">反馈提交成功！</div>
+          <p style="font-size:13px;color:var(--text-sub);margin-bottom:12px">您的问题已进入处理队列，感谢您的反馈</p>
+
+          <div class="ss-ticket">
+            <div class="ss-ticket-row">
+              <span class="ss-ticket-label">🎫 工单编号</span>
+              <span class="ss-ticket-value" id="ticket-id">—</span>
+            </div>
+            <div class="ss-ticket-row">
+              <span class="ss-ticket-label">🕐 提交时间</span>
+              <span class="ss-ticket-value" id="ticket-time">—</span>
+            </div>
+            <div class="ss-ticket-row">
+              <span class="ss-ticket-label">🔥 处理优先级</span>
+              <span class="ss-ticket-value" id="ticket-priority">—</span>
+            </div>
+            <div class="ss-ticket-row">
+              <span class="ss-ticket-label">📊 当前队列排名</span>
+              <span class="ss-ticket-value" id="ticket-rank">—</span>
+            </div>
+          </div>
+
+          <div class="ss-eta">
+            <span style="font-size:24px">⏱️</span>
+            <div>
+              <div style="font-size:12px;opacity:.8">预计处理时间</div>
+              <div id="ticket-eta" style="font-size:18px;font-weight:900">—</div>
+            </div>
+          </div>
+
+          <button class="btn-new-feedback" onclick="resetForm()">📝 继续提交反馈</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 右：队列管理 -->
+  <div>
+    <div class="card">
+      <div class="card-header">
+        <span style="font-size:20px">📋</span>
+        <h2>处理队列</h2>
+        <span class="badge badge-warning" id="queue-count-badge">0 条待处理</span>
+      </div>
+      <div class="card-body" style="padding-top:12px">
+
+        <div class="queue-stats">
+          <div class="qs-item">
+            <div class="qs-num" id="stat-total">0</div>
+            <div class="qs-label">总计反馈</div>
+          </div>
+          <div class="qs-item">
+            <div class="qs-num" id="stat-pending" style="color:var(--accent)">0</div>
+            <div class="qs-label">待处理</div>
+          </div>
+          <div class="qs-item">
+            <div class="qs-num" id="stat-processing" style="color:var(--gold)">0</div>
+            <div class="qs-label">处理中</div>
+          </div>
+          <div class="qs-item">
+            <div class="qs-num" id="stat-done" style="color:var(--green)">0</div>
+            <div class="qs-label">已完成</div>
+          </div>
+        </div>
+
+        <div class="queue-list" id="queue-list">
+          <div class="empty-queue">
+            <div class="eq-icon">📭</div>
+            <p>暂无待处理反馈</p>
+          </div>
+        </div>
+
+        <div class="admin-hint">
+          <span style="color:var(--text-light)">管理员入口：</span>
+          <button class="admin-btn" onclick="toggleAdminPanel()">管理后台</button>
+          &nbsp;·&nbsp;
+          <button class="admin-btn" onclick="exportFeedbacks()">导出数据</button>
+          &nbsp;·&nbsp;
+          <button class="admin-btn" onclick="clearDone()">清除已完成</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 优先级说明 -->
+    <div class="card" style="margin-top:16px">
+      <div class="card-header">
+        <span style="font-size:20px">📊</span>
+        <h2>优先级算法说明</h2>
+      </div>
+      <div class="card-body" style="padding-top:12px">
+        <div style="font-size:12px;color:var(--text-sub);line-height:1.8">
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:16px">🔴</span>
+            <div><strong>高优先级</strong>（预计1-3天）<br>系统功能异常 + 简单问题 + 近期提交</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:16px">🟡</span>
+            <div><strong>中优先级</strong>（预计3-7天）<br>知识内容缺失 + 中等难度 + 常见问题</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 0">
+            <span style="font-size:16px">🟢</span>
+            <div><strong>低优先级</strong>（预计7-14天）<br>较难内容 + 特殊需求 + 建议类反馈</div>
+          </div>
+          <div style="margin-top:10px;padding:8px 10px;background:#f8f9ff;border-radius:8px;font-size:11px;color:var(--primary)">
+            💡 优先级得分 = 难度分 × 0.4 + 类型分 × 0.35 + 时间分 × 0.25
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 管理员面板 -->
+<div id="admin-panel" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;width:500px;max-width:95vw;max-height:80vh;overflow-y:auto;padding:28px;position:relative;">
+    <button onclick="toggleAdminPanel()" style="position:absolute;top:14px;right:16px;font-size:20px;border:none;background:none;cursor:pointer;color:#888">✕</button>
+    <h3 style="font-size:18px;font-weight:800;color:var(--primary);margin-bottom:4px">🔐 管理员操作面板</h3>
+    <p style="font-size:13px;color:var(--text-light);margin-bottom:20px">处理反馈队列，更新工单状态</p>
+    <div id="admin-list"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ════════════════════════════════════
+//  铁路知识系统 · 问题反馈管理引擎
+// ════════════════════════════════════
+
+const STORAGE_KEY = 'hljtu_feedbacks_v1';
+let selectedDiff = 'medium';
+let feedbacks = [];
+
+// 读取数据
+function loadFeedbacks() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    feedbacks = raw ? JSON.parse(raw) : getSampleData();
+  } catch(e) {
+    feedbacks = getSampleData();
+  }
+  saveFeedbacks();
+}
+
+// 示例数据
+function getSampleData() {
+  const now = Date.now();
+  return [
+    {
+      id: 'FB-20260508-001',
+      name: '张同学',
+      studentId: '202301015',
+      major: '铁道信号自动控制',
+      keyword: 'CTCS-4列控系统',
+      desc: '想了解CTCS-4级列控系统的北斗定位原理和移动闭塞机制',
+      type: 'knowledge',
+      difficulty: 'hard',
+      status: 'pending',
+      submitTime: now - 3600000 * 2,
+      priority: 0,
+      score: 0
+    },
+    {
+      id: 'FB-20260507-003',
+      name: '李同学',
+      studentId: '202302021',
+      major: '铁道机车运用与维护',
+      keyword: 'HXD1C机车参数',
+      desc: 'HXD1C型电力机车的详细技术参数和牵引特性曲线',
+      type: 'knowledge',
+      difficulty: 'medium',
+      status: 'processing',
+      submitTime: now - 3600000 * 26,
+      priority: 0,
+      score: 0
+    },
+    {
+      id: 'FB-20260507-001',
+      name: '王同学',
+      studentId: '202203008',
+      major: '铁道交通运营管理',
+      keyword: '调车作业安全规则',
+      desc: '驼峰调车与牵出线调车的安全操作规则对比，课本没有详细内容',
+      type: 'course',
+      difficulty: 'easy',
+      status: 'done',
+      submitTime: now - 3600000 * 48,
+      priority: 0,
+      score: 0
+    }
+  ];
+}
+
+// 保存数据
+function saveFeedbacks() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(feedbacks));
+}
+
+// ──────────────────────────────
+//  优先级计算算法
+// ──────────────────────────────
+function calcPriorityScore(fb) {
+  // 难度分（越简单越紧急，优先处理）
+  const diffScore = { easy: 90, medium: 60, hard: 30 }[fb.difficulty] || 60;
+
+  // 类型分
+  const typeScore = {
+    bug: 100,       // 系统故障最优先
+    knowledge: 75,  // 知识缺失
+    course: 70,     // 课程资料
+    recruit: 65,    // 招聘信息
+    quiz: 60,       // 题库
+    other: 40       // 建议
+  }[fb.type] || 60;
+
+  // 时间分（越早提交得分越高，max 100）
+  const hoursAgo = (Date.now() - fb.submitTime) / 3600000;
+  const timeScore = Math.max(0, 100 - hoursAgo * 2);
+
+  // 综合得分
+  return Math.round(diffScore * 0.4 + typeScore * 0.35 + timeScore * 0.25);
+}
+
+// 获取优先级等级
+function getPriorityLevel(score) {
+  if (score >= 75) return 'high';
+  if (score >= 45) return 'mid';
+  return 'low';
+}
+
+// 获取预计处理时间
+function getETA(score, difficulty) {
+  if (score >= 75) {
+    return difficulty === 'easy' ? '1 个工作日内' : '1-3 个工作日';
+  } else if (score >= 45) {
+    return difficulty === 'hard' ? '5-7 个工作日' : '3-5 个工作日';
+  } else {
+    return difficulty === 'hard' ? '10-14 个工作日' : '7-10 个工作日';
+  }
+}
+
+// 重新计算所有优先级并排序
+function recalcAndSort() {
+  feedbacks.forEach(fb => {
+    fb.score = calcPriorityScore(fb);
+    fb.priority = getPriorityLevel(fb.score);
+  });
+  feedbacks.sort((a, b) => {
+    // 已完成的排最后
+    if (a.status === 'done' && b.status !== 'done') return 1;
+    if (b.status === 'done' && a.status !== 'done') return -1;
+    // 按得分降序
+    return b.score - a.score;
+  });
+}
+
+// ──────────────────────────────
+//  表单相关
+// ──────────────────────────────
+function selectDiff(d) {
+  selectedDiff = d;
+  document.querySelectorAll('.diff-btn').forEach(btn => {
+    btn.className = 'diff-btn';
+  });
+  const map = { easy: 'selected-easy', medium: 'selected-medium', hard: 'selected-hard' };
+  document.getElementById('diff-' + d).classList.add(map[d]);
+}
+
+// 初始选中"中等"
+selectDiff('medium');
+
+function updateCharCount() {
+  const len = document.getElementById('f-desc').value.length;
+  const el = document.getElementById('char-count');
+  el.textContent = len + ' / 500 字';
+  el.className = 'char-count' + (len > 450 ? ' warn' : '') + (len >= 500 ? ' over' : '');
+}
+
+function validateForm() {
+  const name = document.getElementById('f-name').value.trim();
+  const keyword = document.getElementById('f-keyword').value.trim();
+  const desc = document.getElementById('f-desc').value.trim();
+  const major = document.getElementById('f-major').value;
+  if (!name) { showToast('请输入您的姓名', 'error'); return false; }
+  if (!major) { showToast('请选择您的专业', 'error'); return false; }
+  if (!keyword) { showToast('请填写查询的关键词', 'error'); return false; }
+  if (desc.length < 10) { showToast('问题描述至少10个字', 'error'); return false; }
+  return true;
+}
+
+function submitFeedback() {
+  if (!validateForm()) return;
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.textContent = '⏳ 提交中...';
+
+  // 模拟异步（实际环境可替换为 fetch 接口）
+  setTimeout(() => {
+    const now = Date.now();
+    const fb = {
+      id: 'FB-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + String(feedbacks.length + 1).padStart(3, '0'),
+      name: document.getElementById('f-name').value.trim(),
+      studentId: document.getElementById('f-student-id').value.trim() || '未填写',
+      major: document.getElementById('f-major').value,
+      keyword: document.getElementById('f-keyword').value.trim(),
+      desc: document.getElementById('f-desc').value.trim(),
+      type: document.getElementById('f-type').value,
+      difficulty: selectedDiff,
+      status: 'pending',
+      submitTime: now,
+      score: 0,
+      priority: 'mid'
+    };
+    fb.score = calcPriorityScore(fb);
+    fb.priority = getPriorityLevel(fb.score);
+
+    feedbacks.push(fb);
+    saveFeedbacks();
+    recalcAndSort();
+    saveFeedbacks();
+
+    const rank = feedbacks.filter(f => f.status !== 'done').indexOf(fb) + 1;
+    const eta = getETA(fb.score, fb.difficulty);
+    const priorityText = { high: '🔴 高优先级', mid: '🟡 中优先级', low: '🟢 低优先级' }[fb.priority];
+
+    // 显示成功页
+    document.getElementById('feedback-form').style.display = 'none';
+    document.getElementById('form-badge').textContent = '已提交';
+    document.getElementById('form-badge').className = 'badge badge-success';
+
+    document.getElementById('ticket-id').textContent = fb.id;
+    document.getElementById('ticket-time').textContent = formatTime(fb.submitTime);
+    document.getElementById('ticket-priority').textContent = priorityText;
+    document.getElementById('ticket-priority').className = 'ss-ticket-value priority-' + fb.priority;
+    document.getElementById('ticket-rank').textContent = '第 ' + rank + ' 位';
+    document.getElementById('ticket-eta').textContent = eta;
+    document.getElementById('submit-success').classList.add('show');
+
+    renderQueue();
+    btn.disabled = false;
+    btn.textContent = '📨 提交反馈';
+    showToast('反馈提交成功！', 'success');
+  }, 800);
+}
+
+function resetForm() {
+  document.getElementById('feedback-form').style.display = 'block';
+  document.getElementById('submit-success').classList.remove('show');
+  document.getElementById('form-badge').textContent = '待提交';
+  document.getElementById('form-badge').className = 'badge badge-primary';
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-student-id').value = '';
+  document.getElementById('f-major').value = '';
+  document.getElementById('f-keyword').value = '';
+  document.getElementById('f-desc').value = '';
+  document.getElementById('f-type').value = 'knowledge';
+  updateCharCount();
+  selectDiff('medium');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ──────────────────────────────
+//  队列渲染
+// ──────────────────────────────
+function renderQueue() {
+  recalcAndSort();
+  const list = document.getElementById('queue-list');
+  const pending = feedbacks.filter(f => f.status === 'pending').length;
+  const processing = feedbacks.filter(f => f.status === 'processing').length;
+  const done = feedbacks.filter(f => f.status === 'done').length;
+
+  document.getElementById('stat-total').textContent = feedbacks.length;
+  document.getElementById('stat-pending').textContent = pending;
+  document.getElementById('stat-processing').textContent = processing;
+  document.getElementById('stat-done').textContent = done;
+  document.getElementById('queue-count-badge').textContent = (pending + processing) + ' 条待处理';
+
+  if (feedbacks.length === 0) {
+    list.innerHTML = '<div class="empty-queue"><div class="eq-icon">📭</div><p>暂无待处理反馈</p></div>';
+    return;
+  }
+
+  let html = '';
+  feedbacks.forEach((fb, idx) => {
+    const rank = idx + 1;
+    const rankClass = rank <= 3 ? 'rank-' + rank : '';
+    const typeLabel = { knowledge:'知识缺失', course:'课程资料', recruit:'招聘信息', quiz:'题库', bug:'系统故障', other:'建议' }[fb.type] || fb.type;
+    const diffLabel = { easy:'简单', medium:'中等', hard:'较难' }[fb.difficulty] || fb.difficulty;
+    const statusLabel = { pending:'待处理', processing:'处理中', done:'已完成' }[fb.status] || fb.status;
+    const statusColor = { pending:'badge-danger', processing:'badge-warning', done:'badge-success' }[fb.status];
+    const priorityColor = { high:'badge-danger', mid:'badge-warning', low:'badge-success' }[fb.priority];
+    const progressW = fb.status === 'done' ? 100 : fb.status === 'processing' ? 50 : 15;
+    const progressClass = fb.priority;
+    const eta = getETA(fb.score, fb.difficulty);
+    const truncDesc = fb.desc.length > 50 ? fb.desc.slice(0, 50) + '…' : fb.desc;
+
+    html += `<div class="q-item priority-${fb.priority} ${fb.status === 'done' ? 'status-done' : ''}">
+      <div class="qi-top">
+        <div class="qi-rank ${rankClass}">${rank}</div>
+        <div class="qi-title">${fb.keyword || fb.desc.slice(0,20)}</div>
+      </div>
+      <div class="qi-badges">
+        <span class="qi-badge ${statusColor}" style="background:var(--${statusColor === 'badge-danger' ? 'accent' : statusColor === 'badge-warning' ? 'gold' : 'green'});color:#fff">${statusLabel}</span>
+        <span class="qi-badge badge-primary">${typeLabel}</span>
+        <span class="qi-badge" style="background:#f3f4f6;color:#555">${diffLabel}</span>
+        <span class="qi-badge ${priorityColor}" style="background:${fb.priority==='high'?'#fee2e2':fb.priority==='mid'?'#fef3c7':'#dcfce7'};color:${fb.priority==='high'?'var(--accent)':fb.priority==='mid'?'#92400e':'var(--green)'}">${fb.score}分</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-sub);margin-bottom:6px;line-height:1.5">${truncDesc}</div>
+      <div class="progress-bar"><div class="progress-fill ${progressClass}" style="width:${progressW}%"></div></div>
+      <div class="qi-meta" style="margin-top:5px">
+        <span>${fb.name} · ${fb.major.slice(0,8)} · ${formatTimeRelative(fb.submitTime)}</span>
+        <span class="qi-eta">⏱ ${eta}</span>
+      </div>
+    </div>`;
+  });
+  list.innerHTML = html;
+}
+
+// ──────────────────────────────
+//  管理员面板
+// ──────────────────────────────
+function toggleAdminPanel() {
+  const panel = document.getElementById('admin-panel');
+  const visible = panel.style.display !== 'none' && panel.style.display !== '';
+  if (visible) {
+    panel.style.display = 'none';
+    return;
+  }
+  renderAdminList();
+  panel.style.display = 'flex';
+}
+
+function renderAdminList() {
+  const container = document.getElementById('admin-list');
+  if (feedbacks.length === 0) {
+    container.innerHTML = '<p style="text-align:center;color:var(--text-light);padding:20px">暂无反馈数据</p>';
+    return;
+  }
+  let html = '';
+  feedbacks.forEach((fb, idx) => {
+    const statusOptions = ['pending','processing','done'].map(s =>
+      `<option value="${s}" ${fb.status===s?'selected':''}>${{pending:'待处理',processing:'处理中',done:'已完成'}[s]}</option>`
+    ).join('');
+    html += `<div style="border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px">
+      <div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:4px">[${fb.id}] ${fb.keyword}</div>
+      <div style="font-size:12px;color:var(--text-sub);margin-bottom:8px">${fb.name}（${fb.major}）· ${formatTime(fb.submitTime)}</div>
+      <div style="font-size:12px;margin-bottom:8px;line-height:1.6">${fb.desc}</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select onchange="updateStatus(${idx}, this.value)" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px">${statusOptions}</select>
+        <button onclick="deleteFeedback(${idx})" style="padding:6px 12px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer">删除</button>
+      </div>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function updateStatus(idx, status) {
+  feedbacks[idx].status = status;
+  saveFeedbacks();
+  renderQueue();
+  renderAdminList();
+  showToast('状态已更新', 'success');
+}
+
+function deleteFeedback(idx) {
+  if (!confirm('确认删除这条反馈？')) return;
+  feedbacks.splice(idx, 1);
+  saveFeedbacks();
+  renderQueue();
+  renderAdminList();
+  showToast('已删除', 'success');
+}
+
+function clearDone() {
+  const count = feedbacks.filter(f => f.status === 'done').length;
+  if (count === 0) { showToast('暂无已完成的反馈', 'error'); return; }
+  if (!confirm(`确认清除 ${count} 条已完成的反馈？`)) return;
+  feedbacks = feedbacks.filter(f => f.status !== 'done');
+  saveFeedbacks();
+  renderQueue();
+  showToast(`已清除 ${count} 条记录`, 'success');
+}
+
+function exportFeedbacks() {
+  const data = JSON.stringify(feedbacks, null, 2);
+  const blob = new Blob([data], { type: 'application/json;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `feedback_export_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('已导出 ' + feedbacks.length + ' 条反馈', 'success');
+}
+
+// ──────────────────────────────
+//  工具函数
+// ──────────────────────────────
+function formatTime(ts) {
+  const d = new Date(ts);
+  return d.getFullYear() + '-' +
+    String(d.getMonth()+1).padStart(2,'0') + '-' +
+    String(d.getDate()).padStart(2,'0') + ' ' +
+    String(d.getHours()).padStart(2,'0') + ':' +
+    String(d.getMinutes()).padStart(2,'0');
+}
+
+function formatTimeRelative(ts) {
+  const diff = Date.now() - ts;
+  const hours = Math.floor(diff / 3600000);
+  if (hours < 1) return '刚刚';
+  if (hours < 24) return hours + '小时前';
+  const days = Math.floor(hours / 24);
+  if (days < 7) return days + '天前';
+  return formatTime(ts).slice(0,10);
+}
+
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (type ? ' ' + type : '');
+  setTimeout(() => { t.className = ''; }, 2500);
+}
+
+// ── 初始化 ──
+loadFeedbacks();
+renderQueue();
+
+// 每30秒重新计算优先级
+setInterval(() => {
+  recalcAndSort();
+  saveFeedbacks();
+  renderQueue();
+}, 30000);
+</script>
+</body>
+</html>

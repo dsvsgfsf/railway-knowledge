@@ -1,0 +1,31 @@
+{
+  "code": "taiyuan",
+  "name": "中国铁路太原局集团有限公司",
+  "shortName": "太原局",
+  "tier": 2,
+  "tierLabel": "第二梯队",
+  "tierDesc": "中高待遇",
+  "headquarters": "山西省太原市",
+  "coverage": "山西省全境及陕西、内蒙古部分",
+  "mileage": "约5500公里",
+  "lines": ["大秦铁路（世界最繁忙重载铁路）", "石太线", "同蒲线"],
+  "recruitmentScale": "约2000人/年",
+  "competitionRatio": "20:1-50:1",
+  "difficulty": 4,
+  "difficultyLabel": "困难级",
+  "educationPreference": "专科及以上",
+  "juniorCollegeRatio": "约70%",
+  "salary": {
+    "undergraduateMonthly": "6500-8000",
+    "highSpeedDriverMonthly": "10000-13000",
+    "heavyLoadDriverMonthly": "15000-20000",
+    "annualBonus": "1-3万元",
+    "features": ["大秦线重载司机薪资全国顶尖"]
+  },
+  "benefits": ["五险一金", "工作餐", "宿舍", "煤炭经济复苏待遇提升"],
+  "features": ["专科机会多", "大秦线重载司机薪资全国顶尖", "工作强度大（重载列车）"],
+  "departments": ["太原站", "大同站", "太原机务段", "大秦铁路运输段"],
+  "checkupSpecial": ["重载司机需较强体能", "血压要求稳定"],
+  "contact": "0351-26XXXXX",
+  "lastUpdated": "2025-06"
+}

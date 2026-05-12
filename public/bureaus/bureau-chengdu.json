@@ -1,0 +1,30 @@
+{
+  "code": "chengdu",
+  "name": "中国铁路成都局集团有限公司",
+  "shortName": "成都局",
+  "tier": 3,
+  "tierLabel": "第三梯队",
+  "tierDesc": "待遇中等偏下（招聘规模最大）",
+  "headquarters": "四川省成都市",
+  "coverage": "四川、重庆、贵州、云南（一市三省）",
+  "mileage": "约1万公里",
+  "lines": ["西成高铁", "成贵高铁", "成渝高铁", "中老铁路（国际段）"],
+  "recruitmentScale": "约5000人/年（全国最多）",
+  "competitionRatio": "10:1-20:1",
+  "difficulty": 3,
+  "difficultyLabel": "中等级",
+  "educationPreference": "专科及以上",
+  "juniorCollegeRatio": "约70%",
+  "salary": {
+    "undergraduateMonthly": "5000-7000",
+    "highSpeedDriverMonthly": "9000-14000",
+    "annualBonus": "0.8-2万元",
+    "features": ["西南山区艰苦补贴", "成都/重庆城市吸引力强"]
+  },
+  "benefits": ["五险一金", "宿舍", "工作餐", "西南山区补贴"],
+  "features": ["招聘规模大，专科机会多", "成都局校招为主要渠道", "川渝院校学生有优势", "成都/重庆城市吸引力强"],
+  "departments": ["成都站", "重庆站", "贵阳站", "成都机务段", "成都动车段"],
+  "checkupSpecial": ["山区/隧道多，信号工辨色力要求高", "肝功能ALT<40U/L"],
+  "contact": "028-864XXXXXX",
+  "lastUpdated": "2025-06"
+}

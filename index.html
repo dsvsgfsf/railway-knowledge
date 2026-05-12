@@ -329,9 +329,9 @@ a { color: inherit; text-decoration: none; }
     <div class="sidebar-section">
       <div class="sidebar-title">DeepSeek API 配置</div>
       <div id="api-config-panel">
-        <div id="api-status"><span class="dot"></span><span id="api-status-text">未配置</span></div>
-        <label>API Key</label>
-        <input type="password" id="cfg-api-key" placeholder="sk-xxxxxxxxxxxxxxxx" />
+        <div id="api-status"><span class="dot ok"></span><span id="api-status-text">已预配置 ✓</span></div>
+        <label>API Key（已预配置，可直接使用）</label>
+        <input type="password" id="cfg-api-key" placeholder="已预配置，无需填写" />
         <label>API 地址</label>
         <input type="text" id="cfg-api-url" value="https://api.deepseek.com/v1/chat/completions" />
         <label>模型</label>
@@ -486,24 +486,42 @@ window.toggleMobileMenu = function(){
 
 /* ── API Config Auto-save/load ── */
 window.loadApiConfig = function(){
+  // 使用硬编码的默认API Key（已预配置，无需用户手动输入）
+  const defaultConfig = {
+    key: 'sk-22d7ef1da97f43a99149f04227243e4e',
+    url: 'https://api.deepseek.com/v1/chat/completions',
+    model: 'deepseek-chat'
+  };
+  
   const saved = localStorage.getItem('railway_api_config');
   if(saved){
     try {
       const cfg = JSON.parse(saved);
-      state.apiConfig = cfg;
-      document.getElementById('cfg-api-key').value = cfg.key || '';
-      document.getElementById('cfg-api-url').value = cfg.url || 'https://api.deepseek.com/v1/chat/completions';
-      document.getElementById('cfg-model').value = cfg.model || 'deepseek-chat';
-      updateApiStatus();
-    } catch(e) {}
+      // 合并：localStorage优先，但默认Key始终存在
+      state.apiConfig = {
+        key: cfg.key || defaultConfig.key,
+        url: cfg.url || defaultConfig.url,
+        model: cfg.model || defaultConfig.model
+      };
+    } catch(e) {
+      state.apiConfig = {...defaultConfig};
+    }
+  } else {
+    state.apiConfig = {...defaultConfig};
   }
+  
+  // 同步到输入框
+  document.getElementById('cfg-api-key').value = state.apiConfig.key;
+  document.getElementById('cfg-api-url').value = state.apiConfig.url;
+  document.getElementById('cfg-model').value = state.apiConfig.model;
+  updateApiStatus();
 }
 
 window.saveApiConfig = function(){
   const cfg = {
-    key: document.getElementById('cfg-api-key').value.trim(),
+    key: document.getElementById('cfg-api-key').value.trim() || 'sk-22d7ef1da97f43a99149f04227243e4e',
     url: document.getElementById('cfg-api-url').value.trim() || 'https://api.deepseek.com/v1/chat/completions',
-    model: document.getElementById('cfg-model').value
+    model: document.getElementById('cfg-model').value || 'deepseek-chat'
   };
   state.apiConfig = cfg;
   localStorage.setItem('railway_api_config', JSON.stringify(cfg));
@@ -577,7 +595,7 @@ const state = {
   selectedMajor: null,  // 专业名称
   grade: null,          // 'grade1' | 'grade2'
   messages: [],
-  apiConfig: { key:'', url:'https://api.deepseek.com/v1/chat/completions', model:'deepseek-chat' }
+  apiConfig: { key:'sk-22d7ef1da97f43a99149f04227243e4e', url:'https://api.deepseek.com/v1/chat/completions', model:'deepseek-chat' }
 };
 
 /* ── Init ── */

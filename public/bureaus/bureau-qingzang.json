@@ -1,0 +1,36 @@
+{
+  "code": "qingzang",
+  "name": "中国铁路青藏集团有限公司",
+  "shortName": "青藏集团",
+  "tier": 2,
+  "tierLabel": "第二梯队",
+  "tierDesc": "中高待遇（含高原补贴）",
+  "headquarters": "青海省西宁市",
+  "coverage": "青海省、西藏自治区",
+  "mileage": "高原铁路网络",
+  "lines": ["青藏铁路（世界上海拔最高、线路最长的高原铁路）", "拉林铁路"],
+  "altitude": "线路平均海拔4000-5000m，最高点唐古拉山口5072m",
+  "recruitmentScale": "约603人/年",
+  "competitionRatio": "3:1-8:1",
+  "difficulty": 1,
+  "difficultyLabel": "容易级",
+  "educationPreference": "本科及以上",
+  "juniorCollegeRatio": "约40%",
+  "salary": {
+    "undergraduateMonthly": "5000-7000",
+    "withSubsidyMonthly": "7500-11000",
+    "highSpeedDriverMonthly": "10000-15000（含高原补贴）",
+    "subsidies": {
+      "plateauAllowance": "1500-4000元/月"
+    },
+    "annualBonus": "0.5-1.5万元",
+    "features": ["高原补贴后收入可观"]
+  },
+  "benefits": ["免费宿舍", "高原休假制度", "免费医疗", "艰苦地区补贴"],
+  "features": ["世界上海拔最高的铁路局", "高原休假制度", "免费医疗保障"],
+  "departments": ["西宁站", "拉萨站", "格尔木站", "青藏铁路运输段"],
+  "checkupSpecial": ["血红蛋白男≥150g/L，女≥140g/L", "血氧饱和度≥95%", "心电图必须正常", "肺功能FVC≥80%预计值", "高原适应性体检"],
+  "medicalNote": "高原适应性体检为必查项目，包括血红蛋白、心电图、肺功能、血氧饱和度",
+  "contact": "0971-7XXXXXXX",
+  "lastUpdated": "2025-06"
+}

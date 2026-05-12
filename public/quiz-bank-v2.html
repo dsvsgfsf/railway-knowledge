@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>铁路专业题库 - 选择课程</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Microsoft YaHei', 'PingFang SC', Arial, sans-serif;
+  background: linear-gradient(135deg, #0a1628 0%, #1a3a5c 50%, #0d2137 100%);
+  min-height: 100vh;
+  color: #1a1a2e;
+}
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+/* 头部 */
+.header {
+  text-align: center;
+  padding: 30px 20px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 16px;
+  margin-bottom: 30px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.header h1 {
+  font-size: 32px;
+  color: #fff;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.header p {
+  color: rgba(255,255,255,0.7);
+  font-size: 16px;
+}
+.header .subtitle {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+.header .badge {
+  background: rgba(255,255,255,0.1);
+  padding: 6px 16px;
+  border-radius: 20px;
+  color: rgba(255,255,255,0.9);
+  font-size: 13px;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+/* 筛选栏 */
+.filter-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.filter-btn {
+  padding: 10px 24px;
+  border-radius: 25px;
+  border: 2px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.85);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-family: inherit;
+}
+.filter-btn:hover {
+  background: rgba(255,255,255,0.15);
+  transform: translateY(-2px);
+}
+.filter-btn.active {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  border-color: #e74c3c;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(231,76,60,0.4);
+}
+/* 分类卡片网格 */
+.quiz-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+.quiz-card {
+  background: linear-gradient(145deg, #ffffff 0%, #f8f9fc 100%);
+  border-radius: 16px;
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 1px solid rgba(0,0,0,0.08);
+  position: relative;
+  overflow: hidden;
+}
+.quiz-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+}
+.quiz-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+}
+.quiz-card .card-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+}
+.quiz-card .card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 8px;
+}
+.quiz-card .card-desc {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+.quiz-card .card-meta {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+.quiz-card .meta-item {
+  background: #f0f2f7;
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 12px;
+  color: #555;
+}
+.quiz-card .meta-item.questions {
+  background: linear-gradient(135deg, #3498db22, #2980b922);
+  color: #2980b9;
+}
+.quiz-card .meta-item.category {
+  background: linear-gradient(135deg, #9b59b622, #8e44ad22);
+  color: #8e44ad;
+}
+.quiz-card .card-action {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: #fff;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateX(10px);
+  transition: all 0.3s;
+}
+.quiz-card:hover .card-action {
+  opacity: 1;
+  transform: translateX(0);
+}
+/* 特殊样式 - 招聘考试 */
+.quiz-card.recruitment::before {
+  background: linear-gradient(90deg, #1a4b8c, #2980b9);
+}
+.quiz-card.recruitment .card-action {
+  background: linear-gradient(135deg, #1a4b8c, #2980b9);
+}
+/* 颜色主题 */
+.quiz-card.signal::before { background: linear-gradient(90deg, #f39c12, #e67e22); }
+.quiz-card.train::before { background: linear-gradient(90deg, #27ae60, #2ecc71); }
+.quiz-card.overhead::before { background: linear-gradient(90deg, #f1c40f, #f39c12); }
+.quiz-card.repair::before { background: linear-gradient(90deg, #e74c3c, #c0392b); }
+.quiz-card.intro::before { background: linear-gradient(90deg, #3498db, #2980b9); }
+.quiz-card.electric::before { background: linear-gradient(90deg, #9b59b6, #8e44ad); }
+.quiz-card.traction::before { background: linear-gradient(90deg, #1abc9c, #16a085); }
+.quiz-card.safety::before { background: linear-gradient(90deg, #e74c3c, #c0392b); }
+.quiz-card.operation::before { background: linear-gradient(90deg, #2ecc71, #27ae60); }
+.quiz-card.computer::before { background: linear-gradient(90deg, #3498db, #2980b9); }
+.quiz-card.economy::before { background: linear-gradient(90deg, #f39c12, #e67e22); }
+.quiz-card.maintenance::before { background: linear-gradient(90deg, #34495e, #2c3e50); }
+/* 返回按钮 */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 25px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  margin-bottom: 20px;
+  transition: all 0.3s;
+  text-decoration: none;
+}
+.back-btn:hover {
+  background: rgba(255,255,255,0.2);
+  transform: translateX(-5px);
+}
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: rgba(255,255,255,0.6);
+}
+.empty-state .icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+/* 加载动画 */
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: rgba(255,255,255,0.7);
+}
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255,255,255,0.1);
+  border-top-color: #e74c3c;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 15px;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+/* 统计信息 */
+.stats-bar {
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 15px 25px;
+  margin-bottom: 25px;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 15px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.stat-item {
+  text-align: center;
+  color: #fff;
+}
+.stat-item .num {
+  font-size: 28px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #e74c3c, #f39c12);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.stat-item .label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+  margin-top: 3px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <a href="#" class="back-btn" onclick="window.close(); return false;">← 返回主系统</a>
+  
+  <div class="header">
+    <h1>📚 铁路专业题库</h1>
+    <p>黑龙江交通职业技术学院 · 铁路知识智能查询系统</p>
+    <div class="subtitle">
+      <span class="badge">🏢 铁路局招聘考试</span>
+      <span class="badge">📖 专业课程题库</span>
+      <span class="badge">⚡ 真题模拟练习</span>
+    </div>
+  </div>
+  
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="num">15+</div>
+      <div class="label">课程题库</div>
+    </div>
+    <div class="stat-item">
+      <div class="num">2500+</div>
+      <div class="label">精选题目</div>
+    </div>
+    <div class="stat-item">
+      <div class="num">3</div>
+      <div class="label">题目类型</div>
+    </div>
+    <div class="stat-item">
+      <div class="num">100%</div>
+      <div class="label">原创解析</div>
+    </div>
+  </div>
+  
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterQuizzes('all')">全部课程</button>
+    <button class="filter-btn" onclick="filterQuizzes('exam')">招聘考试</button>
+    <button class="filter-btn" onclick="filterQuizzes('signal')">信号类</button>
+    <button class="filter-btn" onclick="filterQuizzes('operation')">行车类</button>
+    <button class="filter-btn" onclick="filterQuizzes('locomotive')">机车类</button>
+    <button class="filter-btn" onclick="filterQuizzes('power')">供电类</button>
+    <button class="filter-btn" onclick="filterQuizzes('foundation')">基础类</button>
+  </div>
+  
+  <div class="quiz-grid" id="quizGrid">
+    <div class="loading">
+      <div class="spinner"></div>
+      正在加载题库...
+    </div>
+  </div>
+</div>
+
+<script>
+// 题库数据
+const QUIZ_BANKS = [
+  // ===== 铁路局招聘综合考试 =====
+  {
+    id: 'recruitment',
+    name: '铁路局招聘综合考试',
+    icon: '🏢',
+    desc: '包含行测、铁路基础、时事政治、专业知识四大部分，全面覆盖铁路局招聘笔试内容',
+    questions: 200,
+    category: 'exam',
+    subCategory: '招聘考试',
+    color: 'recruitment',
+    sections: 4
+  },
+  // ===== 信号类 =====
+  {
+    id: 'signal',
+    name: '铁路信号基础',
+    icon: '🚦',
+    desc: '信号系统核心知识：色灯信号、轨道电路、联锁设备、闭塞系统',
+    questions: 200,
+    category: 'signal',
+    subCategory: '信号类',
+    color: 'signal',
+    sections: 4
+  },
+  {
+    id: '铁路信号自动控制基础',
+    name: '铁路信号自动控制基础',
+    icon: '🔐',
+    desc: '计算机联锁、ZPW-2000A轨道电路、TDCS/CTC系统、信号三要素',
+    questions: 75,
+    category: 'signal',
+    subCategory: '信号类',
+    color: 'signal',
+    sections: 1
+  },
+  // ===== 行车类 =====
+  {
+    id: 'trainOperation',
+    name: '铁路行车组织',
+    icon: '🚃',
+    desc: '列车运行图、车站工作组织、接发列车、调度指挥与运输组织',
+    questions: 200,
+    category: 'operation',
+    subCategory: '行车类',
+    color: 'train',
+    sections: 4
+  },
+  {
+    id: '铁路旅客运输组织',
+    name: '铁路旅客运输组织',
+    icon: '🚆',
+    desc: '旅客列车分类、票务管理、实名制、携带品规定、票价机制',
+    questions: 65,
+    category: 'operation',
+    subCategory: '行车类',
+    color: 'train',
+    sections: 1
+  },
+  // ===== 机车类 =====
+  {
+    id: 'locomotiveRepair',
+    name: '机车检修与故障处理',
+    icon: '🔧',
+    desc: '电力机车主电路、制动系统、故障处理、检修规程与DK-1制动机',
+    questions: 200,
+    category: 'locomotive',
+    subCategory: '机车类',
+    color: 'repair',
+    sections: 4
+  },
+  {
+    id: '机车牵引与控制',
+    name: '机车牵引与控制',
+    icon: '⚡',
+    desc: '电力机车牵引特性、主电路、HXD系列、列车制动、牵引重量',
+    questions: 70,
+    category: 'locomotive',
+    subCategory: '机车类',
+    color: 'traction',
+    sections: 1
+  },
+  {
+    id: '动车组技术',
+    name: '动车组技术',
+    icon: '🚄',
+    desc: 'CRH/CR系列动车组结构、检修级别、动力分散、TCMS系统',
+    questions: 70,
+    category: 'locomotive',
+    subCategory: '机车类',
+    color: 'traction',
+    sections: 1
+  },
+  // ===== 供电类 =====
+  {
+    id: 'overheadLine',
+    name: '接触网运行与检修',
+    icon: '⚡',
+    desc: '电气化铁路基础、接触网设备、牵引供电、补偿装置、检修作业',
+    questions: 200,
+    category: 'power',
+    subCategory: '供电类',
+    color: 'overhead',
+    sections: 4
+  },
+  // ===== 安全类 =====
+  {
+    id: '铁路行车安全',
+    name: '铁路行车安全',
+    icon: '🛡️',
+    desc: '行车规章、事故等级、安全管理、CTCS列控系统、闭塞制度',
+    questions: 80,
+    category: 'foundation',
+    subCategory: '安全类',
+    color: 'safety',
+    sections: 1
+  },
+  // ===== 基础类 =====
+  {
+    id: 'railwayIntro',
+    name: '铁道概论',
+    icon: '🚂',
+    desc: '铁路概述、线路工程、信号基础、机车车辆，综合铁路入门知识',
+    questions: 200,
+    category: 'foundation',
+    subCategory: '基础类',
+    color: 'intro',
+    sections: 4
+  },
+  {
+    id: '铁道概论',
+    name: '铁道概论（基础版）',
+    icon: '📖',
+    desc: '世界铁路发展史、中国铁路标准、速度等级、线路分类基础',
+    questions: 80,
+    category: 'foundation',
+    subCategory: '基础类',
+    color: 'intro',
+    sections: 1
+  },
+  {
+    id: '电工基础',
+    name: '电工基础',
+    icon: '💡',
+    desc: '电路定律、交直流电路、电磁感应、变压器、三相异步电机',
+    questions: 60,
+    category: 'foundation',
+    subCategory: '基础类',
+    color: 'electric',
+    sections: 1
+  },
+  {
+    id: '铁路线路维修',
+    name: '铁路线路维修',
+    icon: '🔩',
+    desc: '钢轨接头、轨枕、道床、无缝线路、曲线超高、道岔病害检修',
+    questions: 70,
+    category: 'foundation',
+    subCategory: '基础类',
+    color: 'maintenance',
+    sections: 1
+  },
+  {
+    id: '计算机基础',
+    name: '计算机基础',
+    icon: '💻',
+    desc: '计算机硬件、软件、网络基础、数据库、进制转换、TCP/IP协议',
+    questions: 60,
+    category: 'foundation',
+    subCategory: '基础类',
+    color: 'computer',
+    sections: 1
+  },
+  {
+    id: '运输经济学基础',
+    name: '运输经济学基础',
+    icon: '📊',
+    desc: '运输经济学原理、成本分析、运价政策、铁路与公路运输比较',
+    questions: 50,
+    category: 'foundation',
+    subCategory: '基础类',
+    color: 'economy',
+    sections: 1
+  }
+];
+
+// 当前筛选
+let currentFilter = 'all';
+
+// 渲染题库卡片
+function renderQuizCards(filter = 'all') {
+  const grid = document.getElementById('quizGrid');
+  let filtered = QUIZ_BANKS;
+  
+  if (filter !== 'all') {
+    if (filter === 'exam') {
+      filtered = QUIZ_BANKS.filter(q => q.category === 'exam');
+    } else {
+      filtered = QUIZ_BANKS.filter(q => q.category === filter);
+    }
+  }
+  
+  if (filtered.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">📭</div>
+        <p>该分类暂无题库</p>
+      </div>
+    `;
+    return;
+  }
+  
+  grid.innerHTML = filtered.map(quiz => `
+    <div class="quiz-card ${quiz.color}" onclick="startExam('${quiz.id}', ${quiz.questions})">
+      <div class="card-icon">${quiz.icon}</div>
+      <div class="card-title">${quiz.name}</div>
+      <div class="card-desc">${quiz.desc}</div>
+      <div class="card-meta">
+        <span class="meta-item questions">📝 ${quiz.questions}题</span>
+        <span class="meta-item category">📂 ${quiz.subCategory}</span>
+        ${quiz.sections > 1 ? `<span class="meta-item">📖 ${quiz.sections}章节</span>` : ''}
+      </div>
+      <div class="card-action">开始考试 →</div>
+    </div>
+  `).join('');
+}
+
+// 筛选
+function filterQuizzes(filter) {
+  currentFilter = filter;
+  // 更新按钮状态
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.includes(
+      filter === 'all' ? '全部' :
+      filter === 'exam' ? '招聘' :
+      filter === 'signal' ? '信号' :
+      filter === 'operation' ? '行车' :
+      filter === 'locomotive' ? '机车' :
+      filter === 'power' ? '供电' :
+      '基础'
+    ));
+  });
+  renderQuizCards(filter);
+}
+
+// 开始考试
+function startExam(quizId, totalQuestions) {
+  // 打开考试窗口
+  const examWindow = window.open(
+    `quiz-exam.html?id=${encodeURIComponent(quizId)}&count=10`,
+    '铁路考试',
+    'width=900,height=800,scrollbars=yes,resizable=yes'
+  );
+  
+  if (!examWindow) {
+    alert('请允许弹出窗口以进行考试');
+  }
+}
+
+// 初始化
+document.addEventListener('DOMContentLoaded', function() {
+  renderQuizCards();
+});
+</script>
+</body>
+</html>

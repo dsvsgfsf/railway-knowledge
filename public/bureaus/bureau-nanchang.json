@@ -1,0 +1,30 @@
+{
+  "code": "nanchang",
+  "name": "中国铁路南昌局集团有限公司",
+  "shortName": "南昌局",
+  "tier": 3,
+  "tierLabel": "第三梯队",
+  "tierDesc": "待遇中等偏下",
+  "headquarters": "江西省南昌市",
+  "coverage": "江西省全境及福建、湖南部分",
+  "mileage": "约5000公里",
+  "lines": ["沪昆高铁", "京九铁路", "赣瑞龙铁路"],
+  "recruitmentScale": "2000-2500人/年",
+  "competitionRatio": "8:1-20:1",
+  "difficulty": 3,
+  "difficultyLabel": "中等级",
+  "educationPreference": "专科及以上",
+  "juniorCollegeRatio": "约65%",
+  "salary": {
+    "undergraduateMonthly": "4500-6500",
+    "highSpeedDriverMonthly": "8000-13000",
+    "annualBonus": "0.5-1.5万元",
+    "features": ["昌福线/南龙线新线路司机需求大", "中部地区生活成本较低"]
+  },
+  "benefits": ["五险一金", "宿舍", "工作餐"],
+  "features": ["江西/福建院校学生有优势", "昌福线、南龙线新线路司机需求大"],
+  "departments": ["南昌站", "南昌西站", "福州站", "南昌机务段"],
+  "checkupSpecial": ["辨色力严格"],
+  "contact": "0791-8XXXXXXX",
+  "lastUpdated": "2025-06"
+}

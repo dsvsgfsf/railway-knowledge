@@ -1,0 +1,31 @@
+{
+  "code": "shanghai",
+  "name": "中国铁路上海局集团有限公司",
+  "shortName": "上海局",
+  "tier": 1,
+  "tierLabel": "第一梯队",
+  "tierDesc": "全国待遇最优",
+  "headquarters": "上海市静安区",
+  "coverage": "上海、江苏、浙江、安徽（一市三省）",
+  "mileage": "约1.3万公里",
+  "lines": ["京沪高铁", "沪宁城际", "沪杭高铁", "沿海铁路", "沪昆高铁"],
+  "annualRevenue": "全国18个铁路局前三",
+  "recruitmentScale": "4000-5000人/年",
+  "competitionRatio": "≥50:1",
+  "difficulty": 5,
+  "difficultyLabel": "地狱级",
+  "educationPreference": "本科及以上",
+  "juniorCollegeRatio": "约60%",
+  "salary": {
+    "undergraduateMonthly": "8000-12000",
+    "highSpeedDriverMonthly": "15000-20000",
+    "annualBonus": "2-5万元",
+    "features": ["全国最高薪资", "年终奖丰厚"]
+  },
+  "benefits": ["六险二金", "工作餐", "免费通勤票", "节日福利", "职工宿舍"],
+  "features": ["学历要求相对较高", "211/985毕业生竞争激烈", "专科生需专业极对口+有实习经历"],
+  "departments": ["上海站", "南京站", "杭州站", "合肥站", "上海机务段", "南京东机辆段", "上海动车段", "上海高铁基础设施段"],
+  "checkupSpecial": ["高铁司机血压要求≤130/85mmHg", "辨色力严格"],
+  "contact": "021-5122XXXX",
+  "lastUpdated": "2025-06"
+}

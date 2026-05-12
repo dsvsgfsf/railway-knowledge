@@ -1,0 +1,30 @@
+{
+  "code": "shenyang",
+  "name": "中国铁路沈阳局集团有限公司",
+  "shortName": "沈阳局",
+  "tier": 2,
+  "tierLabel": "第二梯队",
+  "tierDesc": "中高待遇",
+  "headquarters": "辽宁省沈阳市",
+  "coverage": "辽宁、吉林、黑龙江（一省两区）及内蒙古东部",
+  "mileage": "约1.3万公里（全国最多）",
+  "lines": ["京哈铁路", "哈大高铁", "沈山线"],
+  "recruitmentScale": "约4000人/年（全国最多之一）",
+  "competitionRatio": "10:1-30:1",
+  "difficulty": 3,
+  "difficultyLabel": "中等级",
+  "educationPreference": "专科及以上",
+  "juniorCollegeRatio": "约60%",
+  "salary": {
+    "undergraduateMonthly": "5000-7000",
+    "highSpeedDriverMonthly": "9000-13000",
+    "annualBonus": "1-2万元",
+    "features": ["管辖里程全国第一", "严寒补贴保障"]
+  },
+  "benefits": ["五险一金", "宿舍", "工作餐", "严寒补贴"],
+  "features": ["冬季严寒，需适应低温作业", "管辖里程全国第一", "站段数量多，招聘需求大", "专科生机会多"],
+  "departments": ["沈阳站", "大连站", "长春站", "哈尔滨站", "沈阳机务段", "沈阳动车段"],
+  "checkupSpecial": ["血红蛋白男≥140g/L（冬训期需更高）", "心电图寒冷气候适应性评估", "辨色力严格（信号工必查）"],
+  "contact": "024-620XXXXX",
+  "lastUpdated": "2025-06"
+}

@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>中国铁路机车图片图鉴 - 黑龙江交通职业技术学院</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Microsoft YaHei', 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .header h1 {
+      color: #2c3e50;
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      color: #7f8c8d;
+      font-size: 14px;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: transform 0.2s;
+    }
+
+    .back-link:hover {
+      transform: translateY(-2px);
+    }
+
+    .filter-bar {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .filter-btn {
+      padding: 10px 20px;
+      border: 2px solid #667eea;
+      background: white;
+      color: #667eea;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .filter-btn:hover {
+      background: #667eea;
+      color: white;
+    }
+
+    .filter-btn.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-color: transparent;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .locomotive-card {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s;
+    }
+
+    .locomotive-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+    }
+
+    .card-image {
+      height: 220px;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+
+    .locomotive-card:hover .card-image img {
+      transform: scale(1.05);
+    }
+
+    .card-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      backdrop-filter: blur(10px);
+    }
+
+    .card-type-label {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 16px;
+      font-size: 15px;
+      font-weight: 700;
+      text-align: center;
+      border-top: 3px solid #667eea;
+    }
+
+    .card-type-label.electric {
+      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+      border-top-color: #e74c3c;
+    }
+
+    .card-type-label.diesel {
+      background: linear-gradient(135deg, #27ae60 0%, #1e8449 100%);
+      border-top-color: #27ae60;
+    }
+
+    .card-type-label.emu {
+      background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+      border-top-color: #3498db;
+    }
+
+    .card-type-label.special {
+      background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);
+      border-top-color: #f39c12;
+    }
+
+    .card-info {
+      padding: 20px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 8px;
+    }
+
+    .card-nickname {
+      display: inline-block;
+      padding: 4px 12px;
+      background: #fff3cd;
+      border-radius: 12px;
+      font-size: 12px;
+      color: #856404;
+      margin-bottom: 12px;
+    }
+
+    .card-specs {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .card-specs td {
+      padding: 6px 8px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .card-specs td:first-child {
+      color: #667eea;
+      font-weight: 600;
+      white-space: nowrap;
+      width: 40%;
+    }
+
+    .card-specs td:last-child {
+      color: #2c3e50;
+    }
+
+    .no-image {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+      opacity: 0.3;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 30px;
+      color: white;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    @media (max-width: 768px) {
+      .gallery {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 16px;
+      }
+
+      .header h1 {
+        font-size: 22px;
+      }
+
+      .filter-bar {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🚂 中国铁路机车图片图鉴</h1>
+      <p>黑龙江交通职业技术学院 · 铁路知识智能查询系统</p>
+      <p style="margin-top: 10px; font-size: 12px;">收录电力机车、内燃机车、动车组等真实图片</p>
+      <a href="../../../index.html" class="back-link">← 返回主系统</a>
+    </div>
+
+    <div class="filter-bar">
+      <button class="filter-btn active" data-filter="all">全部展示</button>
+      <button class="filter-btn" data-filter="electric">电力机车</button>
+      <button class="filter-btn" data-filter="diesel">内燃机车</button>
+      <button class="filter-btn" data-filter="emu">动车组</button>
+      <button class="filter-btn" data-filter="special">特种车辆</button>
+    </div>
+
+    <div class="gallery" id="gallery">
+      <!-- 机车卡片将通过JavaScript动态生成 -->
+    </div>
+
+    <div class="footer">
+      <p>© 2026 黑龙江交通职业技术学院 · 铁路工程系</p>
+      <p style="margin-top: 8px; font-size: 12px;">图片来源：百度百科 · 仅供教学使用</p>
+    </div>
+  </div>
+
+  <script>
+    // 机车图片数据（直接嵌入，无需fetch）
+    const locomotiveData = [
+      // ── 电力机车 ──
+      {
+        type: 'electric',
+        category: '和谐型HXD系列',
+        key: 'HXD1',
+        name: 'HXD1型（和谐电1）',
+        nickname: '大漠红',
+        image: 'https://bkimg.cdn.bcebos.com/smart/9f510fb30f2442a7d9335c78ea15ba4bd11372f0a4ea-bkimg-process,v_1,rw_648,rh_384,maxl_479?x-bce-process=image/format,f_auto',
+        specs: {
+          '轴式': '2×B0-B0（八轴重联）',
+          '总功率': '9600kW',
+          '最高速度': '120km/h'
+        }
+      },
+      {
+        type: 'electric',
+        category: '和谐型HXD系列',
+        key: 'HXD1D',
+        name: 'HXD1D型（和谐1D）',
+        nickname: '大红枣',
+        image: 'https://bkimg.cdn.bcebos.com/smart/9825bc315c6034a85edf134b2e475e540923dc54d8e6-bkimg-process,v_1,rw_648,rh_400,maxl_460?x-bce-process=image/format,f_auto',
+        specs: {
+          '轴式': 'Co-Co（六轴）',
+          '总功率': '7200kW',
+          '最高速度': '160km/h'
+        }
+      },
+      {
+        type: 'electric',
+        category: '和谐型HXD系列',
+        key: 'HXD3',
+        name: 'HXD3型（和谐电3）',
+        nickname: '',
+        image: 'https://bkimg.cdn.bcebos.com/smart/fcfaaf51f3deb48f5c9c2d9bf91f3a292cf578fa-bkimg-process,v_1,rw_800,rh_600,maxl_378?x-bce-process=image/format,f_auto',
+        specs: {
+          '轴式': 'Co-Co（六轴）',
+          '总功率': '7200kW',
+          '最高速度': '120km/h'
+        }
+      },
+      {
+        type: 'electric',
+        category: '和谐型HXD系列',
+        key: 'HXD3D',
+        name: 'HXD3D型（和谐3D）',
+        nickname: '',
+        image: 'https://bkimg.cdn.bcebos.com/smart/71cf3bc79f3df8dcd2d50cd4c411728b4610288e-bkimg-process,v_1,rw_800,rh_600,maxl_378?x-bce-process=image/format,f_auto',
+        specs: {
+          '轴式': 'Co-Co（六轴）',
+          '总功率': '7200kW',
+          '最高速度': '160km/h'
+        }
+      },
+      {
+        type: 'electric',
+        category: '和谐型HXD系列',
+        key: 'HXD2',
+        name: 'HXD2型（和谐电2）',
+        nickname: '',
+        image: 'https://bkimg.cdn.bcebos.com/smart/5243fbf2b2119313b07ec66a256e1bd7912396dd27e9-bkimg-process,v_1,rw_650,rh_407,maxl_453?x-bce-process=image/format,f_auto',
+        specs: {
+          '轴式': '2×Bo-Bo（八轴重联）',
+          '总功率': '9600kW',
+          '最高速度': '120km/h'
+        }
+      },
+      // ── 内燃机车 ──
+      {
+        type: 'diesel',
+        category: '东风系列DF',
+        key: 'DF4B',
+        name: 'DF4B型（东风4B）',
+        nickname: '橘子',
+        image: 'https://bkimg.cdn.bcebos.com/smart/b21c8701a18b87d6277f335f485e3f381f30e924576e-bkimg-process,v_1,rw_4608,rh_3456,maxl_378?x-bce-process=image/format,f_auto',
+        specs: {
+          '轴式': 'Co-Co（六轴）',
+          '装车功率': '2430kW',
+          '最高速度': '100km/h'
+        }
+      },
+      {
+        type: 'diesel',
+        category: '东风系列DF',
+        key: 'DF4',
+        name: 'DF4型（东风4）',
+        nickname: '',
+        image: 'https://bkimg.cdn.bcebos.com/smart/4b90f603738da977391295a77805ef198618377a45b8-bkimg-process,v_1,rw_640,rh_480,maxl_378?x-bce-process=image/format,f_auto',
+        specs: {
+          '轴式': 'Co-Co（六轴）',
+          '装车功率': '2430kW',
+          '最高速度': '100km/h'
+        }
+      },
+      {
+        type: 'diesel',
+        category: '东风系列DF',
+        key: 'DF11',
+        name: 'DF11型（东风11）',
+        nickname: '准高速',
+        image: 'https://bkimg.cdn.bcebos.com/smart/32fa828ba61ea8d336cba10b900a304e241f58d0-bkimg-process,v_1,rw_448,rh_252,maxl_897?x-bce-process=image/format,f_auto',
+        specs: {
+          '轴式': 'Co-Co（六轴）',
+          '装车功率': '3040kW',
+          '最高速度': '170km/h'
+        }
+      },
+      // ── 动车组 ──
+      {
+        type: 'emu',
+        category: '复兴号CR系列',
+        key: 'CR400AF',
+        name: 'CR400AF型',
+        nickname: '红神龙',
+        image: 'https://bkimg.cdn.bcebos.com/smart/d31b0ef41bd5ad6ea347188b8ecb39dbb6fd3c10-bkimg-process,v_1,rw_800,rh_533,maxl_426?x-bce-process=image/format,f_auto',
+        specs: {
+          '运营速度': '350km/h',
+          '试验速度': '420km/h',
+          '编组': '8辆/16辆'
+        }
+      },
+      {
+        type: 'emu',
+        category: '复兴号CR系列',
+        key: 'CR400BF',
+        name: 'CR400BF型',
+        nickname: '金凤凰',
+        image: 'https://bkimg.cdn.bcebos.com/smart/5ab5c9ea15ce36d3acb8632131f33a87e950b167-bkimg-process,v_1,rw_368,rh_252,maxl_737?x-bce-process=image/format,f_auto',
+        specs: {
+          '运营速度': '350km/h',
+          '试验速度': '420km/h',
+          '编组': '8辆/16辆'
+        }
+      },
+      {
+        type: 'emu',
+        category: '复兴号CR系列',
+        key: 'CR300AF',
+        name: 'CR300AF型',
+        nickname: '蓝妹妹',
+        image: 'https://bkimg.cdn.bcebos.com/smart/d52a2834349b033b5bb537072b9821d3d539b70017ed-bkimg-process,v_1,rw_2000,rh_1332,maxl_426?x-bce-process=image/format,f_auto',
+        specs: {
+          '运营速度': '250km/h',
+          '编组': '8辆',
+          '适合线路': '城际铁路'
+        }
+      },
+      {
+        type: 'emu',
+        category: '和谐号CRH系列',
+        key: 'CRH380A',
+        name: 'CRH380A型',
+        nickname: '火箭头',
+        image: 'https://bkimg.cdn.bcebos.com/smart/ca1349540923dd540034d05cdb09b3de9c8248ba-bkimg-process,v_1,rw_1280,rh_800,maxl_454?x-bce-process=image/format,f_auto',
+        specs: {
+          '运营速度': '350km/h',
+          '试验速度': '487.3km/h',
+          '编组': '8辆/16辆'
+        }
+      },
+      // ── 韶山系列 ──
+      {
+        type: 'electric',
+        category: '韶山系列SS',
+        key: 'SS9',
+        name: 'SS9型（韶山9）',
+        nickname: '',
+        image: 'https://bkimg.cdn.bcebos.com/smart/43a7d933c895d143ad4b2558ada495025aafa40fa909-bkimg-process,v_1,rw_1208,rh_805,maxl_426?x-bce-process=image/format,f_auto',
+        specs: {
+          '轴式': 'Co-Co（六轴）',
+          '功率': '4800kW',
+          '最高速度': '170km/h'
+        }
+      },
+      {
+        type: 'electric',
+        category: '韶山系列SS',
+        key: 'SS7',
+        name: 'SS7型（韶山7）',
+        nickname: '',
+        image: 'https://bkimg.cdn.bcebos.com/smart/9825bc315c6034a8831e3574cc13495408237643-bkimg-process,v_1,rw_336,rh_252,maxl_672?x-bce-process=image/format,f_auto',
+        specs: {
+          '轴式': 'Bo-Bo-Bo（六轴）',
+          '功率': '4200kW',
+          '最高速度': '120km/h'
+        }
+      },
+      // ── 高速检测列车 ──
+      {
+        type: 'special',
+        category: '特种车辆',
+        key: 'CIT',
+        name: '高速综合检测列车',
+        nickname: '黄医生',
+        image: 'https://bkimg.cdn.bcebos.com/smart/91ef76c6a7efce1b9d160894d01ae4deb48f8c54cf13-bkimg-process,v_1,rw_378,rh_252,maxl_756?x-bce-process=image/format,f_auto',
+        specs: {
+          '用途': '高铁线路检测',
+          '最高速度': '400km/h',
+          '检测系统': '轨道/接触网/信号'
+        }
+      }
+    ];
+
+    // 渲染机车卡片
+    function renderGallery(filter = 'all') {
+      const gallery = document.getElementById('gallery');
+      gallery.innerHTML = '';
+
+      const filteredData = filter === 'all' 
+        ? locomotiveData 
+        : locomotiveData.filter(item => item.type === filter);
+
+      filteredData.forEach(loco => {
+        const card = document.createElement('div');
+        card.className = 'locomotive-card';
+        card.dataset.type = loco.type;
+
+        // 根据类型选择样式类
+        let typeClass = '';
+        let typeLabel = '';
+        switch(loco.type) {
+          case 'electric':
+            typeClass = 'electric';
+            typeLabel = '⚡ 电力机车';
+            break;
+          case 'diesel':
+            typeClass = 'diesel';
+            typeLabel = '🛢️ 内燃机车';
+            break;
+          case 'emu':
+            typeClass = 'emu';
+            typeLabel = '🚄 动车组';
+            break;
+          case 'special':
+            typeClass = 'special';
+            typeLabel = '🔧 特种车辆';
+            break;
+        }
+
+        card.innerHTML = `
+          <div class="card-image">
+            ${loco.image 
+              ? `<img src="${loco.image}" alt="${loco.name}" onerror="this.parentElement.innerHTML='<div class=\\'no-image\\'>🚂</div>'">`
+              : '<div class="no-image">🚂</div>'
+            }
+            <div class="card-badge">📷 百度百科</div>
+          </div>
+          <div class="card-type-label ${typeClass}">
+            ${typeLabel} · ${loco.category}
+          </div>
+          <div class="card-info">
+            <div class="card-title">${loco.name}</div>
+            ${loco.nickname ? `<div class="card-nickname">🌟 ${loco.nickname}</div>` : ''}
+            <table class="card-specs">
+              ${Object.entries(loco.specs).map(([k, v]) => `
+                <tr>
+                  <td>${k}</td>
+                  <td>${v}</td>
+                </tr>
+              `).join('')}
+            </table>
+          </div>
+        `;
+
+        gallery.appendChild(card);
+      });
+    }
+
+    // 筛选按钮事件
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        renderGallery(this.dataset.filter);
+      });
+    });
+
+    // 初始渲染
+    renderGallery();
+  </script>
+</body>
+</html>

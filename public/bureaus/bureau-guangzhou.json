@@ -1,0 +1,30 @@
+{
+  "code": "guangzhou",
+  "name": "中国铁路广州局集团有限公司",
+  "shortName": "广州局",
+  "tier": 1,
+  "tierLabel": "第一梯队",
+  "tierDesc": "全国待遇最优",
+  "headquarters": "广东省广州市",
+  "coverage": "广东、湖南、海南三省",
+  "mileage": "约1.1万公里",
+  "lines": ["京广高铁", "广深港高铁", "沪昆高铁", "粤港澳大湾区城际铁路"],
+  "recruitmentScale": "3000-4000人/年",
+  "competitionRatio": "≥50:1",
+  "difficulty": 5,
+  "difficultyLabel": "地狱级",
+  "educationPreference": "本科及以上",
+  "juniorCollegeRatio": "约65%",
+  "salary": {
+    "undergraduateMonthly": "7000-11000",
+    "highSpeedDriverMonthly": "12000-18000",
+    "annualBonus": "2-4万元",
+    "features": ["珠三角经济发达", "高温补贴特色"]
+  },
+  "benefits": ["六险二金", "高温补贴", "工作餐", "宿舍"],
+  "features": ["珠三角经济发达，吸引力极强", "招聘专业广", "机车/车辆/运输类均有机会"],
+  "departments": ["广州站", "长沙站", "广九客运段", "广州机务段", "长沙动车段", "广州车辆段"],
+  "checkupSpecial": ["辨色力非常严格", "夏季高温需心血管稳定"],
+  "contact": "020-1234XXXX",
+  "lastUpdated": "2025-06"
+}

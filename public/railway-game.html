@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🚂 铁路司机模拟驾驶 - 双人对抗赛</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    
+    /* 顶部信息栏 */
+    .top-bar {
+      background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
+      padding: 10px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #333;
+    }
+    
+    .game-title { font-size: 18px; font-weight: 800; color: #f39c12; }
+    .timer-display {
+      background: rgba(52,152,219,0.2);
+      border: 2px solid #3498db;
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-size: 24px;
+      font-weight: 900;
+      font-family: 'Courier New', monospace;
+      color: #3498db;
+    }
+    .vs-display { font-size: 28px; font-weight: 900; color: #e74c3c; text-shadow: 0 0 20px rgba(231,76,60,0.8); }
+    
+    /* 玩家状态栏 */
+    .player-status-bar {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background: rgba(0,0,0,0.3);
+    }
+    
+    .player-panel {
+      flex: 1;
+      padding: 10px 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    
+    .player-panel.player1 { background: linear-gradient(135deg, rgba(192,57,43,0.3), rgba(142,40,23,0.3)); border: 2px solid #c0392b; }
+    .player-panel.player2 { background: linear-gradient(135deg, rgba(52,152,219,0.3), rgba(41,128,185,0.3)); border: 2px solid #3498db; }
+    
+    .player-name { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+    .player1 .player-name { color: #e74c3c; }
+    .player2 .player-name { color: #3498db; }
+    
+    .player-stats { display: flex; justify-content: center; gap: 30px; font-size: 14px; }
+    .stat-item { display: flex; flex-direction: column; align-items: center; }
+    .stat-label { color: #888; font-size: 12px; }
+    .stat-value { font-size: 24px; font-weight: 900; font-family: 'Courier New', monospace; color: #f39c12; }
+    
+    .lives-row { display: flex; gap: 4px; justify-content: center; }
+    .mini-heart { font-size: 18px; transition: all 0.3s; }
+    .mini-heart.lost { filter: grayscale(1); opacity: 0.3; }
+    
+    /* 主游戏区域 */
+    .game-container {
+      display: flex;
+      height: calc(100vh - 120px);
+    }
+    
+    /* 玩家区域 */
+    .player-section {
+      width: 28%;
+      background: linear-gradient(180deg, #2c2c3e 0%, #1a1a2e 100%);
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border: 3px solid;
+    }
+    
+    .player-section.player1 { border-color: #c0392b; }
+    .player-section.player2 { border-color: #3498db; }
+    
+    .section-title {
+      text-align: center;
+      font-size: 16px;
+      font-weight: 800;
+      padding: 8px;
+      border-radius: 8px;
+    }
+    
+    .player1 .section-title { background: #c0392b; color: #fff; }
+    .player2 .section-title { background: #3498db; color: #fff; }
+    
+    /* 速度显示 */
+    .speed-display {
+      background: radial-gradient(circle, #3a3a4e 0%, #1a1a2e 100%);
+      border: 2px solid #444;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
+    
+    .speed-value { font-size: 36px; font-weight: 900; color: #2ecc71; font-family: 'Courier New', monospace; }
+    .speed-unit { font-size: 14px; color: #888; }
+    
+    /* 档位显示 */
+    .throttle-display {
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
+    
+    .throttle-label { font-size: 12px; color: #888; margin-bottom: 5px; }
+    .throttle-value { font-size: 28px; font-weight: 900; color: #f39c12; }
+    
+    /* 撒砂按钮 */
+    .sand-btn {
+      background: linear-gradient(180deg, #9b59b6, #6c3483);
+      border: 2px solid #8e44ad;
+      color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .sand-btn:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(155,89,182,0.5); }
+    .sand-btn:active { transform: scale(0.95); }
+    
+    /* 答题区域 - 放大 */
+    .answer-section {
+      flex: 1;
+      background: rgba(0,0,0,0.4);
+      border-radius: 10px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .answer-title {
+      text-align: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: #f39c12;
+      margin-bottom: 10px;
+      padding: 8px;
+      background: rgba(243,156,18,0.2);
+      border-radius: 8px;
+    }
+    
+    .answer-options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+    
+    .option-btn {
+      flex: 1;
+      padding: 12px 15px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 3px solid;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 50px;
+    }
+    
+    .option-btn:hover { transform: scale(1.03); }
+    .option-btn.disabled { opacity: 0.5; pointer-events: none; }
+    .option-btn.correct { animation: correctFlash 0.5s; box-shadow: 0 0 25px rgba(46,204,113,0.8); }
+    .option-btn.wrong { animation: wrongShake 0.5s; box-shadow: 0 0 25px rgba(231,76,60,0.8); }
+    
+    .player1 .option-btn {
+      background: rgba(192,57,43,0.3);
+      border-color: #c0392b;
+      color: #fff;
+    }
+    .player1 .option-btn:hover { background: rgba(192,57,43,0.5); }
+    
+    .player2 .option-btn {
+      background: rgba(52,152,219,0.3);
+      border-color: #3498db;
+      color: #fff;
+    }
+    .player2 .option-btn:hover { background: rgba(52,152,219,0.5); }
+    
+    .option-letter {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 900;
+      flex-shrink: 0;
+    }
+    
+    .player1 .option-letter { background: #c0392b; }
+    .player2 .option-letter { background: #3498db; }
+    
+    .option-text { flex: 1; text-align: left; line-height: 1.3; }
+    
+    /* 中间视野区域 */
+    .view-area {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(180deg, #1a237e 0%, #283593 30%, #3949ab 50%, #5c6bc0 70%, #7986cb 100%);
+    }
+    
+    .sky {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 40%;
+      background: linear-gradient(180deg, #0d1b2a 0%, #1b263b 50%, #415a77 100%);
+    }
+    
+    .stars { position: absolute; width: 100%; height: 100%; }
+    .star {
+      position: absolute;
+      background: #fff;
+      border-radius: 50%;
+      animation: twinkle 2s infinite;
+    }
+    
+    @keyframes twinkle { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    
+    .mountains {
+      position: absolute;
+      bottom: 45%;
+      left: 0;
+      right: 0;
+      height: 80px;
+    }
+    
+    .railway {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 55%;
+      background: linear-gradient(180deg, #4a5568 0%, #2d3748 100%);
+    }
+    
+    .track { position: absolute; bottom: 35%; left: 0; right: 0; height: 30%; }
+    .sleepers {
+      position: absolute;
+      bottom: 33%;
+      left: 0;
+      width: 200%;
+      height: 8px;
+      display: flex;
+      animation: moveSleepers 0.5s linear infinite;
+    }
+    
+    @keyframes moveSleepers { 0% { transform: translateX(0); } 100% { transform: translateX(-40px); } }
+    .sleeper { width: 40px; height: 8px; background: linear-gradient(90deg, #5d4e37, #8b7355, #5d4e37); margin: 0 5px; border-radius: 2px; flex-shrink: 0; }
+    
+    .rails { position: absolute; bottom: 30%; left: 0; right: 0; height: 6px; display: flex; flex-direction: column; justify-content: space-between; }
+    .rail { height: 3px; background: linear-gradient(90deg, #666, #999, #666); }
+    
+    .locomotive {
+      position: absolute;
+      bottom: 25%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 100px;
+      z-index: 10;
+    }
+    
+    .locomotive-body {
+      position: absolute;
+      bottom: 10px;
+      left: 0;
+      width: 200px;
+      height: 70px;
+      background: linear-gradient(180deg, #c0392b, #96281b);
+      border-radius: 10px 10px 5px 5px;
+      border: 3px solid #8e2215;
+    }
+    
+    .locomotive-cabin {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 40px;
+      background: linear-gradient(180deg, #1a5276, #154360);
+      border-radius: 5px 5px 0 0;
+      border: 2px solid #0e3d5c;
+    }
+    
+    .cabin-window {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      right: 5px;
+      height: 20px;
+      background: linear-gradient(180deg, #5dade2, #3498db);
+      border-radius: 3px;
+    }
+    
+    .locomotive-front {
+      position: absolute;
+      bottom: 10px;
+      left: -5px;
+      width: 30px;
+      height: 50px;
+      background: linear-gradient(90deg, #a93226, #c0392b);
+      border-radius: 15px 0 0 15px;
+      border: 3px solid #8e2215;
+      border-right: none;
+    }
+    
+    .headlight {
+      position: absolute;
+      top: 50%;
+      left: -2px;
+      transform: translateY(-50%);
+      width: 12px;
+      height: 12px;
+      background: #f1c40f;
+      border-radius: 50%;
+      box-shadow: 0 0 20px #f1c40f;
+      animation: headlightPulse 1s infinite;
+    }
+    
+    @keyframes headlightPulse { 0%, 100% { box-shadow: 0 0 20px #f1c40f; } 50% { box-shadow: 0 0 40px #f1c40f, 0 0 60px rgba(241,196,15,0.5); } }
+    
+    .locomotive-wheels { position: absolute; bottom: 0; left: 0; right: 0; display: flex; justify-content: space-around; }
+    .wheel {
+      width: 35px;
+      height: 35px;
+      border: 4px solid #666;
+      border-radius: 50%;
+      background: #333;
+      position: relative;
+      animation: wheelRotate 0.5s linear infinite;
+    }
+    
+    @keyframes wheelRotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .wheel::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 10px; height: 10px; background: #888; border-radius: 50%; }
+    .wheel::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 30px; height: 3px; background: #666; }
+    
+    /* 竞争答题横幅 */
+    .competition-banner {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.95);
+      border: 4px solid #f39c12;
+      padding: 20px 40px;
+      border-radius: 15px;
+      text-align: center;
+      z-index: 100;
+      display: none;
+      max-width: 90%;
+    }
+    
+    .competition-banner.show { display: block; animation: bannerPulse 0.5s ease; }
+    @keyframes bannerPulse { 0% { transform: translateX(-50%) scale(0.8); opacity: 0; } 100% { transform: translateX(-50%) scale(1); opacity: 1; } }
+    
+    .banner-question {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #fff;
+      line-height: 1.4;
+    }
+    
+    .banner-hint {
+      font-size: 13px;
+      color: #f39c12;
+    }
+    
+    .banner-hint span { font-weight: 700; }
+    .player1-hint { color: #e74c3c; }
+    .player2-hint { color: #3498db; }
+    
+    /* 得分动画 */
+    .score-popup {
+      position: fixed;
+      font-size: 48px;
+      font-weight: 900;
+      animation: scoreFloat 1.2s ease forwards;
+      z-index: 1000;
+      text-shadow: 0 0 30px currentColor;
+    }
+    
+    @keyframes scoreFloat { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-150px) scale(1.5); } }
+    
+    /* 开始界面 */
+    .start-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(180deg, #0a0a0a, #1a1a2e);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    
+    .start-screen.hidden { display: none; }
+    .game-logo { font-size: 80px; margin-bottom: 20px; animation: logoFloat 2s ease-in-out infinite; }
+    @keyframes logoFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    
+    .game-title-main {
+      font-size: 48px;
+      font-weight: 900;
+      background: linear-gradient(180deg, #c0392b, #f39c12);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+      letter-spacing: 5px;
+    }
+    
+    .game-subtitle { font-size: 24px; color: #f39c12; margin-bottom: 40px; font-weight: 700; }
+    
+    .players-setup { display: flex; gap: 60px; margin-bottom: 40px; }
+    .player-setup-box {
+      padding: 30px 50px;
+      border-radius: 15px;
+      text-align: center;
+      border: 3px solid;
+    }
+    
+    .player-setup-box.player1 { background: rgba(192,57,43,0.2); border-color: #c0392b; }
+    .player-setup-box.player2 { background: rgba(52,152,219,0.2); border-color: #3498db; }
+    .player-setup-box h3 { font-size: 28px; margin-bottom: 10px; }
+    .player-setup-box.player1 h3 { color: #e74c3c; }
+    .player-setup-box.player2 h3 { color: #3498db; }
+    .player-setup-box p { color: #888; font-size: 14px; }
+    
+    .controls-hint { background: rgba(0,0,0,0.3); padding: 20px 40px; border-radius: 10px; margin-bottom: 30px; text-align: center; }
+    .controls-hint h4 { color: #f39c12; margin-bottom: 15px; font-size: 18px; }
+    .controls-hint p { color: #888; font-size: 14px; line-height: 1.8; }
+    .controls-hint span { color: #fff; font-weight: 700; }
+    
+    .player1-color { color: #e74c3c; }
+    .player2-color { color: #3498db; }
+    
+    .start-btn {
+      background: linear-gradient(180deg, #f39c12, #d68910);
+      border: 3px solid #f1c40f;
+      color: #fff;
+      padding: 20px 80px;
+      font-size: 28px;
+      font-weight: 700;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+    }
+    
+    .start-btn:hover { transform: scale(1.1); box-shadow: 0 0 40px rgba(243,156,18,0.8); }
+    
+    /* 游戏结束界面 */
+    .game-over-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.95);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 2000;
+    }
+    
+    .game-over-screen.show { display: flex; }
+    .winner-display { font-size: 80px; margin-bottom: 20px; animation: winnerBounce 1s ease infinite; }
+    @keyframes winnerBounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+    
+    .winner-text { font-size: 48px; font-weight: 900; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 5px; }
+    .winner-text.player1 { color: #e74c3c; text-shadow: 0 0 30px rgba(231,76,60,0.8); }
+    .winner-text.player2 { color: #3498db; text-shadow: 0 0 30px rgba(52,152,219,0.8); }
+    .winner-text.draw { color: #f39c12; text-shadow: 0 0 30px rgba(243,156,18,0.8); }
+    
+    .final-scores { display: flex; gap: 60px; margin-bottom: 40px; }
+    .final-score-box { padding: 20px 40px; border-radius: 15px; text-align: center; border: 3px solid; }
+    .final-score-box.player1 { background: rgba(192,57,43,0.2); border-color: #c0392b; }
+    .final-score-box.player2 { background: rgba(52,152,219,0.2); border-color: #3498db; }
+    .final-score-box h4 { font-size: 20px; margin-bottom: 10px; }
+    .final-score-box.player1 h4 { color: #e74c3c; }
+    .final-score-box.player2 h4 { color: #3498db; }
+    .final-score-box .score { font-size: 48px; font-weight: 900; color: #f39c12; }
+    
+    .restart-btn {
+      background: linear-gradient(180deg, #2ecc71, #1e8449);
+      border: 3px solid #58d68d;
+      color: #fff;
+      padding: 15px 50px;
+      font-size: 20px;
+      font-weight: 700;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+    }
+    
+    .restart-btn:hover { transform: scale(1.1); box-shadow: 0 0 30px rgba(46,204,113,0.8); }
+    
+    /* 警告提示 */
+    .alert-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(192,57,43,0.4);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 500;
+      animation: alertFlash 0.5s ease infinite;
+    }
+    
+    .alert-overlay.show { display: flex; }
+    @keyframes alertFlash { 0%, 100% { background: rgba(192,57,43,0.4); } 50% { background: rgba(192,57,43,0.15); } }
+    .alert-text { font-size: 60px; font-weight: 900; color: #fff; text-shadow: 0 0 30px #e74c3c; }
+    
+    @keyframes correctFlash { 0%, 100% { box-shadow: 0 0 0 rgba(46,204,113,0); } 50% { box-shadow: 0 0 30px rgba(46,204,113,0.8); } }
+    @keyframes wrongShake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+    
+    .toast-message {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #2ecc71;
+      color: #fff;
+      padding: 15px 30px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      z-index: 3000;
+      transition: transform 0.3s ease;
+    }
+    
+    .toast-message.show { transform: translateX(-50%) translateY(0); }
+    .toast-message.error { background: #e74c3c; }
+    
+    /* 档位控制按钮 */
+    .throttle-btns { display: flex; gap: 8px; }
+    .throttle-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid #444;
+      background: linear-gradient(180deg, #444, #333);
+      color: #fff;
+    }
+    
+    .throttle-btn:hover { transform: scale(1.05); box-shadow: 0 0 10px rgba(255,255,255,0.2); }
+  </style>
+</head>
+<body>
+
+<!-- 开始界面 -->
+<div class="start-screen" id="startScreen">
+  <div class="game-logo">🚂⚡🚂</div>
+  <div class="game-title-main">铁路司机模拟驾驶</div>
+  <div class="game-subtitle">双人对抗赛</div>
+  
+  <div class="players-setup">
+    <div class="player-setup-box player1">
+      <h3>🔴 玩家一</h3>
+      <p>档位: <span class="player1-color">Q / E</span></p>
+      <p>撒砂: <span class="player1-color">W</span></p>
+    </div>
+    <div class="player-setup-box player2">
+      <h3>🔵 玩家二</h3>
+      <p>档位: <span class="player2-color">- / =</span></p>
+      <p>撒砂: <span class="player2-color">空格</span></p>
+    </div>
+  </div>
+  
+  <div class="controls-hint">
+    <h4>🎮 竞技规则</h4>
+    <p>
+      两位玩家同时驾驶列车，途中会出现铁路知识问题<br>
+      <span>先按正确答案的玩家得分！</span><br>
+      答错扣一条命，生命归零则出局<br>
+      <span>3分钟限时赛</span>，分数高者获胜！
+    </p>
+  </div>
+  
+  <button class="start-btn" onclick="startGame()">开始对抗</button>
+</div>
+
+<!-- 游戏结束界面 -->
+<div class="game-over-screen" id="gameOverScreen">
+  <div class="winner-display" id="winnerEmoji">🏆</div>
+  <div class="winner-text" id="winnerText">玩家一 获胜！</div>
+  
+  <div class="final-scores">
+    <div class="final-score-box player1">
+      <h4>🔴 玩家一</h4>
+      <div class="score" id="finalScore1">0</div>
+      <div class="stat-label" style="margin-top:5px;">最终得分</div>
+    </div>
+    <div class="final-score-box player2">
+      <h4>🔵 玩家二</h4>
+      <div class="score" id="finalScore2">0</div>
+      <div class="stat-label" style="margin-top:5px;">最终得分</div>
+    </div>
+  </div>
+  
+  <button class="restart-btn" onclick="restartGame()">再来一局</button>
+</div>
+
+<!-- 紧急情况提示 -->
+<div class="alert-overlay" id="alertOverlay">
+  <div class="alert-text" id="alertText">⚡ 知识问答！</div>
+</div>
+
+<!-- 主界面 -->
+<div class="top-bar">
+  <div class="game-title">🚂 铁路司机对抗赛</div>
+  <div class="timer-display" id="timerDisplay">3:00</div>
+  <div class="vs-display">VS</div>
+</div>
+
+<div class="player-status-bar">
+  <div class="player-panel player1">
+    <div class="player-name">🔴 玩家一</div>
+    <div class="player-stats">
+      <div class="stat-item">
+        <span class="stat-label">生命值</span>
+        <div class="lives-row" id="p1Lives">
+          <span class="mini-heart">❤️</span>
+          <span class="mini-heart">❤️</span>
+          <span class="mini-heart">❤️</span>
+        </div>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">得分</span>
+        <span class="stat-value" id="p1Score">0</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="player-panel player2">
+    <div class="player-name">🔵 玩家二</div>
+    <div class="player-stats">
+      <div class="stat-item">
+        <span class="stat-label">生命值</span>
+        <div class="lives-row" id="p2Lives">
+          <span class="mini-heart">❤️</span>
+          <span class="mini-heart">❤️</span>
+          <span class="mini-heart">❤️</span>
+        </div>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">得分</span>
+        <span class="stat-value" id="p2Score">0</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="game-container">
+  <!-- 玩家1区域 -->
+  <div class="player-section player1">
+    <div class="section-title">🔴 玩家一 操纵台</div>
+    
+    <div class="speed-display">
+      <div class="speed-value" id="p1Speed">0</div>
+      <div class="speed-unit">km/h 当前速度</div>
+    </div>
+    
+    <div class="throttle-display">
+      <div class="throttle-label">当前档位</div>
+      <div class="throttle-value">P<span id="p1Throttle">5</span></div>
+    </div>
+    
+    <div class="throttle-btns">
+      <button class="throttle-btn" onclick="p1AdjustThrottle(-1)">➖ 减档 [Q]</button>
+      <button class="throttle-btn" onclick="p1AdjustThrottle(1)">➕ 增档 [E]</button>
+    </div>
+    
+    <button class="sand-btn" onclick="p1Sand()">💨 撒砂 [W]</button>
+    
+    <div class="answer-section" id="p1AnswerSection">
+      <div class="answer-title">⚡ 快速抢答 ⚡</div>
+      <div class="answer-options" id="p1AnswerOptions">
+        <!-- 动态生成选项 -->
+      </div>
+    </div>
+  </div>
+  
+  <!-- 中间视野 -->
+  <div class="view-area" id="viewArea">
+    <div class="sky">
+      <div class="stars" id="stars"></div>
+    </div>
+    
+    <div class="mountains">
+      <svg width="100%" height="80" viewBox="0 0 1000 80" preserveAspectRatio="none">
+        <polygon points="0,80 100,20 200,80" fill="#1a237e" opacity="0.6"/>
+        <polygon points="150,80 300,10 450,80" fill="#1a237e" opacity="0.7"/>
+        <polygon points="400,80 550,25 700,80" fill="#283593" opacity="0.6"/>
+        <polygon points="600,80 750,15 900,80" fill="#1a237e" opacity="0.8"/>
+        <polygon points="800,80 950,30 1000,50 1000,80" fill="#283593" opacity="0.5"/>
+      </svg>
+    </div>
+    
+    <div class="railway">
+      <div class="track">
+        <div class="sleepers" id="sleepers"></div>
+        <div class="rails">
+          <div class="rail"></div>
+          <div class="rail"></div>
+        </div>
+      </div>
+      
+      <div class="locomotive" id="locomotive">
+        <div class="locomotive-cabin">
+          <div class="cabin-window"></div>
+        </div>
+        <div class="locomotive-body">
+          <div class="locomotive-front">
+            <div class="headlight"></div>
+          </div>
+        </div>
+        <div class="locomotive-wheels">
+          <div class="wheel" id="wheel1"></div>
+          <div class="wheel" id="wheel2"></div>
+          <div class="wheel" id="wheel3"></div>
+          <div class="wheel" id="wheel4"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 竞争答题横幅 -->
+    <div class="competition-banner" id="competitionBanner">
+      <div class="banner-question" id="bannerQuestion">问题将显示在这里</div>
+      <div class="banner-hint">
+        <span class="player1-hint">🔴玩家一: Q减档/E增档/W撒砂</span> | 
+        <span class="player2-hint">🔵玩家二: -减档/=增档/空格撒砂</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 玩家2区域 -->
+  <div class="player-section player2">
+    <div class="section-title">🔵 玩家二 操纵台</div>
+    
+    <div class="speed-display">
+      <div class="speed-value" id="p2Speed">0</div>
+      <div class="speed-unit">km/h 当前速度</div>
+    </div>
+    
+    <div class="throttle-display">
+      <div class="throttle-label">当前档位</div>
+      <div class="throttle-value">P<span id="p2Throttle">5</span></div>
+    </div>
+    
+    <div class="throttle-btns">
+      <button class="throttle-btn" onclick="p2AdjustThrottle(-1)">➖ 减档 [-]</button>
+      <button class="throttle-btn" onclick="p2AdjustThrottle(1)">➕ 增档 [=]</button>
+    </div>
+    
+    <button class="sand-btn" onclick="p2Sand()">💨 撒砂 [空格]</button>
+    
+    <div class="answer-section" id="p2AnswerSection">
+      <div class="answer-title">⚡ 快速抢答 ⚡</div>
+      <div class="answer-options" id="p2AnswerOptions">
+        <!-- 动态生成选项 -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 提示信息 -->
+<div class="toast-message" id="toastMessage"></div>
+
+<script>
+// 游戏状态
+const gameState = {
+  isRunning: false,
+  timeLeft: 180,
+  currentQuestion: null,
+  questionActive: false,
+  answeredPlayers: { p1: false, p2: false },
+  timerInterval: null,
+  speedInterval: null,
+  eventInterval: null
+};
+
+// 玩家状态
+const players = {
+  p1: { lives: 3, score: 0, speed: 0, throttleLevel: 5 },
+  p2: { lives: 3, score: 0, speed: 0, throttleLevel: 5 }
+};
+
+// 题库
+const questionBank = [
+  { q: "标准轨距是多少毫米？", a: "1435mm", options: ["1435mm", "1520mm", "1067mm", "1000mm"], category: "铁路基础" },
+  { q: "铁路信号中，红色代表什么含义？", a: "停车", options: ["注意", "减速", "停车", "加速"], category: "信号知识" },
+  { q: "列车运行监控装置的简称是什么？", a: "LKJ", options: ["ATP", "LKJ", "CTCS", "TDCS"], category: "行车设备" },
+  { q: "列车制动管的标准减压量是多少？", a: "140kPa", options: ["100kPa", "120kPa", "140kPa", "170kPa"], category: "制动知识" },
+  { q: "和谐型电力机车的英文缩写是？", a: "HXD", options: ["SS", "DF", "HXD", "CRH"], category: "机车知识" },
+  { q: "电气化铁路接触网的工作电压是？", a: "25kV", options: ["10kV", "25kV", "35kV", "50kV"], category: "供电知识" },
+  { q: "CTCS-2级列控系统依靠什么获取定位？", a: "应答器", options: ["GPS", "应答器", "轨道电路", "无线通信"], category: "列控知识" },
+  { q: "道岔号数越大，侧向通过速度越？", a: "越高", options: ["越低", "越高", "不变", "无关"], category: "线路知识" },
+  { q: "《铁路技术管理规程》简称什么？", a: "《技规》", options: ["《安规》", "《技规》", "《行规》", "《站细》"], category: "规章制度" },
+  { q: "机车乘务员一次连续工作时间不超过？", a: "8小时", options: ["6小时", "8小时", "10小时", "12小时"], category: "劳动安全" },
+  { q: "列车冒进信号机后应如何处理？", a: "立即停车，不得擅自动车", options: ["减速运行", "立即停车，不得擅自动车", "加速通过", "后退返回"], category: "行车安全" },
+  { q: "机车信号突然显示红灯，司机应？", a: "立即采取制动措施停车", options: ["减速运行", "立即采取制动措施停车", "加速通过", "等待通知"], category: "行车安全" },
+  { q: "列车退行时，速度不得超过多少？", a: "15km/h", options: ["5km/h", "15km/h", "25km/h", "40km/h"], category: "行车安全" },
+  { q: "调车作业时，推进车辆运行的限制速度是？", a: "30km/h", options: ["20km/h", "30km/h", "40km/h", "50km/h"], category: "行车安全" },
+  { q: "紧急制动距离与哪些因素有关？", a: "速度、载重、坡度、制动力", options: ["只有速度", "速度、载重、坡度、制动力", "与天气有关", "与机车类型有关"], category: "制动知识" },
+  { q: "电力机车主变压器的作用是什么？", a: "变换电压", options: ["储存电能", "变换电压", "调节电流", "整流"], category: "机车知识" },
+  { q: "旅客列车等级从高到低的顺序是？", a: "动车组>特快>快速>普通", options: ["特快>动车组>快速>普通", "动车组>特快>快速>普通", "快速>特快>动车组>普通", "普通>快速>特快>动车组"], category: "运输组织" },
+  { q: "车站接发列车的程序是什么？", a: "办理闭塞、准备进路、开闭信号", options: ["开放信号即可", "办理闭塞、准备进路、开闭信号", "通知信号楼即可", "准备进路即可"], category: "运输组织" },
+  { q: "道岔由哪几部分组成？", a: "转辙器、辙叉、护轨、连接部分", options: ["只有辙叉", "转辙器、辙叉、护轨、连接部分", "钢轨和轨枕", "信号机和转辙机"], category: "线路知识" },
+  { q: "钢轨的类型以什么来表示？", a: "每米钢轨的质量", options: ["长度", "每米钢轨的质量", "截面积", "材质"], category: "线路知识" },
+  { q: "AT供电方式中AT指的是？", a: "自耦变压器", options: ["电流互感器", "自耦变压器", "电压互感器", "吸流变压器"], category: "供电知识" },
+  { q: "什么叫电分相？", a: "接触网电气隔离区段", options: ["接触网断电的地方", "接触网电气隔离区段", "绝缘锚段关节", "分段绝缘器"], category: "供电知识" },
+  { q: "站内检查车辆时，两端各设置什么防护信号？", a: "红色信号旗（灯）", options: ["黄色信号旗", "红色信号旗（灯）", "绿色信号旗", "白色信号灯"], category: "安全规章" },
+  { q: "新建电气化铁路接触网导线距轨面高度是？", a: "5700mm", options: ["5500mm", "5700mm", "6000mm", "6500mm"], category: "安全规章" },
+  { q: "电气化区段携带超过多长的工具需停电？", a: "2米", options: ["1米", "2米", "3米", "5米"], category: "安全规章" },
+  { q: "机车鸣笛长声是多少秒？", a: "3秒", options: ["1秒", "2秒", "3秒", "5秒"], category: "安全规章" },
+  { q: "中国高铁营业里程已超过多少公里？", a: "4万公里", options: ["2万公里", "3万公里", "4万公里", "5万公里"], category: "铁路时事" },
+  { q: "中国第一条智能高铁是哪一条？", a: "京张高铁", options: ["京沪高铁", "京张高铁", "京雄城际", "京哈高铁"], category: "铁路时事" },
+  { q: "复兴号动车组的英文名称是？", a: "Fuxing", options: ["Harmony", "Fuxing", "China", "CRH"], category: "铁路时事" },
+  { q: "ZPW-2000A系统有几种载频？", a: "4种", options: ["2种", "4种", "6种", "8种"], category: "信号知识" },
+  { q: "S700K型电动转辙机的动作电流是？", a: "2A", options: ["1A", "2A", "3A", "4A"], category: "信号设备" },
+  { q: "ZD6型转辙机的额定转换力是？", a: "2450N或3430N", options: ["1500N", "2000N", "2450N或3430N", "4000N"], category: "信号设备" },
+  { q: "GSM-R的工作频段是？", a: "900MHz", options: ["450MHz", "900MHz", "1800MHz", "2.4GHz"], category: "通信知识" },
+  { q: "铁路交通事故等级分为几级？", a: "四级", options: ["三级", "四级", "五级", "六级"], category: "安全规章" },
+  { q: "遇天气恶劣，信号显示距离不足多少米时，应改用电话闭塞法？", a: "200米", options: ["100米", "200米", "300米", "400米"], category: "行车安全" },
+  { q: "列车运行中，遇有信号显示不明时，司机应？", a: "立即停车", options: ["减速运行", "立即停车", "加速通过", "继续运行等待通知"], category: "行车安全" },
+];
+
+// 音效系统
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playSound(type) {
+  const oscillator = audioCtx.createOscillator();
+  const gainNode = audioCtx.createGain();
+  oscillator.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+  
+  switch(type) {
+    case 'correct':
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(523, audioCtx.currentTime);
+      oscillator.frequency.setValueAtTime(659, audioCtx.currentTime + 0.1);
+      oscillator.frequency.setValueAtTime(784, audioCtx.currentTime + 0.2);
+      gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+      oscillator.start(audioCtx.currentTime);
+      oscillator.stop(audioCtx.currentTime + 0.4);
+      break;
+    case 'wrong':
+      oscillator.type = 'sawtooth';
+      oscillator.frequency.setValueAtTime(200, audioCtx.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.3);
+      gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+      oscillator.start(audioCtx.currentTime);
+      oscillator.stop(audioCtx.currentTime + 0.4);
+      break;
+    case 'alert':
+      oscillator.type = 'square';
+      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+      oscillator.frequency.setValueAtTime(440, audioCtx.currentTime + 0.2);
+      gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+      oscillator.start(audioCtx.currentTime);
+      oscillator.stop(audioCtx.currentTime + 0.5);
+      break;
+    case 'win':
+      oscillator.type = 'sine';
+      for(let i = 0; i < 4; i++) {
+        oscillator.frequency.setValueAtTime(523 + i * 262, audioCtx.currentTime + i * 0.15);
+      }
+      gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.8);
+      oscillator.start(audioCtx.currentTime);
+      oscillator.stop(audioCtx.currentTime + 0.8);
+      break;
+    case 'brake':
+      oscillator.type = 'square';
+      oscillator.frequency.setValueAtTime(150, audioCtx.currentTime);
+      gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+      oscillator.start(audioCtx.currentTime);
+      oscillator.stop(audioCtx.currentTime + 0.2);
+      break;
+  }
+}
+
+// 初始化场景
+function initScene() {
+  const starsContainer = document.getElementById('stars');
+  for(let i = 0; i < 30; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.width = star.style.height = (Math.random() * 3 + 1) + 'px';
+    star.style.animationDelay = Math.random() * 2 + 's';
+    starsContainer.appendChild(star);
+  }
+  
+  const sleepersContainer = document.getElementById('sleepers');
+  for(let i = 0; i < 60; i++) {
+    const sleeper = document.createElement('div');
+    sleeper.className = 'sleeper';
+    sleepersContainer.appendChild(sleeper);
+  }
+}
+
+// 开始游戏
+function startGame() {
+  document.getElementById('startScreen').classList.add('hidden');
+  
+  gameState.isRunning = true;
+  gameState.timeLeft = 180;
+  gameState.questionActive = false;
+  gameState.answeredPlayers = { p1: false, p2: false };
+  
+  players.p1 = { lives: 3, score: 0, speed: 0, throttleLevel: 5 };
+  players.p2 = { lives: 3, score: 0, speed: 0, throttleLevel: 5 };
+  
+  updateUI();
+  audioCtx.resume();
+  
+  updateTimerDisplay();
+  gameState.timerInterval = setInterval(updateTimer, 1000);
+  gameState.speedInterval = setInterval(updateSpeed, 100);
+  gameState.eventInterval = setInterval(triggerRandomEvent, 12000);
+  
+  setTimeout(() => accelerate(), 100);
+}
+
+function updateTimer() {
+  if(!gameState.isRunning) return;
+  gameState.timeLeft--;
+  updateTimerDisplay();
+  if(gameState.timeLeft <= 0) endGame();
+}
+
+function updateTimerDisplay() {
+  const minutes = Math.floor(gameState.timeLeft / 60);
+  const seconds = gameState.timeLeft % 60;
+  document.getElementById('timerDisplay').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function updateSpeed() {
+  if(!gameState.isRunning) return;
+  
+  ['p1', 'p2'].forEach(pid => {
+    const p = players[pid];
+    const targetSpeed = p.throttleLevel * 15;
+    if(p.speed < targetSpeed) {
+      p.speed += 1.5;
+      if(p.speed > targetSpeed) p.speed = targetSpeed;
+    } else if(p.speed > targetSpeed) {
+      p.speed -= 1;
+      if(p.speed < targetSpeed) p.speed = targetSpeed;
+    }
+    
+    // 里程奖励
+    const dist = Math.floor(p.speed * 0.001);
+    if(dist > 0 && dist % 100 === 0 && !p.lastDist || p.lastDist && dist > p.lastDist + 100) {
+      p.score += 10;
+      p.lastDist = dist;
+    }
+  });
+  
+  updateUI();
+  
+  const avgSpeed = (players.p1.speed + players.p2.speed) / 2;
+  document.querySelectorAll('.wheel').forEach(wheel => {
+    wheel.style.animationDuration = Math.max(0.1, 0.5 - avgSpeed * 0.003) + 's';
+  });
+}
+
+function accelerate() {
+  if(!gameState.isRunning) return;
+  setTimeout(accelerate, 1000);
+}
+
+function updateUI() {
+  document.getElementById('p1Score').textContent = players.p1.score;
+  document.getElementById('p1Speed').textContent = Math.round(players.p1.speed);
+  document.getElementById('p1Throttle').textContent = players.p1.throttleLevel;
+  
+  document.getElementById('p2Score').textContent = players.p2.score;
+  document.getElementById('p2Speed').textContent = Math.round(players.p2.speed);
+  document.getElementById('p2Throttle').textContent = players.p2.throttleLevel;
+  
+  updateLivesDisplay('p1');
+  updateLivesDisplay('p2');
+}
+
+function updateLivesDisplay(pid) {
+  const container = document.getElementById(pid + 'Lives');
+  let html = '';
+  for(let i = 0; i < 3; i++) {
+    html += i < players[pid].lives ? '<span class="mini-heart">❤️</span>' : '<span class="mini-heart lost">💔</span>';
+  }
+  container.innerHTML = html;
+}
+
+// 触发随机事件
+function triggerRandomEvent() {
+  if(!gameState.isRunning || gameState.questionActive) return;
+  
+  const question = questionBank[Math.floor(Math.random() * questionBank.length)];
+  gameState.currentQuestion = question;
+  gameState.questionActive = true;
+  gameState.answeredPlayers = { p1: false, p2: false };
+  
+  playSound('alert');
+  document.getElementById('alertOverlay').classList.add('show');
+  document.getElementById('alertText').textContent = '⚡ ' + question.category + '！';
+  
+  setTimeout(() => {
+    document.getElementById('alertOverlay').classList.remove('show');
+    showCompetitionQuestion(question);
+  }, 2000);
+}
+
+function showCompetitionQuestion(question) {
+  const banner = document.getElementById('competitionBanner');
+  document.getElementById('bannerQuestion').textContent = question.q;
+  banner.classList.add('show');
+  
+  const letters = ['A', 'B', 'C', 'D'];
+  
+  // 生成玩家1选项
+  const p1Container = document.getElementById('p1AnswerOptions');
+  p1Container.innerHTML = '';
+  question.options.forEach((opt, i) => {
+    const btn = document.createElement('div');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="option-letter">${letters[i]}</span><span class="option-text">${opt}</span>`;
+    btn.onclick = () => playerAnswer('p1', opt, btn);
+    p1Container.appendChild(btn);
+  });
+  
+  // 生成玩家2选项
+  const p2Container = document.getElementById('p2AnswerOptions');
+  p2Container.innerHTML = '';
+  question.options.forEach((opt, i) => {
+    const btn = document.createElement('div');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="option-letter">${letters[i]}</span><span class="option-text">${opt}</span>`;
+    btn.onclick = () => playerAnswer('p2', opt, btn);
+    p2Container.appendChild(btn);
+  });
+  
+  // 20秒后自动关闭
+  setTimeout(() => {
+    if(gameState.questionActive) closeQuestion();
+  }, 20000);
+}
+
+function playerAnswer(pid, selected, btnElement) {
+  if(!gameState.questionActive || gameState.answeredPlayers[pid]) return;
+  
+  gameState.answeredPlayers[pid] = true;
+  const question = gameState.currentQuestion;
+  const player = players[pid];
+  
+  // 禁用该玩家所有按钮
+  const btns = document.querySelectorAll(`#${pid}AnswerOptions .option-btn`);
+  btns.forEach(btn => btn.classList.add('disabled'));
+  
+  if(selected === question.a) {
+    btnElement.classList.add('correct');
+    playSound('correct');
+    
+    const other = pid === 'p1' ? 'p2' : 'p1';
+    if(!gameState.answeredPlayers[other]) {
+      player.score += 150;
+      showToast(`${pid === 'p1' ? '🔴' : '🔵'} 先下一城！+150分！`);
+      showScorePopup(pid, '+150');
+    } else {
+      player.score += 50;
+      showToast(`${pid === 'p1' ? '🔴' : '🔵'} 紧随其后！+50分！`);
+      showScorePopup(pid, '+50');
+    }
+    
+    updateUI();
+    
+    setTimeout(() => closeQuestion(), 2000);
+  } else {
+    btnElement.classList.add('wrong');
+    playSound('wrong');
+    player.lives--;
+    
+    // 显示正确答案
+    btns.forEach(btn => {
+      if(btn.querySelector('.option-text').textContent === question.a) {
+        btn.classList.add('correct');
+      }
+    });
+    
+    updateUI();
+    
+    if(player.lives <= 0) {
+      showToast(`${pid === 'p1' ? '🔴' : '🔵'} 玩家阵亡！`);
+      setTimeout(() => { closeQuestion(); checkGameEnd(); }, 2000);
+    } else {
+      setTimeout(() => closeQuestion(), 3000);
+    }
+  }
+}
+
+function closeQuestion() {
+  document.getElementById('competitionBanner').classList.remove('show');
+  gameState.questionActive = false;
+  gameState.currentQuestion = null;
+}
+
+function showScorePopup(pid, text) {
+  const popup = document.createElement('div');
+  popup.className = 'score-popup';
+  popup.textContent = text;
+  popup.style.color = pid === 'p1' ? '#e74c3c' : '#3498db';
+  popup.style.left = pid === 'p1' ? '15%' : '75%';
+  popup.style.top = '30%';
+  document.body.appendChild(popup);
+  setTimeout(() => popup.remove(), 1200);
+}
+
+function checkGameEnd() {
+  if(players.p1.lives <= 0 || players.p2.lives <= 0) {
+    if(players.p1.lives > 0) endGame('p1');
+    else if(players.p2.lives > 0) endGame('p2');
+    else endGame();
+  }
+}
+
+function endGame(winner = null) {
+  gameState.isRunning = false;
+  clearInterval(gameState.timerInterval);
+  clearInterval(gameState.speedInterval);
+  clearInterval(gameState.eventInterval);
+  
+  playSound('win');
+  
+  if(winner) {
+    document.getElementById('winnerEmoji').textContent = '🏆';
+    document.getElementById('winnerText').textContent = (winner === 'p1' ? '🔴 玩家一' : '🔵 玩家二') + ' 获胜！';
+    document.getElementById('winnerText').className = 'winner-text ' + winner;
+  } else {
+    if(players.p1.score > players.p2.score) {
+      winner = 'p1';
+      document.getElementById('winnerEmoji').textContent = '🏆';
+      document.getElementById('winnerText').textContent = '🔴 玩家一 获胜！';
+      document.getElementById('winnerText').className = 'winner-text p1';
+    } else if(players.p2.score > players.p1.score) {
+      winner = 'p2';
+      document.getElementById('winnerEmoji').textContent = '🏆';
+      document.getElementById('winnerText').textContent = '🔵 玩家二 获胜！';
+      document.getElementById('winnerText').className = 'winner-text p2';
+    } else {
+      document.getElementById('winnerEmoji').textContent = '🤝';
+      document.getElementById('winnerText').textContent = '势均力敌！平局！';
+      document.getElementById('winnerText').className = 'winner-text draw';
+    }
+  }
+  
+  document.getElementById('finalScore1').textContent = players.p1.score;
+  document.getElementById('finalScore2').textContent = players.p2.score;
+  document.getElementById('gameOverScreen').classList.add('show');
+}
+
+function restartGame() {
+  document.getElementById('gameOverScreen').classList.remove('show');
+  document.getElementById('competitionBanner').classList.remove('show');
+  startGame();
+}
+
+// 玩家控制
+function p1AdjustThrottle(dir) {
+  if(!gameState.isRunning) return;
+  players.p1.throttleLevel = Math.max(1, Math.min(5, players.p1.throttleLevel + dir));
+  updateUI();
+}
+
+function p1Sand() {
+  if(!gameState.isRunning) return;
+  playSound('brake');
+  showToast('🔴 玩家一 撒砂！');
+}
+
+function p2AdjustThrottle(dir) {
+  if(!gameState.isRunning) return;
+  players.p2.throttleLevel = Math.max(1, Math.min(5, players.p2.throttleLevel + dir));
+  updateUI();
+}
+
+function p2Sand() {
+  if(!gameState.isRunning) return;
+  playSound('brake');
+  showToast('🔵 玩家二 撒砂！');
+}
+
+// 键盘控制
+document.addEventListener('keydown', (e) => {
+  if(!gameState.isRunning) return;
+  
+  switch(e.key.toLowerCase()) {
+    case 'q': p1AdjustThrottle(-1); break;
+    case 'e': p1AdjustThrottle(1); break;
+    case 'w': p1Sand(); break;
+    case '-': case '_': p2AdjustThrottle(-1); break;
+    case '=': case '+': p2AdjustThrottle(1); break;
+    case ' ': e.preventDefault(); p2Sand(); break;
+  }
+});
+
+function showToast(message) {
+  const toast = document.getElementById('toastMessage');
+  toast.textContent = message;
+  toast.className = 'toast-message show';
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+initScene();
+</script>
+
+</body>
+</html>

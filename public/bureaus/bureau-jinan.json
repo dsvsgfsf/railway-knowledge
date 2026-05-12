@@ -1,0 +1,30 @@
+{
+  "code": "jinan",
+  "name": "中国铁路济南局集团有限公司",
+  "shortName": "济南局",
+  "tier": 2,
+  "tierLabel": "第二梯队",
+  "tierDesc": "中高待遇",
+  "headquarters": "山东省济南市",
+  "coverage": "山东省全境",
+  "mileage": "约6000公里",
+  "lines": ["京沪高铁", "胶济客专", "青荣城际"],
+  "recruitmentScale": "2000-2500人/年",
+  "competitionRatio": "10:1-25:1",
+  "difficulty": 3,
+  "difficultyLabel": "中等级",
+  "educationPreference": "专科及以上",
+  "juniorCollegeRatio": "约65%",
+  "salary": {
+    "undergraduateMonthly": "5500-7000",
+    "highSpeedDriverMonthly": "9000-13000",
+    "annualBonus": "1-2万元",
+    "features": ["山东地区经济发达", "胶东半岛福利完善"]
+  },
+  "benefits": ["五险一金", "山东地区经济较好，福利体系完善"],
+  "features": ["山东省生源优先", "专科机会较多", "济铁职院学生有优势"],
+  "departments": ["济南站", "青岛站", "济宁站", "济南机务段", "济南动车段"],
+  "checkupSpecial": ["矫正视力≥5.0", "辨色力严格"],
+  "contact": "0531-824XXXXX",
+  "lastUpdated": "2025-06"
+}

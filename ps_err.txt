@@ -1,0 +1,44 @@
+所在位置 行:7 字符: 16
++ $sb.AppendLine(/* quiz-bank-batch2.js - 题库扩充批次2 */)
++                ~
+方法调用中缺少“)”。
+所在位置 行:7 字符: 17
++ $sb.AppendLine(/* quiz-bank-batch2.js - 题库扩充批次2 */)
++                 ~
+必须在“/”运算符后面提供一个值表达式。
+所在位置 行:7 字符: 18
++ $sb.AppendLine(/* quiz-bank-batch2.js - 题库扩充批次2 */)
++                  ~
+必须在“*”运算符后面提供一个值表达式。
+所在位置 行:7 字符: 19
++ $sb.AppendLine(/* quiz-bank-batch2.js - 题库扩充批次2 */)
++                   ~~~~~~~~~~~~~~~~~~~
+表达式或语句中包含意外的标记“quiz-bank-batch2.js”。
+所在位置 行:7 字符: 51
++ $sb.AppendLine(/* quiz-bank-batch2.js - 题库扩充批次2 */)
++                                                   ~
+表达式或语句中包含意外的标记“)”。
+所在位置 行:8 字符: 26
++ $sb.AppendLine((function(){)
++                          ~
+“(”后面应为表达式。
+所在位置 行:8 字符: 27
++ $sb.AppendLine((function(){)
++                           ~
+语句块或类型定义中缺少右“}”。
+所在位置 行:8 字符: 29
++ $sb.AppendLine((function(){)
++                             ~
+方法调用中缺少“)”。
+所在位置 行:9 字符: 1
++ $sb.AppendLine('use strict';)
++ ~~~
+表达式或语句中包含意外的标记“$sb”。
+所在位置 行:9 字符: 28
++ $sb.AppendLine('use strict';)
++                            ~
+方法调用中缺少“)”。
+并未报告所有分析错误。请更正报告的错误并重试。
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : MissingEndParenthesisInMethodCall
+ 

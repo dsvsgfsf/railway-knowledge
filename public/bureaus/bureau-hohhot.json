@@ -1,0 +1,32 @@
+{
+  "code": "hohhot",
+  "name": "中国铁路呼和浩特局集团有限公司",
+  "shortName": "呼和浩特局",
+  "tier": 2,
+  "tierLabel": "第二梯队",
+  "tierDesc": "中高待遇（含边疆补贴）",
+  "headquarters": "内蒙古自治区呼和浩特市",
+  "coverage": "内蒙古中西部及蒙古国、俄罗斯边境",
+  "mileage": "约6000公里",
+  "lines": ["京包高铁（呼包段）", "集通铁路", "唐呼线"],
+  "establishedDate": "1958年11月1日",
+  "recruitmentScale": "1200-1500人/年",
+  "competitionRatio": "5:1-12:1",
+  "difficulty": 2,
+  "difficultyLabel": "较易级",
+  "educationPreference": "专科及以上",
+  "juniorCollegeRatio": "约65%",
+  "salary": {
+    "undergraduateMonthly": "4000-6000",
+    "withSubsidyMonthly": "7000-8000",
+    "highSpeedDriverMonthly": "7000-11000",
+    "annualBonus": "0.5-1.5万元",
+    "features": ["边疆津贴补充", "草原文化特色"]
+  },
+  "benefits": ["边疆津贴", "五险一金", "宿舍"],
+  "features": ["边疆铁路，外接蒙古国和俄罗斯", "草原文化", "边疆津贴补充收入"],
+  "departments": ["呼和浩特站", "包头站", "集宁站", "呼和浩特机务段"],
+  "checkupSpecial": ["边疆岗位竞争小但条件艰苦", "辨色力严格"],
+  "contact": "0471-2XXXXXXX",
+  "lastUpdated": "2025-06"
+}

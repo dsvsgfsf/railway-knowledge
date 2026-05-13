@@ -1274,15 +1274,6 @@ function renderUserList() {
       `;
     });
     
-    // 如果没有任何群聊和好友，显示提示
-    if(userGroups.length === 0 && friends.length === 0) {
-      html = `<div style="padding:40px 20px;text-align:center;color:#999;">
-        <div style="font-size:48px;margin-bottom:15px;">💬</div>
-        <div style="font-size:15px;margin-bottom:8px;">还没有任何消息</div>
-        <div style="font-size:13px;color:#bbb;">点击右上角 + 添加好友或加入群聊</div>
-      </div>`;
-    }
-    
   } else if (activeTab === '好友') {
     friends.forEach(f => {
       const isOnline = now - f.lastActive < 30000;
@@ -1827,8 +1818,6 @@ window.onload = function() {
   const saved = localStorage.getItem('currentUser');
   if(saved) {
     currentUser = JSON.parse(saved);
-    // 确保用户加入默认群聊
-    autoJoinMainGroup(currentUser);
     friends = getFriends();
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('mainContainer').style.display = 'flex';

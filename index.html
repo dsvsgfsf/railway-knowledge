@@ -228,17 +228,27 @@ a { color: inherit; text-decoration: none; }
 
 @media (max-width:768px) {
   :root { --sidebar-w:0px; }
-  #sidebar {
-    position: fixed; left: 0; top: var(--header-h); bottom: 0;
-    width: 280px; z-index: 200;
+  /* 手机端侧边栏改为滑出式菜单 */
+  #sidebar { 
+    position: fixed; 
+    left: 0; top: var(--header-h); bottom: 0;
+    width: 280px; 
+    z-index: 200; 
     transform: translateX(-100%);
     transition: transform 0.3s ease;
-    display: flex;
+    display: block;
   }
   #sidebar.open { transform: translateX(0); }
+  #sidebar-overlay {
+    display: block;
+    position: fixed;
+    top: var(--header-h); left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 199;
+  }
+  #sidebar:not(.open) + #sidebar-overlay { display: none; }
+  /* 手机端顶部菜单按钮 */
   #mobile-menu-btn { display: flex !important; }
-  #sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 150; }
-  #sidebar-overlay.show { display: block; }
   #messages { padding:16px; }
   #input-area { padding:12px 16px 16px; }
   #header .header-badges { display:none; }
@@ -314,7 +324,6 @@ a { color: inherit; text-decoration: none; }
     <span class="badge red">在线</span>
   </div>
 </header>
-
 <div id="sidebar-overlay" onclick="toggleMobileMenu()" style="display:none;"></div>
 <div id="layout">
   <aside id="sidebar">
@@ -329,19 +338,14 @@ a { color: inherit; text-decoration: none; }
     <div class="sidebar-section">
       <div class="sidebar-title">DeepSeek API 配置</div>
       <div id="api-config-panel">
-        <div id="api-status"><span class="dot ok"></span><span id="api-status-text">已预配置 ✓</span></div>
-        <label>API Key（已预配置，可直接使用）</label>
-        <input type="password" id="cfg-api-key" placeholder="已预配置，无需填写" />
+        <div id="api-status"><span class="dot"></span><span id="api-status-text">未配置</span></div>
+        <label>API Key</label>
+        <input type="password" id="cfg-api-key" placeholder="sk-xxxxxxxxxxxxxxxx" />
         <label>API 地址</label>
         <input type="text" id="cfg-api-url" value="https://api.deepseek.com/v1/chat/completions" />
         <label>模型</label>
         <select id="cfg-model"><option value="deepseek-chat">deepseek-chat（推荐）</option><option value="deepseek-reasoner">deepseek-reasoner</option></select>
-        <button class="btn-save" onclick="saveApiConfig()">✓ 保存配置</button>
-        <div style="display:flex;gap:6px;margin-top:6px">
-          <button onclick="exportApiConfig()" style="flex:1;padding:6px;border-radius:6px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);font-size:11px;border:1px solid rgba(255,255,255,.15);cursor:pointer">📤 导出</button>
-          <button onclick="document.getElementById('import-api-file').click()" style="flex:1;padding:6px;border-radius:6px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);font-size:11px;border:1px solid rgba(255,255,255,.15);cursor:pointer">📥 导入</button>
-        </div>
-        <input type="file" id="import-api-file" accept=".json" style="display:none" onchange="importApiConfig(this)">
+        <button class="btn-save" onclick="saveApiConfig()">✓ 保存并测试连接</button>
       </div>
     </div>
     <div class="sidebar-section">
@@ -403,7 +407,7 @@ a { color: inherit; text-decoration: none; }
             <span class="wb-tag" style="cursor:pointer" onclick="quickAsk('推荐适合我当前年级和专业方向的课程书籍')">📚 课程书籍推荐</span>
             <span class="wb-tag" style="cursor:pointer" onclick="quickAsk('铁路局招聘信息')">🏢 铁路局招聘</span>
             <span class="wb-tag" style="cursor:pointer" onclick="quickAsk('查看题库目录')">📚 题库目录</span>
-          <span class="wb-tag" style="cursor:pointer;background:linear-gradient(135deg,#9b59b6,#8e44ad);" onclick="window.open('/public/railway-exam.html','铁路模拟考试','width=1200,height=800')">📋 铁路模拟考试</span>
+          <span class="wb-tag" style="cursor:pointer;background:linear-gradient(135deg,#9b59b6,#8e44ad);" onclick="window.open('public/railway-exam.html','铁路模拟考试','width=1200,height=800')">📋 铁路模拟考试</span>
             <span class="wb-tag" style="cursor:pointer" onclick="quickAsk('铁道概论课程大纲')">📋 课程大纲</span>
             <span class="wb-tag" style="cursor:pointer" onclick="quickAsk('高铁运营最高速度')">🚄 高速铁路</span>
             <span class="wb-tag" style="cursor:pointer;background:linear-gradient(135deg,#e74c3c,#c0392b);" onclick="quickAsk('五步闸操作')">🚂 五步闸操作</span>
@@ -419,8 +423,8 @@ a { color: inherit; text-decoration: none; }
       <div class="disclaimer">💡 回答基于 <span>铁路专业知识语料库</span> 检索 + <span>DeepSeek AI 流式生成</span>，边搜索边显示，如有疑问请以官方教材为准</div>
       <div class="cat-tabs" id="cat-tabs" style="display:none">
         <span class="cat-tab" onclick="quickAsk('推荐适合我当前年级和专业方向的课程书籍')">📚 课程推荐</span>
-        <span class="cat-tab" style="background:linear-gradient(135deg,#27ae60,#2ecc71);color:#fff;" onclick="window.open('/public/quiz-bank-v2.html','题库选择','width=1200,height=800')">📚 题库练习</span>
-        <span class="cat-tab" style="background:linear-gradient(135deg,#9b59b6,#8e44ad);color:#fff;" onclick="window.open('/public/railway-exam.html','铁路模拟考试','width=1200,height=800')">📋 模拟考试</span>
+        <span class="cat-tab" style="background:linear-gradient(135deg,#27ae60,#2ecc71);color:#fff;" onclick="window.open('public/quiz-bank-v2.html','题库选择','width=1200,height=800')">📚 题库练习</span>
+        <span class="cat-tab" style="background:linear-gradient(135deg,#9b59b6,#8e44ad);color:#fff;" onclick="window.open('public/railway-exam.html','铁路模拟考试','width=1200,height=800')">📋 模拟考试</span>
         <span class="cat-tab" onclick="quickAsk('铁路局招聘信息')">🏢 铁路局招聘</span>
         <span class="cat-tab" style="background:#e74c3c;color:#fff;" onclick="quickAsk('五步闸操作')">🚂 五步闸</span>
         <span class="cat-tab" style="background:#2ecc71;color:#fff;" onclick="quickAsk('一次乘务作业标准')">🚄 乘务作业</span>
@@ -475,53 +479,31 @@ a { color: inherit; text-decoration: none; }
 'use strict';
 
 /* ── Mobile Menu Toggle ── */
-window.toggleMobileMenu = function(){
+function toggleMobileMenu(){
   const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebar-overlay');
   sidebar.classList.toggle('open');
-  if(overlay){
-    overlay.classList.toggle('show');
-  }
 }
 
 /* ── API Config Auto-save/load ── */
-window.loadApiConfig = function(){
-  // 使用硬编码的默认API Key（已预配置，无需用户手动输入）
-  const defaultConfig = {
-    key: 'sk-22d7ef1da97f43a99149f04227243e4e',
-    url: 'https://api.deepseek.com/v1/chat/completions',
-    model: 'deepseek-chat'
-  };
-  
+function loadApiConfig(){
   const saved = localStorage.getItem('railway_api_config');
   if(saved){
     try {
       const cfg = JSON.parse(saved);
-      // 合并：localStorage优先，但默认Key始终存在
-      state.apiConfig = {
-        key: cfg.key || defaultConfig.key,
-        url: cfg.url || defaultConfig.url,
-        model: cfg.model || defaultConfig.model
-      };
-    } catch(e) {
-      state.apiConfig = {...defaultConfig};
-    }
-  } else {
-    state.apiConfig = {...defaultConfig};
+      state.apiConfig = cfg;
+      document.getElementById('cfg-api-key').value = cfg.key || '';
+      document.getElementById('cfg-api-url').value = cfg.url || 'https://api.deepseek.com/v1/chat/completions';
+      document.getElementById('cfg-model').value = cfg.model || 'deepseek-chat';
+      updateApiStatus();
+    } catch(e) {}
   }
-  
-  // 同步到输入框
-  document.getElementById('cfg-api-key').value = state.apiConfig.key;
-  document.getElementById('cfg-api-url').value = state.apiConfig.url;
-  document.getElementById('cfg-model').value = state.apiConfig.model;
-  updateApiStatus();
 }
 
-window.saveApiConfig = function(){
+function saveApiConfig(){
   const cfg = {
-    key: document.getElementById('cfg-api-key').value.trim() || 'sk-22d7ef1da97f43a99149f04227243e4e',
+    key: document.getElementById('cfg-api-key').value.trim(),
     url: document.getElementById('cfg-api-url').value.trim() || 'https://api.deepseek.com/v1/chat/completions',
-    model: document.getElementById('cfg-model').value || 'deepseek-chat'
+    model: document.getElementById('cfg-model').value
   };
   state.apiConfig = cfg;
   localStorage.setItem('railway_api_config', JSON.stringify(cfg));
@@ -542,60 +524,13 @@ function updateApiStatus(){
   }
 }
 
-/* ── API配置导入/导出（跨设备同步） ── */
-window.exportApiConfig = function(){
-  const cfg = {
-    key: document.getElementById('cfg-api-key').value.trim(),
-    url: document.getElementById('cfg-api-url').value.trim(),
-    model: document.getElementById('cfg-model').value
-  };
-  if(!cfg.key){
-    showToast('请先填写API Key再导出', 'error');
-    return;
-  }
-  const blob = new Blob([JSON.stringify(cfg, null, 2)], {type: 'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'railway-api-config.json';
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('API配置已导出！可复制到其他设备导入', 'success');
-}
-
-window.importApiConfig = function(fileInput){
-  const file = fileInput.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e){
-    try {
-      const cfg = JSON.parse(e.target.result);
-      if(cfg.key){
-        document.getElementById('cfg-api-key').value = cfg.key || '';
-        document.getElementById('cfg-api-url').value = cfg.url || 'https://api.deepseek.com/v1/chat/completions';
-        document.getElementById('cfg-model').value = cfg.model || 'deepseek-chat';
-        state.apiConfig = cfg;
-        localStorage.setItem('railway_api_config', JSON.stringify(cfg));
-        updateApiStatus();
-        showToast('API配置导入成功！', 'success');
-      } else {
-        showToast('导入失败：未找到有效的API Key', 'error');
-      }
-    } catch(err){
-      showToast('导入失败：文件格式错误', 'error');
-    }
-  };
-  reader.readAsText(file);
-  fileInput.value = '';
-}
-
 /* ── State ── */
 const state = {
   selectedYear: null,   // 入学年份如 2023
   selectedMajor: null,  // 专业名称
   grade: null,          // 'grade1' | 'grade2'
   messages: [],
-  apiConfig: { key:'sk-22d7ef1da97f43a99149f04227243e4e', url:'https://api.deepseek.com/v1/chat/completions', model:'deepseek-chat' }
+  apiConfig: { key:'', url:'https://api.deepseek.com/v1/chat/completions', model:'deepseek-chat' }
 };
 
 /* ── Init ── */
@@ -2001,43 +1936,36 @@ async function callDeepSeekApi(userMsg){
 
 /* ── API Config ── */
 function loadApiConfig(){
-  const saved = localStorage.getItem('railway_api_config');
-  if(saved){
-    try {
-      const cfg = JSON.parse(saved);
-      state.apiConfig = cfg;
-      document.getElementById('cfg-api-key').value = cfg.key || '';
-      document.getElementById('cfg-api-url').value = cfg.url || 'https://api.deepseek.com/v1/chat/completions';
-      document.getElementById('cfg-model').value = cfg.model || 'deepseek-chat';
-      updateApiStatus();
-    } catch(e) {}
-  }
+  try {
+    const saved = localStorage.getItem('railway_api_config');
+    if(saved) Object.assign(state.apiConfig, JSON.parse(saved));
+    document.getElementById('cfg-api-key').value = state.apiConfig.key || '';
+    document.getElementById('cfg-api-url').value = state.apiConfig.url || '';
+    document.getElementById('cfg-model').value = state.apiConfig.model || 'deepseek-chat';
+    if(state.apiConfig.key) setApiStatus('ok','已配置');
+  } catch(e){}
 }
 
 window.saveApiConfig = function(){
-  const cfg = {
-    key: document.getElementById('cfg-api-key').value.trim(),
-    url: document.getElementById('cfg-api-url').value.trim() || 'https://api.deepseek.com/v1/chat/completions',
-    model: document.getElementById('cfg-model').value
-  };
-  state.apiConfig = cfg;
-  localStorage.setItem('railway_api_config', JSON.stringify(cfg));
-  updateApiStatus();
-  showToast('API配置已保存！', 'success');
-};
-
-function updateApiStatus(){
-  const key = state.apiConfig.key;
-  const dot = document.querySelector('#api-status .dot');
-  const text = document.getElementById('api-status-text');
-  if(key){
-    dot.className = 'dot ok';
-    text.textContent = '已配置 ✓';
+  state.apiConfig.key = document.getElementById('cfg-api-key').value.trim();
+  state.apiConfig.url = document.getElementById('cfg-api-url').value.trim() || 'https://api.deepseek.com/v1/chat/completions';
+  state.apiConfig.model = document.getElementById('cfg-model').value;
+  localStorage.setItem('railway_api_config', JSON.stringify(state.apiConfig));
+  if(state.apiConfig.key){
+    setApiStatus('loading','测试中...');
+    fetch(state.apiConfig.url, {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+state.apiConfig.key},
+      body: JSON.stringify({model:state.apiConfig.model, messages:[{role:'user',content:'hi'}], max_tokens:5})
+    }).then(r=>{
+      if(r.ok) { setApiStatus('ok','连接成功 ✓'); showToast('API配置保存成功','success'); }
+      else { setApiStatus('err','连接失败'); showToast('API连接失败，请检查Key和URL','error'); }
+    }).catch(()=>{ setApiStatus('err','网络错误'); showToast('网络错误','error'); });
   } else {
-    dot.className = 'dot';
-    text.textContent = '未配置（仅语料库）';
+    setApiStatus('','未配置');
+    showToast('已保存（未填Key，将仅使用语料库）');
   }
-}
+};
 
 function setApiStatus(cls, text){
   const dot = document.querySelector('#api-status .dot');
@@ -2254,7 +2182,7 @@ window.openVideoLearning = function(){
       </div>
       <div id="bs-book-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:14px"></div>
       <div style="text-align:center;margin-top:20px;padding-top:16px;border-top:1px solid rgba(200,169,81,.1)">
-        <a href="hljtu-bookshelf.html" target="_blank" style="display:inline-block;padding:10px 28px;background:#C8A951;color:#0A1E3C;border-radius:10px;font-size:14px;font-weight:700;text-decoration:none">&#128218; 打开完整书架（搜索/筛选）</a>
+        <a href="bookshelf.html" target="_blank" style="display:inline-block;padding:10px 28px;background:#C8A951;color:#0A1E3C;border-radius:10px;font-size:14px;font-weight:700;text-decoration:none">&#128218; 打开完整书架（搜索/筛选）</a>
       </div>
     </div>`;
     overlay.innerHTML = html;
@@ -2335,7 +2263,7 @@ window.openVideoLearning = function(){
       </div>`;
     });
     html += `</div>`;
-    html += `<br><a href="hljtu-bookshelf.html" target="_blank" style="display:inline-block;padding:8px 20px;background:var(--primary);color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none">&#128218; 打开完整书架</a>`;
+    html += `<br><a href="bookshelf.html" target="_blank" style="display:inline-block;padding:8px 20px;background:var(--primary);color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none">&#128218; 打开完整书架</a>`;
     html += ` <span class="tag-inline" onclick="openBookshelfModal()" style="cursor:pointer">📖 查看全部${books.length}种教材</span>`;
     return html;
   };
